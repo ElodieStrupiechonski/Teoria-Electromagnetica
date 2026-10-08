@@ -1,0 +1,152 @@
+<meta charset="utf-8">
+<title>Reflexión · incidencia normal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#1a1a1a;--muted:#5a5a5a;--navy:#1F3864;--blue:#2E5496;--accent:#C1571B;--green:#2E7D32;--line:#e2dcc9;--panel:#0e1420;--m2:#12303a;--inc:#7aa2e0;--tr:#8bd08f;--env:#e6924a;--serif:'Spectral',Georgia,'Times New Roman',serif;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--line:#333a44;--panel:#0b0f16;--m2:#0f2830;}}
+  :root[data-theme="dark"]{--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--line:#333a44;--panel:#0b0f16;--m2:#0f2830;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45}
+  .wrap{max-width:960px;margin:0 auto;padding-block:22px;padding-left:16px;padding-right:16px}
+  h1{font-size:24px;color:var(--navy);margin:.1em 0}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  canvas{width:100%;border-radius:10px;display:block}
+  .controls{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end}
+  .ctl{flex:1 1 260px;min-width:220px}
+  .ctl label{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-bottom:6px}
+  .ctl label span{color:var(--accent);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+  .tile .k{font-size:12px;color:var(--muted)}
+  .tile .v{font-size:18px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .legend{display:flex;gap:16px;font-size:13.5px;margin:8px 0 0;flex-wrap:wrap}
+  .legend i{display:inline-block;width:16px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .foot{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
+  .credits{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
+  .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  @media (max-width:560px){
+    .wrap{padding-left:16px;padding-right:16px}
+    .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
+    input[type=range]{height:26px}
+    .btn{padding:8px 13px}
+    h1{font-size:26px}
+    .card{padding:18px 16px}
+  }
+</style>
+<div class="wrap">
+  <h1>Reflexión de una onda plana: incidencia normal</h1>
+  <div class="sub">La onda llega del medio 1 a la frontera (z = 0). Parte se refleja (formando una onda estacionaria) y parte se transmite al medio 2.</div>
+
+  <div class="card">
+    <canvas id="cv" height="360"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--inc)"></i>Campo total en el medio 1 (incidente + reflejada)</span>
+      <span><i style="background:var(--tr)"></i>Onda transmitida (medio 2)</span>
+      <span><i style="background:var(--env)"></i>Envolvente (onda estacionaria)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <div class="ctl"><label>Medio 2: ε<sub>r</sub> <span id="erv">4.0</span></label><input id="er" type="range" min="1" max="16" step="0.5" value="4"></div>
+      <div class="btns">
+        <button class="btn primary" id="play">Pausar</button>
+        <button class="btn" id="cond">Conductor perfecto</button>
+        <button class="btn" id="match">Medios adaptados</button>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Γ = (η₂−η₁)/(η₂+η₁)</div><div class="v" id="G">—</div></div>
+      <div class="tile"><div class="k">τ = 1+Γ</div><div class="v" id="tau">—</div></div>
+      <div class="tile"><div class="k">S = (1+|Γ|)/(1−|Γ|)</div><div class="v" id="S">—</div></div>
+      <div class="tile"><div class="k">Potencia reflejada |Γ|²</div><div class="v" id="R">—</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <p style="margin:.2em 0 .7em;color:var(--muted);font-size:14px">En la frontera (<var>z</var> = 0) el campo eléctrico total del medio 1 es la suma del vector incidente y el reflejado:</p>
+    <div class="eq"><span class="vec">E</span><sub>1</sub> <span class="op">=</span> <span class="vec">E</span><sub>i</sub> <span class="op">+</span> <span class="vec">E</span><sub>r</sub></div>
+    <div class="eq"><var>&Gamma;</var> <span class="op">=</span> (<var>&eta;</var><sub>2</sub> <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub>) / (<var>&eta;</var><sub>2</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub>)</div>
+    <div class="eq"><var>&tau;</var> <span class="op">=</span> 1 <span class="op">+</span> <var>&Gamma;</var> <span class="op">=</span> 2<var>&eta;</var><sub>2</sub> / (<var>&eta;</var><sub>2</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub>)</div>
+    <div class="eq">SWR <span class="op">=</span> (1 <span class="op">+</span> |<var>&Gamma;</var>|) / (1 <span class="op">&minus;</span> |<var>&Gamma;</var>|)</div>
+    <div class="eq"><var>R</var> <span class="op">=</span> |<var>&Gamma;</var>|<sup>2</sup> <span style="display:inline-block;width:1.4em"></span> <var>T</var> <span class="op">=</span> 1 <span class="op">&minus;</span> |<var>&Gamma;</var>|<sup>2</sup></div>
+  </div>
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Reflexión con incidencia normal — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+  </div>
+</div>
+<script>
+(function(){
+  var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  var er=4, cond=false, playing=true, t=0;
+  var cv=document.getElementById('cv');
+  function params(){
+    var G,tau;
+    if(cond){G=-1;tau=0;} else {var r=1/Math.sqrt(er); G=(r-1)/(r+1); tau=1+G;}
+    return {G:G,tau:tau};
+  }
+  function labels(){
+    var p=params(),aG=Math.abs(p.G),S=aG>=1?Infinity:(1+aG)/(1-aG);
+    document.getElementById('G').textContent=p.G.toFixed(3);
+    document.getElementById('tau').textContent=p.tau.toFixed(3);
+    document.getElementById('S').textContent=isFinite(S)?S.toFixed(2):'∞';
+    document.getElementById('R').textContent=(aG*aG*100).toFixed(1)+' %';
+    document.getElementById('erv').textContent=cond?'—':er.toFixed(1);
+  }
+  function draw(){
+    var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(320,r.width),H=360;
+    cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+    var p=params(),G=p.G,tau=p.tau;
+    var xb=Math.round(W*0.46), mid=H/2, amp=H*0.30/2.0;
+    // backgrounds
+    x.fillStyle=css('--panel');x.fillRect(0,0,W,H);
+    x.fillStyle=css('--m2');x.fillRect(xb,0,W-xb,H);
+    // boundary
+    x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=2;x.beginPath();x.moveTo(xb,0);x.lineTo(xb,H);x.stroke();
+    // zero line
+    x.strokeStyle='rgba(255,255,255,.18)';x.lineWidth=1;x.beginPath();x.moveTo(0,mid);x.lineTo(W,mid);x.stroke();
+    // labels
+    x.fillStyle='rgba(255,255,255,.75)';x.font='13px sans-serif';
+    x.fillText('Medio 1  (η₁ = 377 Ω)',12,20); x.fillText('Medio 2  (η₂ = η₁/√εr)',xb+12,20);
+    x.fillText('z = 0',xb+6,H-10);
+    var lam1=88, b1=2*Math.PI/lam1, er2=cond?1:er, b2=b1*Math.sqrt(er2);
+    // envelope in medium 1 (standing wave): A(z)=sqrt(1+G^2+2G cos(2 b1 z)), z measured left of boundary
+    x.strokeStyle=css('--env');x.setLineDash([5,5]);x.lineWidth=1.6;x.globalAlpha=.9;
+    for(var s=0;s<2;s++){x.beginPath();for(var px=0;px<=xb;px++){var z=(px-xb)/1; var A=Math.sqrt(1+G*G+2*G*Math.cos(2*b1*z)); var y=mid-(s?-1:1)*A*amp; if(px===0)x.moveTo(px,y);else x.lineTo(px,y);}x.stroke();}
+    x.setLineDash([]);x.globalAlpha=1;
+    // field medium 1: incident + reflected
+    x.strokeStyle=css('--inc');x.lineWidth=2.8;x.beginPath();
+    for(var px1=0;px1<=xb;px1++){var z1=(px1-xb); var E=Math.cos(t-b1*z1)+G*Math.cos(t+b1*z1); var y=mid-E*amp; if(px1===0)x.moveTo(px1,y);else x.lineTo(px1,y);}
+    x.stroke();
+    // field medium 2: transmitted
+    x.strokeStyle=css('--tr');x.lineWidth=2.8;x.beginPath();
+    for(var px2=xb;px2<=W;px2++){var z2=(px2-xb); var Et=tau*Math.cos(t-b2*z2); var y2=mid-Et*amp; if(px2===xb)x.moveTo(px2,y2);else x.lineTo(px2,y2);}
+    x.stroke();
+    // incidence direction arrow
+    x.strokeStyle='rgba(255,255,255,.6)';x.fillStyle='rgba(255,255,255,.6)';x.lineWidth=2;
+    x.beginPath();x.moveTo(20,H-26);x.lineTo(70,H-26);x.stroke();
+    x.beginPath();x.moveTo(70,H-26);x.lineTo(62,H-30);x.lineTo(62,H-22);x.closePath();x.fill();
+    x.fillText('onda incidente →',20,H-34);
+  }
+  function frame(){ if(playing){t+=0.06;} draw(); requestAnimationFrame(frame); }
+  document.getElementById('er').addEventListener('input',function(e){er=+e.target.value;cond=false;labels();});
+  document.getElementById('cond').addEventListener('click',function(){cond=true;labels();});
+  document.getElementById('match').addEventListener('click',function(){cond=false;er=1;document.getElementById('er').value=1;labels();});
+  document.getElementById('play').addEventListener('click',function(){playing=!playing;this.textContent=playing?'Pausar':'Reanudar';});
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',draw);
+  labels();frame();
+})();
+</script>

@@ -1,0 +1,295 @@
+<meta charset="utf-8">
+<title>Circuito RC · desfase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --ink:#1a1a1a; --muted:#5a5a5a; --navy:#1F3864; --blue:#2E5496;
+    --accent:#C1571B; --green:#2E7D32; --line:#e2dcc9; --panel:#0e1420; --paneltx:#e8eef7;
+    --vin:#2E5496; --vr:#C1571B; --vc:#2E7D32;
+    --serif:'Spectral',Georgia,'Times New Roman',serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#14161a; --card:#1e2228; --ink:#f0ece3; --muted:#a9a294; --navy:#9fb6e0; --blue:#a9c0ea;
+    --accent:#e6924a; --green:#8bd08f; --line:#333a44; --panel:#0b0f16; --paneltx:#e8eef7;
+    --vin:#7aa2e0; --vr:#e6924a; --vc:#8bd08f;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#14161a; --card:#1e2228; --ink:#f0ece3; --muted:#a9a294; --navy:#9fb6e0; --blue:#a9c0ea;
+    --accent:#e6924a; --green:#8bd08f; --line:#333a44; --panel:#0b0f16; --paneltx:#e8eef7;
+    --vin:#7aa2e0; --vr:#e6924a; --vc:#8bd08f;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45}
+  .wrap{max-width:1040px;margin:0 auto;padding-block:22px;padding-left:16px;padding-right:16px}
+  h1{font-size:25px;color:var(--navy);margin:.1em 0}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  .controls{display:flex;gap:20px;flex-wrap:wrap}
+  .ctl{flex:1 1 210px;min-width:200px}
+  .ctl label{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-bottom:6px}
+  .ctl label span{color:var(--accent);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:18px;flex-wrap:wrap}
+  .scopewrap{flex:2 1 470px;min-width:300px}
+  .side{flex:1 1 280px;min-width:260px;display:flex;flex-direction:column;gap:16px}
+  canvas{width:100%;border-radius:10px;display:block}
+  .tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+  .tile .k{font-size:12px;color:var(--muted)}
+  .tile .v{font-size:17px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .verdict{background:rgba(46,125,50,.12);border-left:5px solid var(--green);border-radius:8px;padding:10px 14px;font-size:15px}
+  .verdict b{color:var(--green)}
+  .legend{display:flex;gap:16px;font-size:13.5px;margin:8px 0 2px;flex-wrap:wrap;align-items:center}
+  .legend i{display:inline-block;width:16px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .legend label{cursor:pointer;user-select:none}
+  h3{font-size:14px;color:var(--blue);margin:0 0 8px}
+  .two{display:flex;gap:12px}
+  .two>div{flex:1}
+  .foot{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
+  .credits{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  sub{font-size:.72em}
+  .btn{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn:disabled{opacity:.45;cursor:default}
+  .cmp{margin-top:8px;font-size:13.5px;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:8px 12px}
+  .cmp b{font-variant-numeric:tabular-nums}
+  .hdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
+  .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  .eqgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .eqgrid .eq{margin:0}
+  @media (max-width:560px){
+    .wrap{padding-left:16px;padding-right:16px}
+    .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
+    input[type=range]{height:26px}
+    .btn{padding:8px 13px}
+    h1{font-size:26px}
+    .card{padding:18px 16px}
+    .eqgrid{grid-template-columns:1fr}
+  }
+</style>
+
+<div class="wrap">
+  <h1>Circuito RC en serie: desfase entre voltaje y corriente</h1>
+  <div class="sub">Parte C de la P4. Mueve R, C, f y la amplitud, y observa cómo la corriente adelanta al voltaje.</div>
+
+  <div class="card">
+    <div class="controls">
+      <div class="ctl"><label>Resistencia R <span id="rval">1000 Ω</span></label><input id="r" type="range" min="100" max="10000" step="50" value="1000"></div>
+      <div class="ctl"><label>Capacitor C <span id="cval">100 nF</span></label><input id="c" type="range" min="10" max="1000" step="5" value="100"></div>
+      <div class="ctl"><label>Frecuencia f <span id="fval">1000 Hz</span></label><input id="f" type="range" min="100" max="10000" step="50" value="1000"></div>
+      <div class="ctl"><label>Amplitud V<sub>in</sub> <span id="vval">3.0 V</span></label><input id="v" type="range" min="1" max="5" step="0.5" value="3"></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="scopewrap card">
+      <div class="hdr">
+        <h3 style="margin:0">Osciloscopio</h3>
+        <div>
+          <button class="btn primary" id="freeze">Congelar</button>
+          <button class="btn" id="clearf" disabled>Borrar</button>
+        </div>
+      </div>
+      <canvas id="scope" height="330"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--vin)"></i>V<sub>in</sub></span>
+        <span><i style="background:var(--vr)"></i>V<sub>R</sub> ∝ corriente</span>
+        <label><input type="checkbox" id="showvc" checked> <i style="background:var(--vc)"></i>V<sub>C</sub> (capacitor)</label>
+        <span style="color:var(--muted)"><i style="background:var(--muted)"></i>congelado (punteado)</span>
+      </div>
+      <div class="cmp" id="cmp" hidden></div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3>Valores calculados</h3>
+        <div class="tiles">
+          <div class="tile"><div class="k">X<sub>C</sub>=1/(ωC)</div><div class="v" id="xc">—</div></div>
+          <div class="tile"><div class="k">Z=√(R²+X<sub>C</sub>²)</div><div class="v" id="z">—</div></div>
+          <div class="tile"><div class="k">φ=arctan(X<sub>C</sub>/R)</div><div class="v" id="phi">—</div></div>
+          <div class="tile"><div class="k">Δt=(φ/360)T</div><div class="v" id="dt">—</div></div>
+          <div class="tile"><div class="k">|I|=V<sub>in</sub>/Z</div><div class="v" id="ii">—</div></div>
+          <div class="tile"><div class="k">V<sub>R</sub>, V<sub>C</sub> pico</div><div class="v" id="vrc">—</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="two">
+          <div><h3>Fasores</h3><canvas id="phasor" height="200"></canvas></div>
+          <div><h3>Triángulo Z</h3><canvas id="ztri" height="200"></canvas></div>
+        </div>
+      </div>
+      <div class="verdict" id="verdict"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>El circuito (dónde miden las puntas)</h3>
+    <svg viewBox="0 0 640 150" style="max-width:520px;margin:0 auto;display:block" role="img" aria-label="Fuente senoidal en serie con R y C; CH1 mide la fuente, CH2 mide la resistencia">
+      <g fill="none" stroke="var(--ink)" stroke-width="2.4">
+        <circle cx="70" cy="90" r="26"/>
+        <path d="M58 90 q6 -12 12 0 t12 0" stroke="var(--vin)" stroke-width="2.4"/>
+        <line x1="70" y1="64" x2="70" y2="30"/><line x1="70" y1="30" x2="300" y2="30"/>
+        <!-- R -->
+        <path d="M300 30 l8 -9 l16 18 l16 -18 l16 18 l16 -18 l16 18 l8 -9" stroke="var(--vr)"/>
+        <line x1="396" y1="30" x2="470" y2="30"/>
+        <!-- C -->
+        <line x1="470" y1="30" x2="470" y2="70"/>
+        <line x1="452" y1="70" x2="488" y2="70" stroke="var(--vc)"/>
+        <line x1="452" y1="82" x2="488" y2="82" stroke="var(--vc)"/>
+        <line x1="470" y1="82" x2="470" y2="120"/><line x1="470" y1="120" x2="70" y2="120"/><line x1="70" y1="120" x2="70" y2="116"/>
+      </g>
+      <text x="342" y="16" fill="var(--vr)" font-size="15" font-weight="700" text-anchor="middle">R</text>
+      <text x="504" y="80" fill="var(--vc)" font-size="15" font-weight="700">C</text>
+      <text x="70" y="140" fill="var(--vin)" font-size="13" text-anchor="middle">fuente (V_in)</text>
+      <text x="200" y="22" fill="var(--muted)" font-size="12" text-anchor="middle">CH1: V_in (toda la serie)</text>
+      <text x="348" y="52" fill="var(--muted)" font-size="12" text-anchor="middle">CH2: V_R</text>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h3>Relaciones del circuito RC serie</h3>
+    <div class="eqgrid">
+      <div class="eq"><var>X</var><sub>C</sub> <span class="op">=</span> 1 / (<var>&omega;</var><var>C</var>)<span class="op">,</span>&nbsp; <var>&omega;</var> <span class="op">=</span> 2&pi;<var>f</var></div>
+      <div class="eq"><var>Z</var> <span class="op">=</span> <var>R</var> <span class="op">+</span> 1/(j<var>&omega;</var><var>C</var>) <span class="op">=</span> <var>R</var> <span class="op">&minus;</span> j/(<var>&omega;</var><var>C</var>)</div>
+      <div class="eq">|<var>Z</var>| <span class="op">=</span> &radic;<span style="font-size:1.1em">(</span><var>R</var><sup>2</sup> <span class="op">+</span> <var>X</var><sub>C</sub><sup>2</sup><span style="font-size:1.1em">)</span> <span class="op">=</span> &radic;<span style="font-size:1.1em">(</span><var>R</var><sup>2</sup> <span class="op">+</span> (1/(<var>&omega;</var><var>C</var>))<sup>2</sup><span style="font-size:1.1em">)</span></div>
+      <div class="eq"><var>&phi;</var> <span class="op">=</span> arctan<span class="op">(</span><var>X</var><sub>C</sub> / <var>R</var><span class="op">)</span></div>
+      <div class="eq">|<var>I</var>| <span class="op">=</span> <var>V</var><sub>in</sub> / |<var>Z</var>|<span class="op">,</span>&nbsp; <var>V</var><sub>R</sub> <span class="op">=</span> |<var>I</var>| <span class="op">&middot;</span> <var>R</var><span class="op">,</span>&nbsp; <var>V</var><sub>C</sub> <span class="op">=</span> |<var>I</var>| <span class="op">&middot;</span> <var>X</var><sub>C</sub></div>
+      <div class="eq">&Delta;<var>t</var> <span class="op">=</span> (<var>&phi;</var> / 360&deg;) <span class="op">&middot;</span> <var>T</var><span class="op">,</span>&nbsp; <var>T</var> <span class="op">=</span> 1/<var>f</var></div>
+      <div class="eq"><var>f</var><sub>c</sub> <span class="op">=</span> 1 / (2&pi;<var>R</var><var>C</var>)</div>
+    </div>
+  </div>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Circuito RC y fasores — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  var R,C,f,Vp,w,Xc,Z,phi,Ip,VRp,VCp,T;
+  function calc(){
+    R=+document.getElementById('r').value;
+    C=(+document.getElementById('c').value)*1e-9;
+    f=+document.getElementById('f').value;
+    Vp=+document.getElementById('v').value;
+    w=2*Math.PI*f; Xc=1/(w*C); Z=Math.hypot(R,Xc); phi=Math.atan2(Xc,R);
+    Ip=Vp/Z; VRp=Ip*R; VCp=Ip*Xc; T=1/f;
+  }
+  function fmtHz(v){return v>=1000?(v/1000).toFixed(v%1000?2:0)+' kHz':v+' Hz';}
+  function fmtOhm(v){return v>=1000?(v/1000).toFixed(2)+' kΩ':Math.round(v)+' Ω';}
+  function fmtT(s){return s>=1e-3?(s*1e3).toFixed(3)+' ms':(s*1e6).toFixed(1)+' µs';}
+  function fmtA(a){return a>=1e-3?(a*1e3).toFixed(2)+' mA':(a*1e6).toFixed(0)+' µA';}
+  function labels(){
+    document.getElementById('rval').textContent=fmtOhm(R);
+    document.getElementById('cval').textContent=Math.round(C*1e9)+' nF';
+    document.getElementById('fval').textContent=fmtHz(f);
+    document.getElementById('vval').textContent=Vp.toFixed(1)+' V';
+    document.getElementById('xc').textContent=fmtOhm(Xc);
+    document.getElementById('z').textContent=fmtOhm(Z);
+    document.getElementById('phi').textContent=(phi*180/Math.PI).toFixed(1)+'°';
+    document.getElementById('dt').textContent=fmtT((phi/(2*Math.PI))*T);
+    document.getElementById('ii').textContent=fmtA(Ip);
+    document.getElementById('vrc').textContent=VRp.toFixed(2)+' / '+VCp.toFixed(2)+' V';
+    document.getElementById('verdict').innerHTML='La corriente <b>adelanta</b> al voltaje '+(phi*180/Math.PI).toFixed(1)+'°. Sube f y φ baja (X<sub>C</sub> disminuye); el capacitor manda a baja frecuencia.';
+  }
+  function ctxOf(id,h){var cv=document.getElementById(id);var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();
+    var wd=Math.max(240,r.width);cv.width=wd*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:wd,h:h};}
+  function drawScope(){
+    var o=ctxOf('scope',330),x=o.x,W=o.w,H=o.h,pad=8,midY=H/2,cyc=2.5,thetaMax=cyc*2*Math.PI;
+    x.clearRect(0,0,W,H);x.fillStyle=css('--panel');x.fillRect(0,0,W,H);
+    x.strokeStyle='rgba(255,255,255,.10)';x.lineWidth=1;
+    for(var i=0;i<=10;i++){var gx=pad+(W-2*pad)*i/10;x.beginPath();x.moveTo(gx,pad);x.lineTo(gx,H-pad);x.stroke();}
+    for(var j=0;j<=8;j++){var gy=pad+(H-2*pad)*j/8;x.beginPath();x.moveTo(pad,gy);x.lineTo(W-pad,gy);x.stroke();}
+    x.strokeStyle='rgba(255,255,255,.35)';x.beginPath();x.moveTo(pad,midY);x.lineTo(W-pad,midY);x.stroke();
+    var Vmax=frozen?Math.max(Vp,frozen.Vp):Vp;
+    var amp=(H/2-pad)*0.86/Vmax; // volts to pixels, common scale for live and frozen
+    var showvc=document.getElementById('showvc').checked;
+    function curve(fn,col,dash,alpha){x.save();x.globalAlpha=alpha||1;x.setLineDash(dash||[]);x.strokeStyle=col;x.lineWidth=dash?2:2.6;x.beginPath();
+      for(var px=0;px<=(W-2*pad);px++){var th=thetaMax*px/(W-2*pad);var y=midY-fn(th)*amp;var gx=pad+px;if(px===0)x.moveTo(gx,y);else x.lineTo(gx,y);}x.stroke();x.restore();}
+    // frozen reference (dashed, dim) behind the live traces
+    if(frozen){var F=frozen;
+      curve(function(t){return F.Vp*Math.sin(t);},css('--vin'),[5,5],.55);
+      curve(function(t){return F.VRp*Math.sin(t+F.phi);},css('--vr'),[5,5],.55);
+      if(showvc) curve(function(t){return F.VCp*Math.sin(t+F.phi-Math.PI/2);},css('--vc'),[5,5],.55);
+    }
+    curve(function(t){return Vp*Math.sin(t);},css('--vin'));
+    curve(function(t){return VRp*Math.sin(t+phi);},css('--vr'));
+    if(showvc) curve(function(t){return VCp*Math.sin(t+phi-Math.PI/2);},css('--vc'));
+    // dt markers between Vin (rising zero at 0) and VR (rising zero at -phi)
+    x.setLineDash([4,4]);x.lineWidth=1.4;
+    function mk(off,col){var th=off;if(th<0)th+=2*Math.PI;var gx=pad+(th/thetaMax)*(W-2*pad);x.strokeStyle=col;x.beginPath();x.moveTo(gx,pad);x.lineTo(gx,H-pad);x.stroke();return gx;}
+    var xA=mk(0,css('--vin')),xB=mk(-phi,css('--vr'));x.setLineDash([]);
+    x.strokeStyle=css('--paneltx');x.fillStyle=css('--paneltx');x.lineWidth=1.4;var yb=H-pad-10;
+    x.beginPath();x.moveTo(xB,yb);x.lineTo(xA,yb);x.stroke();x.font='12px sans-serif';x.fillText('Δt',(xA+xB)/2-6,yb-4);
+  }
+  function updateCmp(){
+    var el=document.getElementById('cmp');
+    if(!frozen){el.hidden=true;return;}
+    el.hidden=false;var F=frozen;
+    var dphi=(phi-F.phi)*180/Math.PI;
+    el.innerHTML='<b>Congelado</b> (punteado): f='+fmtHz(F.f)+', R='+fmtOhm(F.R)+', C='+Math.round(F.C*1e9)+' nF, φ='+(F.phi*180/Math.PI).toFixed(1)+'°'
+      +' &nbsp;|&nbsp; <b>Actual</b>: φ='+(phi*180/Math.PI).toFixed(1)+'°'
+      +' &nbsp;|&nbsp; Δφ = <b>'+(dphi>=0?'+':'')+dphi.toFixed(1)+'°</b>';
+  }
+  function arrow(x,ox,oy,ex,ey,col,lab,lw){x.strokeStyle=col;x.fillStyle=col;x.lineWidth=lw||3;
+    x.beginPath();x.moveTo(ox,oy);x.lineTo(ex,ey);x.stroke();var a=Math.atan2(ey-oy,ex-ox);
+    x.beginPath();x.moveTo(ex,ey);x.lineTo(ex-11*Math.cos(a-0.4),ey-11*Math.sin(a-0.4));x.lineTo(ex-11*Math.cos(a+0.4),ey-11*Math.sin(a+0.4));x.closePath();x.fill();
+    if(lab){x.font='bold 13px sans-serif';x.fillText(lab,ex+4,ey-4);}}
+  function drawPhasor(){
+    var o=ctxOf('phasor',200),x=o.x,W=o.w,H=o.h,ox=30,oy=H-30,S=Math.min(W-ox-40,H-60)/Vp*0.9;
+    x.clearRect(0,0,W,H);x.strokeStyle=css('--line');x.lineWidth=1;
+    x.beginPath();x.moveTo(ox,oy);x.lineTo(W-8,oy);x.stroke();x.beginPath();x.moveTo(ox,oy);x.lineTo(ox,8);x.stroke();
+    // Vin reference along +x
+    arrow(x,ox,oy,ox+Vp*S,oy,css('--vin'),'V',3);
+    // voltage triangle: VR along +phi, then VC (-90 from VR) tip-to-tail -> reaches Vin tip
+    var rx=ox+VRp*S*Math.cos(phi), ry=oy-VRp*S*Math.sin(phi);
+    arrow(x,ox,oy,rx,ry,css('--vr'),'V_R',2.6);
+    var cx=rx+VCp*S*Math.cos(phi-Math.PI/2), cy=ry-VCp*S*Math.sin(phi-Math.PI/2);
+    arrow(x,rx,ry,cx,cy,css('--vc'),'V_C',2.6);
+    // current phasor (thin) along +phi
+    arrow(x,ox,oy,ox+ (Vp*S*0.5)*Math.cos(phi), oy-(Vp*S*0.5)*Math.sin(phi), css('--accent'),'I',1.6);
+    x.strokeStyle=css('--muted');x.lineWidth=1.2;x.beginPath();x.arc(ox,oy,26,-phi,0);x.stroke();
+    x.fillStyle=css('--muted');x.font='11px sans-serif';x.fillText('φ',ox+30,oy-9);
+  }
+  function drawZtri(){
+    var o=ctxOf('ztri',200),x=o.x,W=o.w,H=o.h,ox=28,oy=H-28,S=Math.min((W-ox-30)/R,(H-56)/Xc);
+    // scale so both fit
+    S=Math.min((W-ox-34)/Math.max(R,1),(H-52)/Math.max(Xc,1));
+    x.clearRect(0,0,W,H);
+    var Rx=ox+R*S, Cy=oy-Xc*S;
+    // R (horizontal), Xc (vertical up from Rx), Z hypotenuse
+    arrow(x,ox,oy,Rx,oy,css('--vr'),'',2.6);
+    arrow(x,Rx,oy,Rx,Cy,css('--vc'),'',2.6);
+    arrow(x,ox,oy,Rx,Cy,css('--navy'),'',3);
+    x.font='bold 13px sans-serif';
+    x.fillStyle=css('--vr');x.fillText('R',(ox+Rx)/2-4,oy+16);
+    x.fillStyle=css('--vc');x.fillText('X_C',Rx+7,(oy+Cy)/2);
+    x.fillStyle=css('--navy');x.fillText('Z',(ox+Rx)/2-20,(oy+Cy)/2-4);
+    x.strokeStyle=css('--muted');x.lineWidth=1.2;x.beginPath();x.arc(ox,oy,24,-phi,0);x.stroke();
+    x.fillStyle=css('--muted');x.font='11px sans-serif';x.fillText('φ',ox+28,oy-8);
+  }
+  var frozen=null;
+  function update(){calc();labels();drawScope();drawPhasor();drawZtri();updateCmp();}
+  ['r','c','f','v'].forEach(function(id){document.getElementById(id).addEventListener('input',update);});
+  document.getElementById('showvc').addEventListener('change',drawScope);
+  document.getElementById('freeze').addEventListener('click',function(){
+    frozen={R:R,C:C,f:f,Vp:Vp,Xc:Xc,Z:Z,phi:phi,VRp:VRp,VCp:VCp};
+    document.getElementById('clearf').disabled=false;update();
+  });
+  document.getElementById('clearf').addEventListener('click',function(){
+    frozen=null;document.getElementById('clearf').disabled=true;update();
+  });
+  window.addEventListener('resize',update);
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',update);
+  update();
+})();
+</script>
