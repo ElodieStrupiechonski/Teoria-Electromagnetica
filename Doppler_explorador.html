@@ -1,0 +1,297 @@
+<meta charset="utf-8">
+<title>Explorador Doppler</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg:#f3f1ec; --card:#ffffff; --ink:#191b22; --muted:#5c6070; --faint:#8a8fa0;
+    --line:#e3e0d6; --grid:#e9e6dd;
+    --blue:#2456a6; --blueSoft:#4a7fd0; --red:#c0392b; --redSoft:#d9635a;
+    --accent:#c96a1e; --green:#2f7d46;
+    --panel:#10141d; --panelInk:#eef2fb;
+    --serif:"Spectral",Georgia,serif; --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0f1117; --card:#171a22; --ink:#eef0f6; --muted:#a2a7b8; --faint:#767c8f;
+    --line:#282c38; --grid:#232735;
+    --blue:#6f9be8; --blueSoft:#5480c8; --red:#e5776b; --redSoft:#c9564b;
+    --accent:#e08a3e; --green:#6cc487;
+    --panel:#0a0d14; --panelInk:#eef2fb;
+  }}
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0f1117; --card:#171a22; --ink:#eef0f6; --muted:#a2a7b8; --faint:#767c8f;
+    --line:#282c38; --grid:#232735;
+    --blue:#6f9be8; --blueSoft:#5480c8; --red:#e5776b; --redSoft:#c9564b;
+    --accent:#e08a3e; --green:#6cc487;
+    --panel:#0a0d14; --panelInk:#eef2fb;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:940px;margin:0 auto;padding-block:32px 40px;padding-left:16px;padding-right:16px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,44px);line-height:1.08;margin:.04em 0 .18em;text-wrap:balance}
+  .lede{font-size:17px;color:var(--muted);max-width:60ch;margin:0}
+  h2{font-family:var(--serif);font-weight:600;font-size:24px;margin:0 0 4px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:22px;box-shadow:0 1px 3px rgba(20,20,40,.05)}
+  .sec-tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+  p{margin:.5em 0}
+  .note{font-size:14.5px;color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px}
+  .panelcanvas{background:var(--panel)}
+  .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:22px;align-items:start}
+  @media (max-width:680px){.grid2{grid-template-columns:1fr}}
+  .ctrl label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin:14px 0 6px}
+  .ctrl label b{font-family:var(--mono);color:var(--accent);font-weight:500}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:7px 13px;cursor:pointer}
+  .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .tile .k{font-size:12px;color:var(--muted)}
+  .tile .v{font-family:var(--mono);font-size:19px;font-weight:500;color:var(--ink)}
+  .tile .v.up{color:var(--blue)} .tile .v.dn{color:var(--red)}
+  .legend{display:flex;gap:16px;font-size:13px;flex-wrap:wrap;margin-top:10px;color:var(--muted)}
+  .legend i{display:inline-block;width:15px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
+  .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  select,input[type=number]{font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+  .calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:6px}
+  .calc-grid label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)}
+  .out{margin-top:16px;background:var(--bg);border-left:4px solid var(--green);border-radius:9px;padding:12px 16px;font-size:15px}
+  .out b{font-family:var(--mono);color:var(--green);font-size:19px}
+  .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)}
+  .credits b{color:var(--ink)}
+  h3{font-family:var(--sans);font-size:15px;margin:16px 0 2px;color:var(--ink)}
+  @media (max-width:560px){
+    .wrap{padding-left:16px;padding-right:16px}
+    .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
+    input[type=range]{height:26px}
+    .btn{padding:8px 13px}
+    h1{font-size:26px}
+    .card{padding:18px 16px}
+    .calc-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 2 · tema 2.9</p>
+    <h1>El efecto Doppler, de la sirena a las galaxias</h1>
+    <p class="lede">Cuando una fuente y un observador se mueven uno respecto al otro, la frecuencia recibida cambia. Mueve los controles para ver el mismo principio en tres escalas: los frentes de onda, la señal que llega a cada observador y la luz corrida al rojo de las galaxias.</p>
+  </header>
+
+  <!-- ============ SECCIÓN 1 ============ -->
+  <section class="card">
+    <p class="sec-tag">Explorador 1 · fuente en movimiento</p>
+    <h2>Los frentes se apretujan adelante</h2>
+    <p class="note">La fuente avanza y emite frentes de onda a intervalos iguales. Adelante (hacia donde va) los frentes se juntan: longitud de onda menor, frecuencia mayor. Atrás ocurre lo contrario.</p>
+    <div class="grid2">
+      <div>
+        <canvas id="waves" class="panelcanvas" height="250"></canvas>
+        <div class="legend"><span><i style="background:var(--blueSoft)"></i>frentes de onda</span><span><i style="background:var(--accent)"></i>fuente y velocidad v</span></div>
+      </div>
+      <div class="ctrl">
+        <div class="row"><button class="btn on" id="wplay">Pausar</button></div>
+        <label>Velocidad de la fuente&nbsp; v/c <b id="bval">0.30</b></label>
+        <input id="beta" type="range" min="0" max="0.7" step="0.01" value="0.3">
+        <div class="tiles">
+          <div class="tile"><div class="k"><var>f</var> adelante  (se acerca)</div><div class="v up" id="fup">—</div></div>
+          <div class="tile"><div class="k"><var>f</var> atrás  (se aleja)</div><div class="v dn" id="fdn">—</div></div>
+        </div>
+        <div class="eq"><var>f</var>&prime; = <var>f</var> / (1 &#8723; <var>v</var>/<var>c</var>)</div>
+        <div class="eq">&Delta;<var>f</var> / <var>f</var> &asymp; <var>v</var>/<var>c</var></div>
+        <p class="note" style="margin-top:12px">Para <var>v</var> &#8810; <var>c</var>: &Delta;<var>f</var>/<var>f</var> &asymp; <var>v</var>/<var>c</var>. Aquí se usa la fuente en movimiento, <var>f</var>&prime; = <var>f</var>/(1&#8723;<var>v</var>/<var>c</var>), para que el efecto se vea con claridad. El signo &minus; corresponde a la fuente que se acerca y el + a la que se aleja.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECCIÓN 2 ============ -->
+  <section class="card">
+    <p class="sec-tag">Explorador 2 · lo que oye o mide cada observador</p>
+    <h2>La misma onda, dos frecuencias</h2>
+    <p class="note">Acoplado al control de arriba: el observador de adelante recibe la onda comprimida (más ciclos en el mismo tiempo) y el de atrás la recibe estirada. La curva de la derecha resume cómo cambia la frecuencia recibida con la velocidad.</p>
+    <div class="grid2">
+      <div>
+        <canvas id="signals" class="panelcanvas" height="250"></canvas>
+        <div class="legend"><span><i style="background:var(--faint)"></i>emitida</span><span><i style="background:var(--blueSoft)"></i>adelante (f sube)</span><span><i style="background:var(--redSoft)"></i>atrás (f baja)</span></div>
+      </div>
+      <div>
+        <canvas id="curve" class="panelcanvas" height="250"></canvas>
+        <p class="note" style="margin-top:10px">Cociente <var>f</var>&prime;/<var>f</var> contra la velocidad. El punto marca la velocidad elegida arriba.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECCIÓN 3 ============ -->
+  <section class="card">
+    <p class="sec-tag">Explorador 3 · corrimiento al rojo cosmológico</p>
+    <h2>Las galaxias que se alejan se ven más rojas</h2>
+    <p class="note">Las galaxias lejanas se alejan de nosotros (expansión del universo). Su luz llega con la longitud de onda estirada: las líneas del espectro se corren hacia el rojo. Mueve la velocidad de alejamiento y observa cómo se desplazan las líneas conocidas del hidrógeno.</p>
+    <canvas id="spectrum" height="200" style="margin-top:8px"></canvas>
+    <div class="ctrl">
+      <label>Velocidad de alejamiento&nbsp; v/c <b id="zbval">0.10</b></label>
+      <input id="zbeta" type="range" min="0" max="0.30" step="0.005" value="0.10">
+    </div>
+    <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
+      <div class="tile"><div class="k">Corrimiento <var>z</var> = &Delta;<var>&lambda;</var>/<var>&lambda;</var></div><div class="v dn" id="zval">—</div></div>
+      <div class="tile"><div class="k">Hα: 656.3 nm  →</div><div class="v dn" id="haobs">—</div></div>
+      <div class="tile"><div class="k">Velocidad de recesión</div><div class="v" id="vkm">—</div></div>
+    </div>
+    <div class="eq"><var>z</var> = &Delta;<var>&lambda;</var>/<var>&lambda;</var> = (<var>&lambda;</var><sub>obs</sub> &minus; <var>&lambda;</var>)/<var>&lambda;</var> &asymp; <var>v</var>/<var>c</var></div>
+    <div class="eq"><var>&lambda;</var><sub>obs</sub> = <var>&lambda;</var>(1 + <var>z</var>)</div>
+    <div class="eq"><var>v</var> = <var>H</var><sub>0</sub> <span class="op">&middot;</span> <var>d</var></div>
+    <p class="note" style="margin-top:12px">Aproximación clásica <var>z</var> &asymp; <var>v</var>/<var>c</var> (válida para <var>v</var> &#8810; <var>c</var>). Por la ley de Hubble, <var>v</var> = <var>H</var><sub>0</sub> <var>d</var>: cuanto más lejos está la galaxia, más rápido se aleja y mayor es su corrimiento al rojo. Así se descubrió que el universo se expande.</p>
+  </section>
+
+  <!-- ============ SECCIÓN 4 ============ -->
+  <section class="card">
+    <p class="sec-tag">Explorador 4 · calculadora (radar y comunicaciones)</p>
+    <h2>Corrimiento Doppler en un radar</h2>
+    <p class="note">En un radar la onda viaja de ida y de regreso, así que el efecto Doppler actúa dos veces (factor 2). Es la base del radar de velocidad y del seguimiento de aeronaves y satélites.</p>
+    <div class="calc-grid">
+      <label>Frecuencia f (GHz)<input type="number" id="cf" value="10" min="0" step="0.1"></label>
+      <label>Velocidad radial v (m/s)<input type="number" id="cv" value="30" min="0" step="1"></label>
+      <label>Sentido<select id="cdir"><option value="1">se acerca (f sube)</option><option value="-1">se aleja (f baja)</option></select></label>
+      <label>Trayecto<select id="cmode"><option value="2">radar (ida y vuelta)</option><option value="1">un solo trayecto</option></select></label>
+    </div>
+    <div class="eq">&Delta;<var>f</var> = <var>k</var> <span class="op">&middot;</span> <var>f</var> <span class="op">&middot;</span> (<var>v</var>/<var>c</var>),&nbsp; con <var>k</var> = 2 para radar,&nbsp; <var>k</var> = 1 para un trayecto</div>
+    <div class="out" id="cout">—</div>
+  </section>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Efecto Doppler electromagnético — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+    <p>Fundamentos: Ulaby, F. T. <i>Fundamentals of Applied Electromagnetics</i>, Pearson. Sadiku, M. N. O. <i>Elements of Electromagnetics</i>, Oxford University Press.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(260,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
+  var beta=0.30, playing=true, fc=0, xs=0, waves=[], SPD=1.5, EMIT=26, tt=0;
+
+  // ---- Section 1: wavefronts ----
+  function sec1labels(){
+    document.getElementById('bval').textContent=beta.toFixed(2);
+    document.getElementById('fup').textContent=(1/(1-beta)).toFixed(2)+' f';
+    document.getElementById('fdn').textContent=(1/(1+beta)).toFixed(2)+' f';
+  }
+  function drawWaves(){
+    var o=fit(document.getElementById('waves'),250),x=o.x,W=o.w,H=o.h,mid=H/2;
+    if(playing){xs+=beta*SPD;fc++;if(fc%EMIT===0)waves.push({x:xs,r:0.1});for(var i=0;i<waves.length;i++)waves[i].r+=SPD;waves=waves.filter(function(w){return w.r<2.2*W;});if(xs>W-26){xs=0;waves=[];fc=0;}}
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    x.fillStyle='rgba(255,255,255,.55)';x.font='12px '+C('--mono')+',monospace';
+    x.textAlign='right';x.fillText('adelante · f sube',W-12,20);x.textAlign='left';x.fillText('atrás · f baja',12,20);
+    x.strokeStyle=C('--blueSoft');
+    for(var j=0;j<waves.length;j++){x.globalAlpha=Math.max(.22,1-waves[j].r/(1.9*W));x.lineWidth=2;x.beginPath();x.arc(waves[j].x,mid,waves[j].r,0,6.2832);x.stroke();}
+    x.globalAlpha=1;
+    x.fillStyle=C('--accent');x.beginPath();x.arc(xs,mid,6,0,6.2832);x.fill();
+    x.strokeStyle=C('--accent');x.lineWidth=3;x.beginPath();x.moveTo(xs,mid);x.lineTo(xs+44,mid);x.stroke();
+    x.beginPath();x.moveTo(xs+44,mid);x.lineTo(xs+36,mid-5);x.lineTo(xs+36,mid+5);x.closePath();x.fill();
+  }
+  // ---- Section 2: signals + curve ----
+  function drawSignals(){
+    var o=fit(document.getElementById('signals'),250),x=o.x,W=o.w,H=o.h,pad=10;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    var rows=[{y:H*0.22,f:1,col:C('--faint'),lab:'emitida'},{y:H*0.53,f:1/(1-beta),col:C('--blueSoft'),lab:'adelante'},{y:H*0.84,f:1/(1+beta),col:C('--redSoft'),lab:'atrás'}];
+    var base=2*Math.PI/70;
+    for(var r=0;r<rows.length;r++){var row=rows[r],amp=H*0.12;
+      x.strokeStyle='rgba(255,255,255,.14)';x.lineWidth=1;x.beginPath();x.moveTo(pad,row.y);x.lineTo(W-pad,row.y);x.stroke();
+      x.strokeStyle=row.col;x.lineWidth=2.6;x.beginPath();
+      for(var px=0;px<=W-2*pad;px++){var yy=row.y-Math.sin(base*row.f*px - tt*row.f)*amp;var gx=pad+px;if(px===0)x.moveTo(gx,yy);else x.lineTo(gx,yy);}
+      x.stroke();
+      x.fillStyle=row.col;x.font='12px '+C('--mono')+',monospace';x.fillText(row.lab,pad+2,row.y-amp-4);
+    }
+  }
+  function drawCurve(){
+    var o=fit(document.getElementById('curve'),250),x=o.x,W=o.w,H=o.h,pad=38;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    var x0=pad,x1=W-12,y0=H-28,y1=14, bmax=0.7, ymin=0.5, ymax=3.4;
+    function X(b){return x0+(x1-x0)*b/bmax;} function Y(v){return y0+(y1-y0)*(v-ymin)/(ymax-ymin);}
+    // grid + axes
+    x.strokeStyle='rgba(255,255,255,.12)';x.lineWidth=1;
+    for(var b=0;b<=0.7001;b+=0.1){x.beginPath();x.moveTo(X(b),y1);x.lineTo(X(b),y0);x.stroke();}
+    x.strokeStyle='rgba(255,255,255,.4)';x.beginPath();x.moveTo(x0,Y(1));x.lineTo(x1,Y(1));x.stroke();
+    x.fillStyle='rgba(255,255,255,.6)';x.font='11px '+C('--mono')+',monospace';
+    x.fillText('f′/f',6,Y(1)-6);x.textAlign='center';x.fillText('v/c',(x0+x1)/2,H-8);x.textAlign='left';
+    x.fillText('1',x0-16,Y(1)+4);x.fillText('3',x0-16,Y(3)+4);
+    // curves
+    function plot(fn,col){x.strokeStyle=col;x.lineWidth=2.6;x.beginPath();for(var b=0;b<=bmax+1e-9;b+=0.01){var yy=Y(Math.min(ymax,fn(b)));if(b===0)x.moveTo(X(b),yy);else x.lineTo(X(b),yy);}x.stroke();}
+    plot(function(b){return 1/(1-b);},C('--blueSoft'));
+    plot(function(b){return 1/(1+b);},C('--redSoft'));
+    // dots at current beta
+    function dot(v,col){x.fillStyle=col;x.beginPath();x.arc(X(beta),Y(Math.min(ymax,v)),5,0,6.2832);x.fill();}
+    dot(1/(1-beta),C('--blueSoft'));dot(1/(1+beta),C('--redSoft'));
+  }
+  // ---- Section 3: spectrum / redshift ----
+  var LINES=[{l:434.0,n:'Hγ'},{l:486.1,n:'Hβ'},{l:589.0,n:'Na'},{l:656.3,n:'Hα'}];
+  function specGrad(x,x0,x1){
+    var g=x.createLinearGradient(x0,0,x1,0);
+    g.addColorStop(0,'#6a00b8');g.addColorStop(0.13,'#2836d6');g.addColorStop(0.30,'#00a2c8');
+    g.addColorStop(0.46,'#28b24a');g.addColorStop(0.62,'#e8d21a');g.addColorStop(0.76,'#f08a1c');
+    g.addColorStop(0.86,'#d81f1f');g.addColorStop(1,'#3a0a0a');return g;
+  }
+  var LMIN=380,LMAX=780;
+  function drawSpectrum(){
+    var zb=parseFloat(document.getElementById('zbeta').value), z=zb;
+    var o=fit(document.getElementById('spectrum'),200),x=o.x,W=o.w,H=o.h,pad=14;
+    var x0=pad,x1=W-pad, topY=40, barH=54, obsY=118, obsH=54;
+    function X(l){return x0+(x1-x0)*(l-LMIN)/(LMAX-LMIN);}
+    x.fillStyle=C('--card');x.fillRect(0,0,W,H);
+    x.fillStyle=C('--muted');x.font='12px '+C('--sans')+',sans-serif';
+    x.fillText('Espectro en reposo (laboratorio)',x0,topY-8);
+    x.fillText('Galaxia que se aleja',x0,obsY-8);
+    // bars
+    x.fillStyle=specGrad(x,x0,x1);x.fillRect(x0,topY,x1-x0,barH);x.fillRect(x0,obsY,x1-x0,obsH);
+    // wavelength ticks
+    x.fillStyle=C('--faint');x.font='10px '+C('--mono')+',monospace';x.textAlign='center';
+    for(var l=400;l<=750;l+=50){var xx=X(l);x.fillRect(xx,obsY+obsH,1,5);x.fillText(l,xx,obsY+obsH+16);}
+    x.textAlign='left';x.fillText('nm',x1-4,obsY+obsH+16);
+    // rest lines (top) and observed (bottom) with connectors
+    for(var i=0;i<LINES.length;i++){var lr=LINES[i].l, lo=lr*(1+z);
+      var xr=X(lr), xo=X(Math.min(LMAX,lo));
+      // rest
+      x.strokeStyle='#111';x.globalAlpha=.85;x.lineWidth=2;x.beginPath();x.moveTo(xr,topY);x.lineTo(xr,topY+barH);x.stroke();
+      // observed
+      x.beginPath();x.moveTo(xo,obsY);x.lineTo(xo,obsY+obsH);x.stroke();
+      x.globalAlpha=1;
+      // connector arrow rest->observed
+      x.strokeStyle=C('--red');x.setLineDash([3,3]);x.lineWidth=1.4;x.beginPath();x.moveTo(xr,topY+barH+2);x.lineTo(xo,obsY-2);x.stroke();x.setLineDash([]);
+      // label
+      x.fillStyle=C('--ink');x.font='600 12px '+C('--sans')+',sans-serif';x.textAlign='center';x.fillText(LINES[i].n,xr,topY-0.5*0+ -0.5);x.textAlign='left';
+      x.fillStyle=C('--ink');x.font='11px '+C('--mono')+',monospace';x.textAlign='center';x.fillText(Math.round(lo),xo,obsY+obsH+ -60);x.textAlign='left';
+    }
+    // readouts
+    document.getElementById('zbval').textContent=zb.toFixed(3);
+    document.getElementById('zval').textContent=z.toFixed(3);
+    document.getElementById('haobs').textContent=(656.3*(1+z)).toFixed(0)+' nm';
+    document.getElementById('vkm').textContent=Math.round(zb*299792.458).toLocaleString('es-MX')+' km/s';
+  }
+  // ---- Section 4: calculator ----
+  function calc(){
+    var f=parseFloat(document.getElementById('cf').value)||0, v=parseFloat(document.getElementById('cv').value)||0;
+    var dir=parseFloat(document.getElementById('cdir').value), k=parseFloat(document.getElementById('cmode').value);
+    var c=299792458, df=k*f*1e9*(v/c)*dir, fo=f*1e9+df;
+    function fmt(hz){var a=Math.abs(hz);if(a>=1e9)return (hz/1e9).toFixed(4)+' GHz';if(a>=1e6)return (hz/1e6).toFixed(3)+' MHz';if(a>=1e3)return (hz/1e3).toFixed(2)+' kHz';return hz.toFixed(1)+' Hz';}
+    var sign=df>=0?'+':'';
+    document.getElementById('cout').innerHTML='Corrimiento Δf = <b>'+sign+fmt(df)+'</b><br><span class="note">Frecuencia recibida f′ = '+fmt(fo)+'. '+(dir>0?'El objeto se acerca, la frecuencia sube.':'El objeto se aleja, la frecuencia baja.')+'</span>';
+  }
+
+  // wire up
+  document.getElementById('beta').addEventListener('input',function(e){beta=+e.target.value;sec1labels();drawCurve();});
+  document.getElementById('wplay').addEventListener('click',function(){playing=!playing;this.textContent=playing?'Pausar':'Reanudar';this.classList.toggle('on',playing);});
+  document.getElementById('zbeta').addEventListener('input',drawSpectrum);
+  ['cf','cv','cdir','cmode'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',function(){drawCurve();drawSpectrum();});
+  function loop(){if(playing)tt+=0.09;drawWaves();drawSignals();requestAnimationFrame(loop);}
+  sec1labels();drawCurve();drawSpectrum();calc();loop();
+})();
+</script>

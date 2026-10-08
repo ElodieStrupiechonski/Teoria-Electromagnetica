@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: "Teoría Electromagnética — Exploradores interactivos"
+message: "Si usas este material, por favor cítalo con los datos siguientes."
+type: dataset
+authors:
+  - family-names: "Strupiechonski"
+    given-names: "Elodie"
+    orcid: "https://orcid.org/0000-0001-8991-8499"
+    affiliation: "Escuela Nacional de Estudios Superiores (ENES) Unidad Juriquilla, UNAM"
+  - family-names: "de Luna Bugallo"
+    given-names: "Andrés"
+    orcid: "https://orcid.org/0000-0002-7591-5235"
+    affiliation: "Centro de Física Aplicada y Tecnología Avanzada (CFATA), UNAM"
+version: "1.0"
+date-released: "2026-09-29"
+license: CC-BY-4.0
+keywords:
+  - electromagnetismo
+  - recurso educativo abierto
+  - física
+  - ondas electromagnéticas
+  - enseñanza de la física
+  - ingeniería aeroespacial
+  - UNAM
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.XXXXXXX"
+    description: "DOI de concepto (todas las versiones); se completa al publicar en Zenodo."

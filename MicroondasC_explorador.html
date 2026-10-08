@@ -1,0 +1,245 @@
+<meta charset="utf-8">
+<title>Medir c con microondas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
+    --blue:#2456a6;--blueSoft:#4a7fd0;--red:#c0392b;--redSoft:#d9635a;--accent:#c96a1e;--green:#2f7d46;--panel:#10141d;
+    --serif:"Spectral",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--panel:#0a0d14;}}
+  :root[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--panel:#0a0d14;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:940px;margin:0 auto;padding-block:32px 40px;padding-left:16px;padding-right:16px}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
+  .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.6vw,40px);line-height:1.08;margin:.04em 0 .18em;text-wrap:balance}
+  .lede{font-size:17px;color:var(--muted);max-width:64ch;margin:0}
+  h2{font-family:var(--serif);font-weight:600;font-size:22px;margin:0 0 6px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 20px;margin-top:22px;box-shadow:0 1px 3px rgba(20,20,40,.05)}
+  @media (min-width:560px){.card{padding:22px 24px}}
+  .sec-tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+  .note{font-size:14.5px;color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px}
+  #stage{background:var(--panel);touch-action:none;cursor:ew-resize}
+  .ctrl label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin:14px 0 6px}
+  .ctrl label b{font-family:var(--mono);color:var(--accent);font-weight:500}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:8px 13px;cursor:pointer}
+  .btn.hl{background:var(--accent);border-color:var(--accent);color:#fff}
+  .step{display:inline-flex;align-items:center;gap:10px}
+  .step button{width:34px;height:34px;font-size:18px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;cursor:pointer}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  @media (min-width:560px){.tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .tile .k{font-size:11.5px;color:var(--muted)} .tile .v{font-family:var(--mono);font-size:17px;font-weight:500;color:var(--ink)}
+  .tile.key{border-color:var(--accent)} .tile.key .v{color:var(--accent)}
+  .tile.res{border-color:var(--green)} .tile.res .v{color:var(--green);font-size:19px}
+  .legend{display:flex;gap:16px;font-size:13px;flex-wrap:wrap;margin-top:10px;color:var(--muted)}
+  .legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:6px}
+  .safe{background:var(--bg);border-left:4px solid var(--red);border-radius:9px;padding:12px 14px;font-size:14px;color:var(--ink)}
+  .safe b{color:var(--red)}
+  .kv{font-size:14px;margin:5px 0} .kv b{font-family:var(--mono);color:var(--ink)}
+  .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}h1{font-size:26px}}
+</style>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Teoría Electromagnética · Práctica P5 · velocidad de propagación</p>
+    <h1>Medir la velocidad de la luz con un horno de microondas</h1>
+    <p class="lede">Dentro de un horno de microondas se forma una onda estacionaria. La comida se calienta más en los antinodos, y la distancia entre dos puntos calientes vecinos es media longitud de onda. Con la frecuencia de la placa del horno se obtiene <var>c</var> = <var>f</var>·<var>&lambda;</var>. Mide y compruébalo.</p>
+  </header>
+
+  <section class="card">
+    <p class="sec-tag">Explorador · mide la separación entre puntos calientes</p>
+    <canvas id="stage" height="320"></canvas>
+    <div class="legend"><span><i style="background:linear-gradient(90deg,#c0392b,#e08a3e,#e8d21a)"></i>puntos calientes (antinodos)</span><span><i style="background:#6f9be8"></i>campo E de la onda estacionaria</span><span>arrastra las pinzas del calibrador ▲</span></div>
+    <div class="ctrl">
+      <label><span>Frecuencia del horno <var>f</var> (de la placa)</span> <b id="fv">2450 MHz</b></label>
+      <input id="f" type="range" min="300" max="3000" step="5" value="2450">
+      <div class="row">
+        <span class="step">Escribe <var>f</var> (MHz): <input id="fnum" type="number" min="100" max="6000" step="5" value="2450" style="font:inherit;width:92px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"></span>
+        <button class="btn" data-f="2450">2.45 GHz (doméstico)</button>
+        <button class="btn" data-f="915">915 MHz (industrial)</button>
+      </div>
+      <label><span>Pinza izquierda del calibrador</span> <b id="h1v">—</b></label>
+      <input id="h1" type="range" min="0" max="300" step="1" value="30">
+      <label><span>Pinza derecha del calibrador</span> <b id="h2v">—</b></label>
+      <input id="h2" type="range" min="0" max="300" step="1" value="275">
+      <div class="row">
+        <span class="step">Espacios medidos <var>n</var>:
+          <button id="ndn" aria-label="menos">−</button><b id="nv" style="font-family:var(--mono);min-width:1.4em;text-align:center">4</b><button id="nup" aria-label="más">+</button>
+        </span>
+        <button class="btn" id="snap">Ajustar a los puntos calientes</button>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Frecuencia f</div><div class="v" id="tf">—</div></div>
+      <div class="tile"><div class="k">Distancia medida D</div><div class="v" id="tD">—</div></div>
+      <div class="tile key"><div class="k">Media onda d = D/n</div><div class="v" id="td">—</div></div>
+      <div class="tile res"><div class="k">c medida = 2·d·f</div><div class="v" id="tc">—</div></div>
+      <div class="tile"><div class="k">c aceptada</div><div class="v" id="tc0">2.998×10⁸ m/s</div></div>
+      <div class="tile"><div class="k">Error relativo</div><div class="v" id="terr">—</div></div>
+    </div>
+    <p class="note" style="margin-top:12px">Sugerencia: mide entre el primero y el último punto caliente que puedas (varios espacios <var>n</var>) y divide entre <var>n</var>. Así el error de leer cada extremo se reparte y la medición de <var>d</var> = <var>&lambda;</var>/2 sale mucho mejor.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Con tus datos · calcula c con tu medición real</p>
+    <div class="row" style="gap:14px">
+      <span class="step"><var>f</var> (MHz) <input id="uf" type="number" min="100" max="6000" step="5" value="2450" style="font:inherit;width:88px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"></span>
+      <span class="step"><var>D</var> (cm) <input id="uD" type="number" min="0" step="0.1" value="23" style="font:inherit;width:78px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"></span>
+      <span class="step"><var>n</var> espacios <input id="un" type="number" min="1" step="1" value="3" style="font:inherit;width:64px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"></span>
+    </div>
+    <div class="tiles">
+      <div class="tile key"><div class="k">d = D/n</div><div class="v" id="ud">—</div></div>
+      <div class="tile"><div class="k">λ = 2d</div><div class="v" id="ulam">—</div></div>
+      <div class="tile res"><div class="k">c = 2·d·f</div><div class="v" id="uc">—</div></div>
+      <div class="tile"><div class="k">Error vs c aceptada</div><div class="v" id="uerr">—</div></div>
+    </div>
+    <p class="note" style="margin-top:12px">Precargado con tu experimento (queso rallado): <var>f</var> = 2450 MHz, 4 manchas → <var>n</var> = 3 espacios, <var>D</var> = 23 cm. Los hornos reales dan dispersión (±10–25 %): dentro de la cavidad se excitan varios modos 3D, no una onda plana ideal, así que las manchas no quedan exactamente a <var>λ</var>/2. Por eso conviene promediar varios ensayos y medir el mayor número de espacios posible.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Cómo funciona · la física</p>
+    <h2>Onda estacionaria y por qué la separación es λ/2</h2>
+    <p class="note">Las paredes metálicas del horno reflejan la microonda. La onda que va y la que regresa se suman en una <b>onda estacionaria</b>: hay puntos fijos donde el campo siempre vale cero (<b>nodos</b>) y puntos donde oscila con amplitud máxima (<b>antinodos</b>). El calentamiento es proporcional a <var>E</var><sup>2</sup>, así que la comida se funde en los antinodos.</p>
+    <div class="eq"><var>E</var>(<var>x</var>,<var>t</var>) <span class="op">=</span> 2<var>E</var><sub>0</sub> sen(<var>k</var><var>x</var>) cos(<var>&omega;</var><var>t</var>)</div>
+    <p class="note">Nodos y antinodos consecutivos se repiten cada media longitud de onda, por eso los puntos calientes están separados por:</p>
+    <div class="eq"><var>d</var> <span class="op">=</span> <var>&lambda;</var> / 2</div>
+    <p class="note">La onda viaja a <var>c</var> = <var>f</var>·<var>&lambda;</var>. Despejando con lo que medimos (<var>&lambda;</var> = 2<var>d</var>) y la frecuencia de la placa:</p>
+    <div class="eq"><var>c</var> <span class="op">=</span> <var>f</var> <var>&lambda;</var> <span class="op">=</span> <var>f</var> <span class="op">&middot;</span> 2<var>d</var></div>
+    <p class="note">Valor esperado: con <var>f</var> = 2.45 GHz, <var>&lambda;</var> ≈ 12.2 cm y <var>d</var> ≈ 6.1 cm. Este es el mismo principio de la onda estacionaria de la P8 (reflexión), ahora usado para medir. En el <b>espectro electromagnético</b>, 2.45 GHz cae en las <b>microondas</b>.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Seguridad · antes de encender</p>
+    <div class="safe">
+      <b>Precauciones.</b> Nunca operes el horno <b>vacío</b>. Calienta en intervalos <b>cortos</b> (10–30 s) y vigila: la comida puede quemarse o humear. No metas <b>metales</b>. Usa guantes; el plato queda caliente. Retira el <b>plato giratorio</b> para que la comida no se mueva (o inviértelo). Hazlo con <b>supervisión</b> y buena ventilación. El horno cerrado y en buen estado confina la radiación; no lo fuerces ni operes con la puerta dañada.
+    </div>
+  </section>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Velocidad de la luz con microondas — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+    <p>Método basado en: Stauffer, R. H. (1997). Finding the speed of light with marshmallows—A take-home lab. <i>The Physics Teacher</i>, 35(4), 231–232. DOI: <a href="https://doi.org/10.1119/1.2344657" target="_blank" rel="noopener">10.1119/1.2344657</a>.</p>
+  </div>
+</div>
+<script>
+(function(){
+  var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  var c0=299792458, Wcm=35;                     // ventana (cm), se adapta a la frecuencia
+  var f=2.45e9, h1=3.06, h2=27.5, n=4;
+  function lam(){return c0/f*100;}              // cm
+  function win(){var d=lam()/2, w=Math.max(20,Math.min(120,5.5*d));return Math.ceil(w/5)*5;} // ventana adaptada a f
+  function setWin(){Wcm=win();}
+  function antinodes(){var L=lam(),d=L/2,x0=L/4,arr=[];for(var xx=x0;xx<=Wcm-0.2;xx+=d)arr.push(xx);return arr;}
+  function fit(cv,H){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(280,r.width);cv.width=w*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return{x:x,w:w,h:H};}
+  var padL=40,padR=16;
+  function PX(xcm,W){return padL+(W-padL-padR)*xcm/Wcm;}
+  function invX(px,W){return Wcm*(px-padL)/(W-padL-padR);}
+  function draw(){
+    var o=fit(document.getElementById('stage'),320),x=o.x,W=o.w,H=o.h;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    var L=lam(),k=2*Math.PI/L;
+    var yWave=64, ampW=40, bandY=118, bandH=52, rulerY=196, calY=232;
+    // --- onda E(x) ---
+    x.strokeStyle='rgba(255,255,255,.18)';x.lineWidth=1;x.beginPath();x.moveTo(padL,yWave);x.lineTo(W-padR,yWave);x.stroke();
+    x.fillStyle='rgba(255,255,255,.6)';x.font='11px '+C('--mono')+',monospace';x.fillText('E(x)',6,yWave-30);
+    x.strokeStyle=C('--blueSoft');x.lineWidth=2.4;x.beginPath();
+    for(var px=0;px<=W-padL-padR;px++){var xc=invX(padL+px,W);var yy=yWave-Math.sin(k*xc)*ampW;var gx=padL+px;if(px===0)x.moveTo(gx,yy);else x.lineTo(gx,yy);}
+    x.stroke();
+    var ans=antinodes();
+    // nodos (E=0) y antinodos marcados
+    for(var m=0;m*L/2<=Wcm+0.1;m++){var xn=m*L/2;var gx=PX(xn,W);x.strokeStyle='rgba(255,255,255,.25)';x.setLineDash([2,3]);x.beginPath();x.moveTo(gx,yWave-ampW-4);x.lineTo(gx,bandY+bandH);x.stroke();x.setLineDash([]);}
+    for(var i=0;i<ans.length;i++){var gx=PX(ans[i],W);x.fillStyle=C('--accent');x.beginPath();x.arc(gx,yWave-Math.sin(k*ans[i])*ampW,3.5,0,6.2832);x.fill();}
+    // --- banda de calor con puntos calientes (gaussianas en antinodos) ---
+    x.fillStyle='#20130c';x.fillRect(padL,bandY,W-padL-padR,bandH);
+    for(var gxp=0;gxp<=W-padL-padR;gxp++){var xc=invX(padL+gxp,W);var inten=0;
+      for(var j=0;j<ans.length;j++){var dxx=(xc-ans[j]);inten+=Math.exp(-dxx*dxx/(2*Math.pow(L/10,2)));}
+      inten=Math.min(1,inten);
+      var rr=Math.round(60+195*inten), gg=Math.round(20+150*inten*inten), bb=Math.round(10+30*inten);
+      x.fillStyle='rgba('+rr+','+gg+','+bb+','+(0.25+0.75*inten)+')';
+      x.fillRect(padL+gxp,bandY,1.5,bandH);
+    }
+    x.strokeStyle='rgba(255,255,255,.25)';x.lineWidth=1;x.strokeRect(padL,bandY,W-padL-padR,bandH);
+    x.fillStyle='rgba(255,255,255,.7)';x.font='11px '+C('--mono')+',monospace';x.fillText('comida (plato)',padL+4,bandY-6);
+    // --- regla en cm (pasos adaptados a la ventana) ---
+    var major=(Wcm<=35?5:(Wcm<=75?10:20)), minor=major/5;
+    x.strokeStyle='rgba(255,255,255,.4)';x.fillStyle='rgba(255,255,255,.6)';x.font='10px '+C('--mono')+',monospace';x.textAlign='center';
+    for(var cm=0;cm<=Wcm+1e-6;cm+=minor){var gx=PX(cm,W);var big=(Math.abs(cm%major)<1e-6||Math.abs(cm%major-major)<1e-6);x.beginPath();x.moveTo(gx,rulerY);x.lineTo(gx,rulerY+(big?9:5));x.stroke();if(big)x.fillText(Math.round(cm),gx,rulerY+22);}
+    x.textAlign='right';x.fillText('cm',W-padR,rulerY-4);x.textAlign='left';
+    // --- calibrador ---
+    var gx1=PX(h1,W),gx2=PX(h2,W);
+    // líneas guía desde la banda
+    x.strokeStyle=C('--green');x.setLineDash([3,3]);x.lineWidth=1;
+    x.beginPath();x.moveTo(gx1,bandY);x.lineTo(gx1,calY);x.moveTo(gx2,bandY);x.lineTo(gx2,calY);x.stroke();x.setLineDash([]);
+    // barra
+    x.strokeStyle=C('--green');x.lineWidth=2.5;x.beginPath();x.moveTo(gx1,calY);x.lineTo(gx2,calY);x.stroke();
+    // manijas (triángulos)
+    function handle(gx){x.fillStyle=C('--green');x.beginPath();x.moveTo(gx,calY-9);x.lineTo(gx-6,calY-20);x.lineTo(gx+6,calY-20);x.closePath();x.fill();}
+    handle(gx1);handle(gx2);
+    // etiqueta D
+    var D=Math.abs(h2-h1);
+    x.fillStyle=C('--green');x.font='600 13px '+C('--sans')+',sans-serif';x.textAlign='center';
+    x.fillText('D = '+D.toFixed(1)+' cm  ('+n+' espacios)',(gx1+gx2)/2,calY+22);x.textAlign='left';
+  }
+  function readouts(){
+    var L=lam(),d=L/2,D=Math.abs(h2-h1),dm=D/n;
+    var cmeas=2*(dm/100)*f;
+    document.getElementById('fv').textContent=Math.round(f/1e6)+' MHz';
+    document.getElementById('h1v').textContent=h1.toFixed(1)+' cm';
+    document.getElementById('h2v').textContent=h2.toFixed(1)+' cm';
+    document.getElementById('nv').textContent=n;
+    document.getElementById('tf').textContent=(f/1e9).toFixed(3)+' GHz';
+    document.getElementById('tD').textContent=D.toFixed(1)+' cm';
+    document.getElementById('td').textContent=dm.toFixed(2)+' cm';
+    document.getElementById('tc').textContent=cmeas.toExponential(3)+' m/s';
+    var err=(cmeas-c0)/c0*100;
+    document.getElementById('terr').textContent=(err>=0?'+':'')+err.toFixed(1)+' %';
+  }
+  function upd(){readouts();draw();}
+  function snap(){var ans=antinodes();if(ans.length>=2){h1=ans[0];h2=ans[ans.length-1];n=ans.length-1;}
+    else{h1=lam()/4;h2=Math.min(Wcm,h1+lam()/2);n=1;}
+    document.getElementById('h1').value=Math.round(h1*300/Wcm);document.getElementById('h2').value=Math.round(h2*300/Wcm);upd();}
+  // controles
+  function setF(mhz){mhz=Math.max(100,Math.min(6000,mhz));f=mhz*1e6;
+    document.getElementById('f').value=Math.max(300,Math.min(3000,mhz));
+    document.getElementById('fnum').value=Math.round(mhz);setWin();snap();}
+  document.getElementById('f').addEventListener('input',function(e){setF(+e.target.value);});
+  document.getElementById('fnum').addEventListener('input',function(e){setF(+e.target.value);});
+  document.querySelectorAll('[data-f]').forEach(function(b){b.addEventListener('click',function(){setF(+b.getAttribute('data-f'));});});
+  document.getElementById('h1').addEventListener('input',function(e){h1=+e.target.value/1;h1=Math.max(0,Math.min(Wcm, (+e.target.value)*Wcm/300));upd();});
+  document.getElementById('h2').addEventListener('input',function(e){h2=Math.max(0,Math.min(Wcm,(+e.target.value)*Wcm/300));upd();});
+  document.getElementById('nup').addEventListener('click',function(){n=Math.min(9,n+1);upd();});
+  document.getElementById('ndn').addEventListener('click',function(){n=Math.max(1,n-1);upd();});
+  document.getElementById('snap').addEventListener('click',snap);
+  // arrastre en el canvas (elige la manija más cercana)
+  var cv=document.getElementById('stage'),drag=null;
+  function pick(e){var r=cv.getBoundingClientRect(),W=r.width;var xc=invX(e.clientX-r.left,W);
+    if(Math.abs(xc-h1)<=Math.abs(xc-h2))drag='h1';else drag='h2';setDrag(e);}
+  function setDrag(e){var r=cv.getBoundingClientRect(),W=r.width;var xc=Math.max(0,Math.min(Wcm,invX(e.clientX-r.left,W)));
+    if(drag==='h1'){h1=xc;document.getElementById('h1').value=Math.round(xc*300/Wcm);}else{h2=xc;document.getElementById('h2').value=Math.round(xc*300/Wcm);}upd();}
+  cv.addEventListener('pointerdown',function(e){pick(e);cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',function(e){if(drag)setDrag(e);});
+  cv.addEventListener('pointerup',function(){drag=null;});
+  cv.addEventListener('pointercancel',function(){drag=null;});
+  // calculadora "con tus datos"
+  function udata(){var uf=(+document.getElementById('uf').value)||0, uD=(+document.getElementById('uD').value)||0, un=Math.max(1,(+document.getElementById('un').value)||1);
+    var d=uD/un, lamu=2*d, cu=2*(d/100)*uf*1e6, err=(cu-c0)/c0*100;
+    document.getElementById('ud').textContent=d.toFixed(2)+' cm';
+    document.getElementById('ulam').textContent=lamu.toFixed(2)+' cm';
+    document.getElementById('uc').textContent=(cu>0?cu.toExponential(3)+' m/s':'—');
+    document.getElementById('uerr').textContent=(uf>0&&uD>0?(err>=0?'+':'')+err.toFixed(1)+' %':'—');}
+  ['uf','uD','un'].forEach(function(id){document.getElementById(id).addEventListener('input',udata);});
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',upd);
+  window.addEventListener('resize',upd);
+  setWin();snap();udata();
+})();
+</script>

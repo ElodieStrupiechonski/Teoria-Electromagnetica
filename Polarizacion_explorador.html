@@ -1,0 +1,248 @@
+<meta charset="utf-8">
+<title>Explorador de Polarización</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
+    --blue:#2456a6;--blueSoft:#4a7fd0;--red:#c0392b;--redSoft:#d9635a;--accent:#c96a1e;--green:#2f7d46;--greenSoft:#5aa871;--panel:#10141d;
+    --serif:"Spectral",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}}
+  :root[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:940px;margin:0 auto;padding-block:32px 40px;padding-left:16px;padding-right:16px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.6vw,40px);line-height:1.08;margin:.04em 0 .18em;text-wrap:balance}
+  .lede{font-size:17px;color:var(--muted);max-width:62ch;margin:0}
+  h2{font-family:var(--serif);font-weight:600;font-size:23px;margin:0 0 4px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:22px;box-shadow:0 1px 3px rgba(20,20,40,.05)}
+  .sec-tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+  .note{font-size:14.5px;color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px}
+  .panelcanvas{background:var(--panel)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+  @media (max-width:680px){.grid2{grid-template-columns:1fr}}
+  .ctrl label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin:14px 0 6px}
+  .ctrl label b{font-family:var(--mono);color:var(--accent);font-weight:500}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:7px 12px;cursor:pointer}
+  .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .tile .k{font-size:12px;color:var(--muted)} .tile .v{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--ink)}
+  .legend{display:flex;gap:16px;font-size:13px;flex-wrap:wrap;margin-top:10px;color:var(--muted)}
+  .legend i{display:inline-block;width:15px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  .knobwrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+  #knob{width:150px;height:150px;touch-action:none;cursor:grab}
+  #knob:active{cursor:grabbing}
+  .meter{height:16px;background:var(--bg);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:6px}
+  .meter .fill{height:100%;background:linear-gradient(90deg,var(--redSoft),var(--green));width:50%;transition:width .08s linear}
+  .verdict{background:var(--bg);border-left:4px solid var(--accent);border-radius:9px;padding:10px 14px;font-size:14.5px;margin-top:14px}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
+  .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  @media (max-width:560px){
+    .wrap{padding-left:16px;padding-right:16px}
+    .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
+    input[type=range]{height:26px}
+    .btn{padding:8px 13px}
+    h1{font-size:26px}
+    .card{padding:18px 16px}
+  }
+</style>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 2 · tema 2.8</p>
+    <h1>Polarización: la figura que dibuja el campo</h1>
+    <p class="lede">El campo eléctrico de una onda plana vive en el plano perpendicular a la propagación. Según las amplitudes de sus dos componentes y el desfase entre ellas, la punta del vector traza una recta, un círculo o una elipse. Muévelo y descúbrelo.</p>
+  </header>
+
+  <section class="card">
+    <p class="sec-tag">Explorador · vector de campo eléctrico</p>
+    <div class="grid2">
+      <div>
+        <canvas id="fig" class="panelcanvas" height="300"></canvas>
+        <div class="legend"><span><i style="background:var(--accent)"></i>vector E (ahora)</span><span><i style="background:var(--blueSoft)"></i>trayectoria en un periodo</span><span>⊙ = z sale hacia ti</span></div>
+      </div>
+      <div>
+        <canvas id="comp" class="panelcanvas" height="140"></canvas>
+        <div class="legend"><span><i style="background:var(--blueSoft)"></i>E<sub>x</sub>(t)</span><span><i style="background:var(--redSoft)"></i>E<sub>y</sub>(t)</span><span>eje horizontal = tiempo t · la línea marca el instante actual</span></div>
+        <div class="ctrl">
+          <label><span>Amplitud E<sub>x</sub></span> <b id="axv">1.00</b></label><input id="ax" type="range" min="0" max="1" step="0.02" value="1">
+          <label><span>Amplitud E<sub>y</sub></span> <b id="ayv">1.00</b></label><input id="ay" type="range" min="0" max="1" step="0.02" value="1">
+          <label><span>Desfase δ</span> <b id="dv">90°</b></label><input id="d" type="range" min="0" max="360" step="1" value="90">
+        </div>
+        <div class="row">
+          <button class="btn" data-p="lin">Lineal</button>
+          <button class="btn" data-p="cir">Circular</button>
+          <button class="btn" data-p="eli">Elíptica</button>
+        </div>
+      </div>
+    </div>
+    <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
+      <div class="tile"><div class="k">Tipo de polarización</div><div class="v" id="tipo">—</div></div>
+      <div class="tile"><div class="k">Sentido de giro</div><div class="v" id="giro">—</div></div>
+      <div class="tile"><div class="k">Relación axial (eje mayor / menor)</div><div class="v" id="ar">—</div></div>
+    </div>
+    <div class="eq"><var>E</var><sub>x</sub> = <var>A</var> cos(<var>&omega;</var><var>t</var>)<span class="op">,</span> <var>E</var><sub>y</sub> = <var>B</var> cos(<var>&omega;</var><var>t</var> + <var>&delta;</var>)</div>
+    <p class="note" style="margin-top:12px">Escribimos las componentes del campo como <var>E</var><sub>x</sub> = <var>A</var> cos(<var>&omega;</var><var>t</var>) y <var>E</var><sub>y</sub> = <var>B</var> cos(<var>&omega;</var><var>t</var> + <var>&delta;</var>). Las dos figuras describen la onda en un mismo punto del espacio a lo largo del tiempo. La de la izquierda es el plano transversal (<var>x</var>, <var>y</var>) mirando de frente a la onda que se acerca (⊙ = <var>z</var>): la punta del vector <span class="vec">E</span> traza la elipse. La de la derecha muestra las componentes <var>E</var><sub>x</sub> y <var>E</var><sub>y</sub> en función del tiempo <var>t</var>; la línea vertical marca el instante actual y avanza en sincronía con el vector giratorio de la izquierda.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Caso real · enlace satélite → estación terrena</p>
+    <h2>¿Por qué los satélites usan polarización circular?</h2>
+    <p class="note">La onda que llega del satélite (arriba) tiene la polarización que definiste en el explorador. La antena de la estación terrena es un dipolo lineal que puedes girar con la perilla. Observa cuánta señal se recibe según la orientación: es el factor de pérdida por polarización (PLF).</p>
+    <div class="eq">PLF = |ê<sub>w</sub>&middot;ê<sub>a</sub>|<sup>2</sup> <span class="op">&nbsp;&nbsp;</span> (lineal) &nbsp; PLF = cos<sup>2</sup><var>&theta;</var></div>
+    <div class="grid2">
+      <div>
+        <canvas id="link" class="panelcanvas" height="260"></canvas>
+        <div class="legend"><span><i style="background:var(--blueSoft)"></i>onda incidente</span><span><i style="background:var(--greenSoft)"></i>antena receptora</span></div>
+        <div style="font-size:13px;color:var(--muted);margin-top:12px">Señal recibida</div>
+        <div class="meter"><div class="fill" id="mfill"></div></div>
+      </div>
+      <div class="knobwrap">
+        <div style="font-size:13px;font-weight:600;color:var(--muted);align-self:flex-start">Perilla: orientación de la antena</div>
+        <canvas id="knob" width="150" height="150"></canvas>
+        <div style="font-family:var(--mono);font-size:15px;color:var(--accent)" id="angv">0°</div>
+        <div style="width:100%">
+          <label for="knobslider" style="display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px">Orientación de la antena</label>
+          <input id="knobslider" type="range" min="0" max="360" step="1" value="0">
+        </div>
+        <div class="tiles" style="width:100%;grid-template-columns:1fr 1fr">
+          <div class="tile"><div class="k">Potencia recibida</div><div class="v" id="plfpct">—</div></div>
+          <div class="tile"><div class="k">Pérdida (PLF)</div><div class="v" id="plfdb">—</div></div>
+        </div>
+        <div class="verdict" id="verdict" style="width:100%">—</div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px">Con polarización lineal, girar la antena 90° apaga la señal (PLF = cos<sup>2</sup><var>&theta;</var>): un satélite que gira o una antena mal alineada pierde el enlace. Con polarización circular la señal se mantiene constante en &minus;3 dB sin importar la orientación; por eso el GPS, la telemetría satelital y muchos enlaces aeronáuticos la prefieren.</p>
+  </section>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Polarización de ondas electromagnéticas — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+  </div>
+</div>
+<script>
+(function(){
+  var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(240,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
+  var A=1,B=1,dd=90*Math.PI/180,t=0,thetaRx=0;
+  function classify(){var s=Math.abs(Math.sin(dd));if(A<0.03||B<0.03||s<0.04)return{tipo:'Lineal',giro:'—'};var circ=Math.abs(A-B)<0.04&&Math.abs(s-1)<0.04;return{tipo:circ?'Circular':'Elíptica',giro:(Math.sin(dd)>0?'horario':'antihorario')+' (en pantalla)'};}
+  function axialRatio(){var rmax=0,rmin=1e9;for(var k=0;k<180;k++){var th=k*Math.PI/90;var ex=A*Math.cos(th),ey=B*Math.cos(th+dd);var r=Math.hypot(ex,ey);if(r>rmax)rmax=r;if(r<rmin)rmin=r;}if(rmin<1e-4)return'∞ (lineal)';return(rmax/rmin).toFixed(2);}
+  function plf(theta){var den=A*A+B*B;if(den<1e-9)return 0;var c=Math.cos(theta),s=Math.sin(theta);return (A*A*c*c+B*B*s*s+2*A*B*c*s*Math.cos(dd))/den;}
+  function labels(){
+    document.getElementById('axv').textContent=A.toFixed(2);
+    document.getElementById('ayv').textContent=B.toFixed(2);
+    document.getElementById('dv').textContent=Math.round(dd*180/Math.PI)+'°';
+    var c=classify();
+    document.getElementById('tipo').textContent=c.tipo;
+    document.getElementById('giro').textContent=c.tipo==='Lineal'?'—':c.giro;
+    document.getElementById('ar').textContent=c.tipo==='Lineal'?'∞ (recta)':axialRatio();
+    updateLink();
+  }
+  function drawFig(){
+    var o=fit(document.getElementById('fig'),300),x=o.x,W=o.w,H=o.h,cx=W/2,cy=H/2,S=Math.min(W,H)/2-26;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    x.strokeStyle='rgba(255,255,255,.16)';x.lineWidth=1;
+    x.beginPath();x.moveTo(cx-S-8,cy);x.lineTo(cx+S+8,cy);x.stroke();
+    x.beginPath();x.moveTo(cx,cy-S-8);x.lineTo(cx,cy+S+8);x.stroke();
+    x.fillStyle='rgba(255,255,255,.55)';x.font='11px '+C('--mono')+',monospace';x.fillText('x',cx+S+2,cy-6);x.fillText('y',cx+8,cy-S-2);
+    // z out of page indicator (top-left)
+    var zx=30,zy=26;x.strokeStyle='rgba(255,255,255,.6)';x.lineWidth=1.5;x.beginPath();x.arc(zx,zy,9,0,6.2832);x.stroke();
+    x.fillStyle='rgba(255,255,255,.8)';x.beginPath();x.arc(zx,zy,2.4,0,6.2832);x.fill();
+    x.font='11px '+C('--mono')+',monospace';x.fillStyle='rgba(255,255,255,.7)';x.fillText('z (hacia ti)',zx+15,zy+4);
+    // trajectory
+    x.strokeStyle=C('--blueSoft');x.lineWidth=2;x.beginPath();
+    for(var k=0;k<=360;k++){var th=k*Math.PI/180;var px=cx+A*Math.cos(th)*S;var py=cy-B*Math.cos(th+dd)*S;if(k===0)x.moveTo(px,py);else x.lineTo(px,py);}x.stroke();
+    var ex=A*Math.cos(t),ey=B*Math.cos(t+dd);var tx=cx+ex*S,ty=cy-ey*S;
+    x.strokeStyle=C('--accent');x.lineWidth=3;x.beginPath();x.moveTo(cx,cy);x.lineTo(tx,ty);x.stroke();
+    x.fillStyle=C('--accent');x.beginPath();x.arc(tx,ty,5,0,6.2832);x.fill();
+  }
+  function drawComp(){
+    var o=fit(document.getElementById('comp'),150),x=o.x,W=o.w,H=o.h,padx=12,mid=H/2-4,amp=H*0.30;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    var PM=4*Math.PI,x0=padx,x1=W-padx;
+    function PX(phi){return x0+(x1-x0)*phi/PM;}
+    // gridlines at t = 0, T, 2T  (phi = 0, 2π, 4π)
+    x.strokeStyle='rgba(255,255,255,.16)';x.lineWidth=1;
+    [0,2*Math.PI,4*Math.PI].forEach(function(g){var gx=PX(g);x.beginPath();x.moveTo(gx,10);x.lineTo(gx,H-16);x.stroke();});
+    // zero line
+    x.strokeStyle='rgba(255,255,255,.28)';x.beginPath();x.moveTo(x0,mid);x.lineTo(x1,mid);x.stroke();
+    // STATIC time-domain curves Ex(t), Ey(t)
+    function pl(fn,col){x.strokeStyle=col;x.lineWidth=2.4;x.beginPath();for(var i=0;i<=240;i++){var phi=PM*i/240;var gx=PX(phi),gy=mid-fn(phi)*amp;if(i===0)x.moveTo(gx,gy);else x.lineTo(gx,gy);}x.stroke();}
+    pl(function(p){return A*Math.cos(p);},C('--blueSoft'));
+    pl(function(p){return B*Math.cos(p+dd);},C('--redSoft'));
+    // "instante actual" marker, synced with the rotating vector on the left
+    var phin=((t%PM)+PM)%PM, mx=PX(phin);
+    x.strokeStyle=C('--accent');x.lineWidth=1.6;x.setLineDash([4,3]);x.beginPath();x.moveTo(mx,10);x.lineTo(mx,H-16);x.stroke();x.setLineDash([]);
+    x.fillStyle=C('--blueSoft');x.beginPath();x.arc(mx,mid-A*Math.cos(phin)*amp,4,0,6.2832);x.fill();
+    x.fillStyle=C('--redSoft');x.beginPath();x.arc(mx,mid-B*Math.cos(phin+dd)*amp,4,0,6.2832);x.fill();
+    // labels
+    x.fillStyle='rgba(255,255,255,.65)';x.font='11px '+C('--mono')+',monospace';x.textAlign='center';
+    x.fillText('0',PX(0),H-4);x.fillText('T',PX(2*Math.PI),H-4);x.fillText('2T',PX(4*Math.PI),H-4);
+    x.textAlign='left';x.fillText('tiempo t →',x0+2,16);
+  }
+  function drawLink(){
+    var o=fit(document.getElementById('link'),260),x=o.x,W=o.w,H=o.h,cx=W/2,cy=H/2,S=Math.min(W,H)/2-24;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    x.strokeStyle='rgba(255,255,255,.14)';x.lineWidth=1;x.beginPath();x.moveTo(cx-S,cy);x.lineTo(cx+S,cy);x.moveTo(cx,cy-S);x.lineTo(cx,cy+S);x.stroke();
+    // incoming polarization figure
+    x.strokeStyle=C('--blueSoft');x.lineWidth=2;x.beginPath();
+    for(var k=0;k<=360;k++){var th=k*Math.PI/180;var px=cx+A*Math.cos(th)*S;var py=cy-B*Math.cos(th+dd)*S;if(k===0)x.moveTo(px,py);else x.lineTo(px,py);}x.stroke();
+    // receiver antenna (dipole line through origin at thetaRx)
+    x.strokeStyle=C('--greenSoft');x.lineWidth=4;x.lineCap='round';
+    x.beginPath();x.moveTo(cx-Math.cos(thetaRx)*S,cy+Math.sin(thetaRx)*S);x.lineTo(cx+Math.cos(thetaRx)*S,cy-Math.sin(thetaRx)*S);x.stroke();x.lineCap='butt';
+    x.fillStyle='rgba(255,255,255,.6)';x.font='11px '+C('--mono')+',monospace';x.fillText('antena ↕ (girable)',10,18);
+  }
+  function drawKnob(){
+    var cv=document.getElementById('knob');var dpr=window.devicePixelRatio||1;cv.width=150*dpr;cv.height=150*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+    var cx=75,cy=75,R=58;
+    x.clearRect(0,0,150,150);
+    x.fillStyle=C('--bg');x.strokeStyle=C('--line');x.lineWidth=2;x.beginPath();x.arc(cx,cy,R,0,6.2832);x.fill();x.stroke();
+    // ticks
+    x.strokeStyle=C('--faint');x.lineWidth=1.5;for(var a=0;a<360;a+=30){var ang=a*Math.PI/180;x.beginPath();x.moveTo(cx+Math.cos(ang)*(R-2),cy-Math.sin(ang)*(R-2));x.lineTo(cx+Math.cos(ang)*(R-9),cy-Math.sin(ang)*(R-9));x.stroke();}
+    // pointer
+    x.strokeStyle=C('--accent');x.lineWidth=5;x.lineCap='round';x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(thetaRx)*(R-14),cy-Math.sin(thetaRx)*(R-14));x.stroke();x.lineCap='butt';
+    x.fillStyle=C('--accent');x.beginPath();x.arc(cx,cy,6,0,6.2832);x.fill();
+  }
+  function updateLink(){
+    var p=plf(thetaRx),pct=Math.max(0,Math.min(1,p));
+    document.getElementById('angv').textContent=Math.round(((thetaRx*180/Math.PI)%360+360)%360)+'°';
+    document.getElementById('plfpct').textContent=(pct*100).toFixed(0)+' %';
+    document.getElementById('plfdb').textContent=(p<1e-4?'−∞':(10*Math.log10(p)).toFixed(1))+' dB';
+    document.getElementById('mfill').style.width=(Math.max(1,pct*100))+'%';
+    var c=classify(),v=document.getElementById('verdict');
+    if(c.tipo==='Lineal') v.innerHTML='Polarización <b>lineal</b>: la señal sigue cos²θ y cae a cero cuando la antena queda perpendicular. Frágil ante desalineación o giro del satélite.';
+    else if(c.tipo==='Circular') v.innerHTML='Polarización <b>circular</b>: la señal se mantiene en −3 dB sin importar la orientación de la antena. Robusta: la que usan GPS y satélites.';
+    else v.innerHTML='Polarización <b>elíptica</b>: la señal varía con la orientación pero no llega a cero. Caso intermedio.';
+    drawKnob();drawLink();
+  }
+  // knob drag
+  var knob=document.getElementById('knob');
+  function setFromEvent(e){var r=knob.getBoundingClientRect();var px=(e.clientX-r.left),py=(e.clientY-r.top);thetaRx=Math.atan2(-(py-75),(px-75));document.getElementById('knobslider').value=Math.round(((thetaRx*180/Math.PI)%360+360)%360);updateLink();}
+  var dragging=false;
+  knob.addEventListener('pointerdown',function(e){dragging=true;knob.setPointerCapture(e.pointerId);setFromEvent(e);});
+  knob.addEventListener('pointermove',function(e){if(dragging)setFromEvent(e);});
+  knob.addEventListener('pointerup',function(){dragging=false;});
+  knob.addEventListener('pointercancel',function(){dragging=false;});
+  document.getElementById('knobslider').addEventListener('input',function(e){thetaRx=(+e.target.value)*Math.PI/180;updateLink();});
+  // main controls
+  document.getElementById('ax').addEventListener('input',function(e){A=+e.target.value;labels();});
+  document.getElementById('ay').addEventListener('input',function(e){B=+e.target.value;labels();});
+  document.getElementById('d').addEventListener('input',function(e){dd=(+e.target.value)*Math.PI/180;labels();});
+  document.querySelectorAll('[data-p]').forEach(function(btn){btn.addEventListener('click',function(){
+    var p=btn.getAttribute('data-p');
+    if(p==='lin'){A=1;B=0;dd=0;}if(p==='cir'){A=1;B=1;dd=Math.PI/2;}if(p==='eli'){A=1;B=0.5;dd=Math.PI/2;}
+    document.getElementById('ax').value=A;document.getElementById('ay').value=B;document.getElementById('d').value=Math.round(dd*180/Math.PI);labels();});});
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',function(){drawKnob();});
+  window.addEventListener('resize',updateLink);
+  labels();
+  (function loop(){t+=0.05;drawFig();drawComp();drawLink();requestAnimationFrame(loop);})();
+})();
+</script>

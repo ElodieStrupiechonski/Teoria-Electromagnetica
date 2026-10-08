@@ -1,0 +1,37 @@
+{
+  "title": "Teoría Electromagnética — Exploradores interactivos",
+  "upload_type": "lesson",
+  "language": "spa",
+  "version": "1.0",
+  "access_right": "open",
+  "license": "cc-by-4.0",
+  "creators": [
+    {
+      "name": "Strupiechonski, Elodie",
+      "affiliation": "Escuela Nacional de Estudios Superiores (ENES) Unidad Juriquilla, Universidad Nacional Autónoma de México",
+      "orcid": "0000-0001-8991-8499"
+    },
+    {
+      "name": "de Luna Bugallo, Andrés",
+      "affiliation": "Centro de Física Aplicada y Tecnología Avanzada (CFATA), Universidad Nacional Autónoma de México",
+      "orcid": "0000-0002-7591-5235"
+    }
+  ],
+  "description": "Colección de recursos educativos abiertos e interactivos para el curso de Teoría Electromagnética de la licenciatura en Ingeniería Aeroespacial (ENES Juriquilla, UNAM). Cada explorador es una página HTML autónoma en la que el estudiante manipula controles y observa en tiempo real el fenómeno físico. La colección incluye nueve exploradores: espectro electromagnético con cuatro ejes convertibles (longitud de onda, frecuencia, energía y número de onda); efecto Doppler y corrimiento al rojo; polarización lineal, circular y elíptica con un caso de enlace satelital; efecto piel en conductores; circuito RC y fasores; reflexión con incidencia normal y onda estacionaria; ley de Snell, reflexión total interna y ángulo de Brewster; campo de un solenoide finito; y la medición de la velocidad de la luz con microondas (onda estacionaria, c = f·λ). Los recursos son autocontenidos (no requieren internet), se adaptan al tema claro u oscuro y están redactados en español. Entrada por el archivo index.html.",
+  "keywords": [
+    "electromagnetismo",
+    "recurso educativo abierto",
+    "física",
+    "ondas electromagnéticas",
+    "polarización",
+    "efecto Doppler",
+    "espectro electromagnético",
+    "efecto piel",
+    "líneas de transmisión",
+    "ingeniería aeroespacial",
+    "simulación interactiva",
+    "enseñanza de la física",
+    "UNAM"
+  ],
+  "notes": "Material didáctico para el curso de Teoría Electromagnética, Ingeniería Aeroespacial, ENES Juriquilla, UNAM. Abrir index.html para navegar la colección."
+}

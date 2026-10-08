@@ -1,0 +1,107 @@
+<meta charset="utf-8">
+<title>Exploradores EM</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
+    --blue:#2456a6;--blueSoft:#4a7fd0;--red:#c0392b;--accent:#c96a1e;--green:#2f7d46;
+    --serif:"Spectral",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--accent:#e08a3e;--green:#6cc487;}}
+  :root[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--accent:#e08a3e;--green:#6cc487;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:940px;margin:0 auto;padding-block:36px 44px;padding-left:20px;padding-right:20px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.06;margin:.04em 0 .2em;text-wrap:balance}
+  .lede{font-size:17px;color:var(--muted);max-width:64ch;margin:0 0 6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;margin-top:26px}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 1px 3px rgba(20,20,40,.05);transition:transform .12s ease,border-color .12s ease}
+  a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+  a.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .u{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .ct{font-family:var(--serif);font-size:20px;font-weight:600;margin:6px 0 4px}
+  .cd{font-size:14px;color:var(--muted)}
+  .chip{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11.5px;color:var(--accent)}
+  .swatch{height:8px;border-radius:6px;margin-bottom:14px}
+  .credits{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  .hint{font-size:13px;color:var(--faint);margin-top:8px}
+</style>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">ENES Juriquilla, UNAM · Ingeniería Aeroespacial</p>
+    <h1>Exploradores interactivos de Teoría Electromagnética</h1>
+    <p class="lede">Una colección de recursos abiertos para tocar la física: mueve un control y observa cómo responde el fenómeno. Cada explorador acompaña un tema del curso y su práctica de laboratorio.</p>
+    <p class="hint">Abre cada tarjeta en su propia página. Mantén todos los archivos en la misma carpeta para que los enlaces funcionen.</p>
+  </header>
+
+  <div class="grid">
+    <a class="card" href="Doppler_explorador.html">
+      <div class="swatch" style="background:linear-gradient(90deg,var(--blue),var(--red))"></div>
+      <div class="u">Unidad 2 · tema 2.9</div>
+      <div class="ct">Efecto Doppler</div>
+      <div class="cd">Frentes de onda, la señal que recibe cada observador y el corrimiento al rojo de las galaxias.</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+    <a class="card" href="Polarizacion_explorador.html">
+      <div class="swatch" style="background:linear-gradient(90deg,var(--blueSoft),var(--accent))"></div>
+      <div class="u">Unidad 2 · tema 2.8 · P7</div>
+      <div class="ct">Polarización</div>
+      <div class="cd">La punta del campo E traza una recta, un círculo o una elipse según amplitudes y desfase.</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+    <a class="card" href="Reflexion_interactivo.html">
+      <div class="swatch" style="background:linear-gradient(90deg,var(--blue),var(--green))"></div>
+      <div class="u">Unidad 3 · tema 3.2 · P8</div>
+      <div class="ct">Reflexión (incidencia normal)</div>
+      <div class="cd">Onda estacionaria en el medio 1 y onda transmitida en el medio 2, con Γ, τ y SWR.</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+    <a class="card" href="Snell_explorador.html">
+      <div class="swatch" style="background:linear-gradient(90deg,var(--accent),var(--green))"></div>
+      <div class="u">Unidad 3 · temas 3.5–3.8 · P10, P11</div>
+      <div class="ct">Ley de Snell y reflexión total</div>
+      <div class="cd">Refracción, ángulo crítico (reflexión total interna) y ángulo de Brewster con trazado de rayos.</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+    <a class="card" href="Espectro_explorador.html">
+      <div class="swatch" style="background:linear-gradient(90deg,#3b5a8c,#6a4ea8,#a0522d,#e8d21a,#7a3fb0,#8b2f6b)"></div>
+      <div class="u">Transversal · todo el espectro</div>
+      <div class="ct">Espectro electromagnético</div>
+      <div class="cd">Cuatro ejes (λ, f, energía, número de onda) alineados, con bandas y tecnologías (radio a gamma).</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+    <a class="card" href="Solenoide_explorador.html">
+      <div class="swatch" style="background:linear-gradient(90deg,var(--faint),var(--accent))"></div>
+      <div class="u">Unidad 1 · tema 1.4 · P3</div>
+      <div class="ct">Solenoide finito</div>
+      <div class="cd">El campo real B(z) frente al ideal μ₀nI y el efecto de borde de la bobina casera de la P3.</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+    <a class="card" href="EfectoPiel_explorador.html">
+      <div class="swatch" style="background:linear-gradient(90deg,var(--blueSoft),var(--faint))"></div>
+      <div class="u">Unidad 2 · tema 2.6 · P6</div>
+      <div class="ct">Efecto piel</div>
+      <div class="cd">La onda decae como e^(−z/δ) dentro del metal; δ contra frecuencia y material.</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+    <a class="card" href="RC_interactivo.html">
+      <div class="swatch" style="background:linear-gradient(90deg,var(--blueSoft),var(--red))"></div>
+      <div class="u">Unidad 2 · fasores · P4 (parte C)</div>
+      <div class="ct">Circuito RC y desfase</div>
+      <div class="cd">Osciloscopio, corriente que adelanta al voltaje, fasores y triángulo de impedancias.</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+    <a class="card" href="MicroondasC_explorador.html">
+      <div class="swatch" style="background:linear-gradient(90deg,var(--accent),var(--red))"></div>
+      <div class="u">Ondas EM · P5</div>
+      <div class="ct">Velocidad de la luz con microondas</div>
+      <div class="cd">Onda estacionaria en el horno: mide la separación de los puntos calientes (λ/2) y obtén c = f·λ.</div>
+      <div class="chip">Abrir explorador →</div>
+    </a>
+  </div>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Teoría Electromagnética — Exploradores interactivos</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+  </div>
+</div>

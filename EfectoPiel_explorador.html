@@ -1,0 +1,182 @@
+<meta charset="utf-8">
+<title>Explorador de Efecto Piel</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
+    --blue:#2456a6;--blueSoft:#4a7fd0;--red:#c0392b;--redSoft:#d9635a;--accent:#c96a1e;--green:#2f7d46;--greenSoft:#5aa871;--panel:#10141d;
+    --serif:"Spectral",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}}
+  :root[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:940px;margin:0 auto;padding-block:32px 40px;padding-left:16px;padding-right:16px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.6vw,40px);line-height:1.08;margin:.04em 0 .18em;text-wrap:balance}
+  .lede{font-size:17px;color:var(--muted);max-width:64ch;margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:22px;box-shadow:0 1px 3px rgba(20,20,40,.05)}
+  .sec-tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+  .note{font-size:14.5px;color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px}
+  .panelcanvas{background:var(--panel)}
+  .grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;align-items:start}
+  @media (max-width:680px){.grid2{grid-template-columns:1fr}}
+  .ctrl label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin:12px 0 6px}
+  .ctrl label b{font-family:var(--mono);color:var(--accent);font-weight:500}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:7px 12px;cursor:pointer}
+  .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .tile .k{font-size:12px;color:var(--muted)} .tile .v{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--ink)}
+  .legend{display:flex;gap:16px;font-size:13px;flex-wrap:wrap;margin-top:10px;color:var(--muted)}
+  .legend i{display:inline-block;width:15px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
+  .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  @media (max-width:560px){
+    .wrap{padding-left:16px;padding-right:16px}
+    .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
+    input[type=range]{height:26px}
+    .btn{padding:8px 13px}
+    h1{font-size:26px}
+    .card{padding:18px 16px}
+  }
+</style>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 2 · tema 2.6 · práctica P6</p>
+    <h1>Efecto piel: hasta dónde entra la onda en el metal</h1>
+    <p class="lede">La onda sí entra en el conductor, pero se apaga muy rápido: su amplitud decae como e^(−z/δ) con la profundidad. La profundidad de penetración δ mide hasta dónde llega de forma apreciable — cae al 37 % en una δ y a ~5 % en tres δ. Cambia la frecuencia y el material, y observa cómo la onda se confina cerca de la superficie.</p>
+  </header>
+
+  <section class="card">
+    <p class="sec-tag">Explorador · onda penetrando en el conductor</p>
+    <div class="grid2">
+      <div>
+        <canvas id="skin" class="panelcanvas" height="250"></canvas>
+        <div class="legend"><span><i style="background:var(--blueSoft)"></i>campo E</span><span><i style="background:var(--greenSoft)"></i>campo H (retrasado)</span><span><i style="background:var(--accent)"></i>envolvente e^(−z/δ)</span></div>
+        <canvas id="df" class="panelcanvas" height="170" style="margin-top:14px"></canvas>
+        <div class="legend"><span><i style="background:var(--accent)"></i>δ contra frecuencia (escala fija, log–log)</span></div>
+      </div>
+      <div class="ctrl">
+        <div class="row">
+          <button class="btn on" data-m="cobre">cobre</button>
+          <button class="btn" data-m="aluminio">aluminio</button>
+          <button class="btn" data-m="oro">oro</button>
+          <button class="btn" data-m="mar">agua de mar</button>
+        </div>
+        <label><span>Frecuencia f</span> <b id="fv">1 MHz</b></label><input id="f" type="range" min="3" max="15" step="0.05" value="6">
+        <div class="tiles">
+          <div class="tile"><div class="k">Conductividad σ</div><div class="v" id="sig">—</div></div>
+          <div class="tile"><div class="k">Profundidad δ = 1/√(πfμσ)</div><div class="v" id="dl">—</div></div>
+          <div class="tile"><div class="k">Atenuación α = 1/δ</div><div class="v" id="al">—</div></div>
+          <div class="tile"><div class="k">Resistencia superficial Rs</div><div class="v" id="rs">—</div></div>
+          <div class="tile"><div class="k">Desfase de H respecto de E</div><div class="v" id="ph">—</div></div>
+          <div class="tile"><div class="k">Régimen</div><div class="v" id="reg">—</div></div>
+        </div>
+        <p class="note" style="margin-top:12px">En un buen conductor H se retrasa 45° respecto de E (la impedancia intrínseca tiene ángulo de 45°). Por eso conviene usar conductores huecos o plateados, y por eso la jaula de Faraday de la P6 apantalla las señales: dentro apenas quedan unas cuantas δ de campo.</p>
+      </div>
+    </div>
+    <p class="sec-tag" style="margin-top:20px">Relaciones clave</p>
+    <div class="eq"><var>&delta;</var> <span class="op">=</span> 1 <span class="op">/</span> &radic;(&pi; <var>f</var> &middot; <var>&mu;</var> &middot; <var>&sigma;</var>)</div>
+    <div class="eq"><span class="vec">E</span>(<var>z</var>) <span class="op">=</span> <span class="vec">E</span><sub>0</sub> <var>e</var><sup>&minus;<var>z</var>/<var>&delta;</var></sup></div>
+    <div class="eq"><var>&alpha;</var> <span class="op">=</span> <var>&beta;</var> <span class="op">=</span> 1 <span class="op">/</span> <var>&delta;</var></div>
+    <div class="eq"><var>&theta;</var><sub><var>&eta;</var></sub> <span class="op">=</span> &frac12; arctan(<var>&sigma;</var> <span class="op">/</span> <var>&omega;</var><var>&epsilon;</var>) <span class="op">&rarr;</span> 45&deg; = &pi;/4</div>
+    <p class="note" style="margin-top:6px">En un buen conductor el ángulo de la impedancia intrínseca es de 45&deg;: la <span class="vec">H</span> se retrasa &pi;/4 respecto de la <span class="vec">E</span>. La amplitud decae como exp(&minus;<var>z</var>/<var>&delta;</var>) y cae al 37 % en una <var>&delta;</var>.</p>
+    <p class="note" style="margin-top:6px">Nota: por arriba del infrarrojo (banda visible marcada en la gráfica) este modelo de buen conductor es solo orientativo; a esas frecuencias la conductividad deja de ser constante y aparecen efectos de plasma.</p>
+  </section>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Efecto piel en conductores — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+  </div>
+</div>
+<script>
+(function(){
+  var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  var MU0=4*Math.PI*1e-7, E0P=8.854e-12;
+  function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(240,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
+  var MAT={cobre:{s:5.8e7,er:1},aluminio:{s:3.5e7,er:1},oro:{s:4.1e7,er:1},mar:{s:4,er:81}};
+  var mat='cobre', fexp=6, t=0;
+  function sigma(){return MAT[mat].s;} function er(){return MAT[mat].er;}
+  function fval(){return Math.pow(10,fexp);}
+  function delta(f){return 1/Math.sqrt(Math.PI*f*MU0*sigma());}
+  function lossTan(f){return sigma()/(2*Math.PI*f*er()*E0P);}       // σ/(ωε)
+  function etaAngle(f){return 0.5*Math.atan(lossTan(f));}            // H lags E by this
+  function fmtLen(m){if(m>=1)return m.toFixed(2)+' m';if(m>=1e-3)return (m*1e3).toFixed(3)+' mm';if(m>=1e-6)return (m*1e6).toFixed(2)+' µm';return (m*1e9).toFixed(1)+' nm';}
+  function fmtF(f){if(f>=1e12)return (f/1e12).toFixed(2)+' THz';if(f>=1e9)return (f/1e9).toFixed(2)+' GHz';if(f>=1e6)return (f/1e6).toFixed(2)+' MHz';if(f>=1e3)return (f/1e3).toFixed(1)+' kHz';return f.toFixed(0)+' Hz';}
+  function labels(){
+    var f=fval(),dl=delta(f),tanD=lossTan(f),ang=etaAngle(f)*180/Math.PI;
+    document.getElementById('fv').textContent=fmtF(f);
+    document.getElementById('sig').textContent=(sigma()>=1e6?(sigma()/1e6).toFixed(1)+'×10⁶':sigma())+' S/m';
+    document.getElementById('dl').textContent=fmtLen(dl);
+    document.getElementById('al').textContent=(1/dl).toExponential(2)+' Np/m';
+    document.getElementById('rs').textContent=(1/(sigma()*dl)).toExponential(2)+' Ω';
+    document.getElementById('ph').textContent=ang.toFixed(1)+'°';
+    document.getElementById('reg').textContent=tanD>10?'buen conductor':(tanD<0.1?'cuasi-dieléctrico':'intermedio');
+  }
+  function drawSkin(){
+    var o=fit(document.getElementById('skin'),250),x=o.x,W=o.w,H=o.h,pad=10,mid=H/2,amp=H*0.32,Nsh=6;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    var g=x.createLinearGradient(pad,0,W-pad,0);g.addColorStop(0,'rgba(74,127,208,.20)');g.addColorStop(1,'rgba(74,127,208,0)');
+    x.fillStyle=g;x.fillRect(pad,pad,W-2*pad,H-2*pad);
+    x.strokeStyle='rgba(255,255,255,.14)';x.lineWidth=1;x.beginPath();x.moveTo(pad,mid);x.lineTo(W-pad,mid);x.stroke();
+    x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=2;x.beginPath();x.moveTo(pad,pad);x.lineTo(pad,H-pad);x.stroke();
+    x.fillStyle='rgba(255,255,255,.6)';x.font='11px '+C('--mono')+',monospace';x.fillText('superficie',pad+4,pad+12);x.fillText('profundidad z →',W-118,H-8);
+    var span=W-2*pad, lag=etaAngle(fval());
+    function ex(u){return Math.exp(-u);}
+    // envelope
+    x.strokeStyle=C('--accent');x.lineWidth=1.5;x.setLineDash([5,4]);
+    x.beginPath();for(var p=0;p<=span;p++){x.lineTo(pad+p,mid-ex(Nsh*p/span)*amp);}x.stroke();
+    x.beginPath();for(var q=0;q<=span;q++){x.lineTo(pad+q,mid+ex(Nsh*q/span)*amp);}x.stroke();x.setLineDash([]);
+    // H (retrasado) drawn behind E
+    x.strokeStyle=C('--greenSoft');x.lineWidth=2.2;x.globalAlpha=.9;x.beginPath();
+    for(var ph=0;ph<=span;ph++){var uh=Nsh*ph/span;var yh=mid-ex(uh)*Math.cos(uh-t-lag)*amp;if(ph===0)x.moveTo(pad+ph,yh);else x.lineTo(pad+ph,yh);}x.stroke();x.globalAlpha=1;
+    // E
+    x.strokeStyle=C('--blueSoft');x.lineWidth=2.8;x.beginPath();
+    for(var px=0;px<=span;px++){var u=Nsh*px/span;var y=mid-ex(u)*Math.cos(u-t)*amp;if(px===0)x.moveTo(pad+px,y);else x.lineTo(pad+px,y);}x.stroke();
+    // delta markers
+    var dl=delta(fval());
+    x.strokeStyle='rgba(255,255,255,.35)';x.fillStyle='rgba(255,255,255,.7)';x.font='11px '+C('--mono')+',monospace';
+    for(var kk=1;kk<=3;kk++){var xx=pad+span*kk/Nsh;x.setLineDash([2,3]);x.beginPath();x.moveTo(xx,pad);x.lineTo(xx,H-pad);x.stroke();x.setLineDash([]);x.fillText(kk+'δ',xx-6,H-pad-4);}
+    x.fillStyle=C('--accent');x.fillText('δ = '+fmtLen(dl),pad+span/Nsh+4,pad+14);
+  }
+  function drawDF(){
+    var o=fit(document.getElementById('df'),170),x=o.x,W=o.w,H=o.h,padL=46,padR=12,padT=12,padB=26;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    var e0=3,e1=15;                 // f: 1 kHz .. 1 PHz
+    var lyTop=1, lyBot=-9;          // δ: 10 m .. 1 nm  (log10, FIXED scale for all materials)
+    function X(fe){return padL+(W-padL-padR)*(fe-e0)/(e1-e0);}
+    function Y(ld){return padT+(H-padT-padB)*(lyTop-ld)/(lyTop-lyBot);}
+    // visible band (approx 4.3e14 .. 7.9e14 Hz -> exp 14.63 .. 14.90)
+    x.fillStyle='rgba(255,255,255,.10)';x.fillRect(X(14.63),padT,X(14.90)-X(14.63),H-padT-padB);
+    x.fillStyle='rgba(255,255,255,.5)';x.font='10px '+C('--mono')+',monospace';x.save();x.translate(X(14.77),padT+30);x.rotate(-Math.PI/2);x.fillText('visible',0,0);x.restore();
+    // grid + y labels
+    x.strokeStyle='rgba(255,255,255,.12)';x.lineWidth=1;
+    var yl=[[0,'1 m'],[-3,'1 mm'],[-6,'1 µm'],[-9,'1 nm']];
+    x.fillStyle='rgba(255,255,255,.55)';
+    for(var i=0;i<yl.length;i++){var yy=Y(yl[i][0]);x.beginPath();x.moveTo(padL,yy);x.lineTo(W-padR,yy);x.stroke();x.fillText(yl[i][1],4,yy+4);}
+    var xl=[[3,'1k'],[6,'1M'],[9,'1G'],[12,'1T'],[15,'1P']];
+    for(var j=0;j<xl.length;j++){x.fillText(xl[j][1],X(xl[j][0])-6,H-9);}
+    // current material curve (fixed scale -> moves when material changes)
+    x.strokeStyle=C('--accent');x.lineWidth=2.6;x.beginPath();
+    for(var fe=e0;fe<=e1+1e-9;fe+=0.05){var ld=Math.log10(delta(Math.pow(10,fe)));var yy2=Y(ld);if(fe===e0)x.moveTo(X(fe),yy2);else x.lineTo(X(fe),yy2);}x.stroke();
+    // dot
+    x.fillStyle=C('--accent');x.beginPath();x.arc(X(fexp),Y(Math.log10(delta(fval()))),4.5,0,6.2832);x.fill();
+  }
+  function statLabels(){labels();drawDF();}
+  document.getElementById('f').addEventListener('input',function(e){fexp=+e.target.value;statLabels();});
+  document.querySelectorAll('[data-m]').forEach(function(btn){btn.addEventListener('click',function(){
+    mat=btn.getAttribute('data-m');document.querySelectorAll('[data-m]').forEach(function(b){b.classList.toggle('on',b===btn);});statLabels();});});
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',function(){statLabels();});
+  window.addEventListener('resize',function(){statLabels();});
+  statLabels();
+  (function loop(){t+=0.08;drawSkin();requestAnimationFrame(loop);})();
+})();
+</script>

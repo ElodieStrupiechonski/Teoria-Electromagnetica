@@ -1,0 +1,187 @@
+<meta charset="utf-8">
+<title>Espectro EM</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
+    --blue:#2456a6;--blueSoft:#4a7fd0;--red:#c0392b;--accent:#c96a1e;--green:#2f7d46;--panel:#10141d;--panelInk:#eef2fb;
+    --serif:"Spectral",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--accent:#e08a3e;--green:#6cc487;--panel:#0a0d14;}}
+  :root[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--accent:#e08a3e;--green:#6cc487;--panel:#0a0d14;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:1000px;margin:0 auto;padding-block:32px 40px;padding-left:16px;padding-right:16px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,5.4vw,42px);line-height:1.07;margin:.04em 0 .18em;text-wrap:balance}
+  .lede{font-size:16px;color:var(--muted);max-width:66ch;margin:0}
+  h2{font-family:var(--serif);font-weight:600;font-size:20px;margin:0 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin-top:20px;box-shadow:0 1px 3px rgba(20,20,40,.05)}
+  @media (min-width:560px){.card{padding:20px 22px}}
+  .sec-tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:0 0 10px}
+  .note{font-size:13.5px;color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px}
+  #spec{background:var(--panel);touch-action:none;cursor:ew-resize}
+  .slider{width:100%;accent-color:var(--accent);margin-top:12px;height:26px}
+  .hint{font-size:12.5px;color:var(--faint);margin-top:4px;text-align:center}
+  .bandleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:12px;color:var(--muted)}
+  .bandleg span{display:inline-flex;align-items:center;gap:5px}
+  .bandleg i{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .presets{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+  .btn{font:inherit;font-size:12.5px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:8px 11px;cursor:pointer}
+  .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:16px}
+  @media (min-width:560px){.tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .tile .k{font-size:11.5px;color:var(--muted)} .tile .v{font-family:var(--mono);font-size:16px;font-weight:500;color:var(--ink)}
+  .tile.hl{border-color:var(--accent);grid-column:1/-1} .tile.hl .v{color:var(--accent);font-size:18px}
+  @media (min-width:560px){.tile.hl{grid-column:auto}}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;margin:8px 0;overflow-x:auto;text-align:center;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
+  .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  .kv{font-size:13.5px;margin:5px 0} .kv b{font-family:var(--mono);color:var(--ink)}
+  .credits{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+</style>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Teoría Electromagnética · el espectro completo</p>
+    <h1>Un solo eje, cuatro formas de medirlo</h1>
+    <p class="lede">Toda onda electromagnética se describe por su longitud de onda, su frecuencia, la energía de su fotón o su número de onda: cuatro maneras de nombrar lo mismo. Mueve el cursor por el espectro y observa las cuatro convertirse a la vez, del radio a los rayos gamma.</p>
+  </header>
+
+  <section class="card">
+    <p class="sec-tag">Explorador · mueve el cursor sobre el espectro</p>
+    <canvas id="spec" height="430"></canvas>
+    <input id="pos" class="slider" type="range" min="3" max="24" step="0.01" value="14.74" aria-label="Posición en el espectro">
+    <div class="hint">Usa el deslizador o toca la gráfica para mover el cursor</div>
+    <div class="bandleg" id="bandleg"></div>
+    <div class="presets" id="presets"></div>
+    <div class="tiles">
+      <div class="tile hl"><div class="k">Banda</div><div class="v" id="oBand">—</div></div>
+      <div class="tile"><div class="k">Frecuencia f</div><div class="v" id="oF">—</div></div>
+      <div class="tile"><div class="k">Longitud de onda λ</div><div class="v" id="oL">—</div></div>
+      <div class="tile"><div class="k">Energía (eV)</div><div class="v" id="oEeV">—</div></div>
+      <div class="tile"><div class="k">Energía (J)</div><div class="v" id="oEJ">—</div></div>
+      <div class="tile"><div class="k">Número de onda</div><div class="v" id="oWn">—</div></div>
+    </div>
+    <p class="note" style="margin-top:12px">Los límites entre bandas son convencionales y se traslapan; las etiquetas de tecnología marcan valores representativos.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Fórmulas de conversión</p>
+    <div class="eq"><var>&lambda;</var> <span class="op">=</span> <var>c</var> / <var>f</var><span class="op">,</span>&nbsp; <var>f</var> <span class="op">=</span> <var>c</var> / <var>&lambda;</var></div>
+    <div class="eq"><var>E</var> <span class="op">=</span> <var>h</var><var>f</var> <span class="op">=</span> <var>h</var><var>c</var> / <var>&lambda;</var><span class="op">,</span>&nbsp; <var>E</var><sub>[eV]</sub> <span class="op">=</span> <var>E</var><sub>[J]</sub> / <var>e</var></div>
+    <div class="eq"><var>&nu;&#772;</var> (cm<sup>&minus;1</sup>) <span class="op">=</span> 1 / <var>&lambda;</var><sub>[cm]</sub> <span class="op">=</span> <var>f</var> / (100<span class="op">&middot;</span><var>c</var>)</div>
+    <div class="eq">Atajos:&nbsp; <var>E</var><sub>[eV]</sub> <span class="op">=</span> 1240 / <var>&lambda;</var><sub>[nm]</sub> <span class="op">&middot;</span>&nbsp; 1 eV &harr; 8065.5 cm<sup>&minus;1</sup> &harr; 2.418×10<sup>14</sup> Hz</div>
+  </section>
+  <section class="card">
+    <p class="sec-tag">Constantes de la naturaleza</p>
+    <p class="kv">Velocidad de la luz &nbsp; <b>c = 2.998×10⁸ m/s</b></p>
+    <p class="kv">Constante de Planck &nbsp; <b>h = 6.626×10⁻³⁴ J·s</b></p>
+    <p class="kv">Planck en eV &nbsp; <b>h = 4.136×10⁻¹⁵ eV·s</b></p>
+    <p class="kv">Carga elemental &nbsp; <b>e = 1.602×10⁻¹⁹ C</b></p>
+    <p class="kv">Producto útil &nbsp; <b>h·c = 1240 eV·nm</b></p>
+  </section>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Espectro electromagnético — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+  </div>
+</div>
+<script>
+(function(){
+  var c=2.998e8, h=6.626e-34, eC=1.602e-19, LMIN=3, LMAX=24;
+  var logf=Math.log10(c/550e-9);
+  var CV=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function fit(cv,hgt){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(280,r.width);cv.width=w*dpr;cv.height=hgt*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:hgt};}
+  var PADL=14,PADR=14;
+  function X(lf,w){return PADL+(w-PADL-PADR)*(lf-LMIN)/(LMAX-LMIN);}
+  function invX(px,w){return LMIN+(LMAX-LMIN)*(px-PADL)/(w-PADL-PADR);}
+  var BANDS=[
+    {a:3,b:8.5,c:'#3b5a8c',n:'Radiofrecuencia'},{a:8.5,b:11.48,c:'#2f7d7a',n:'Microondas'},
+    {a:11.48,b:13,c:'#6a4ea8',n:'Terahertz'},{a:13,b:14.63,c:'#a0522d',n:'Infrarrojo'},
+    {a:14.63,b:14.90,c:'rainbow',n:'Visible'},{a:14.90,b:16.5,c:'#7a3fb0',n:'Ultravioleta'},
+    {a:16.5,b:19.7,c:'#35608b',n:'Rayos X'},{a:19.7,b:24,c:'#8b2f6b',n:'Rayos gamma'}
+  ];
+  var FLAGS=[{lf:8,t:'FM'},{lf:9.26,t:'4G'},{lf:9.54,t:'5G sub-6'},{lf:10.45,t:'5G mmW'},{lf:12,t:'1 THz'}];
+  var FLAGS_N=[{lf:9.54,t:'5G'},{lf:10.45,t:'mmW'},{lf:12,t:'1 THz'}];
+  var FTICKS=[[1e3,'1 kHz'],[1e6,'1 MHz'],[1e9,'1 GHz'],[1e12,'1 THz'],[1e15,'1 PHz'],[1e18,'1 EHz'],[1e21,'1 ZHz'],[1e24,'1 YHz']];
+  var LTICKS=[[1e5,'100 km'],[1e3,'1 km'],[1,'1 m'],[1e-2,'1 cm'],[1e-3,'1 mm'],[1e-6,'1 µm'],[1e-9,'1 nm'],[1e-12,'1 pm'],[1e-15,'1 fm']];
+  var ETICKS=[[1e-9,'1 neV'],[1e-6,'1 µeV'],[1e-3,'1 meV'],[1,'1 eV'],[1e3,'1 keV'],[1e6,'1 MeV'],[1e9,'1 GeV']];
+  var WTICKS=[[1e-4,'10⁻⁴'],[1e-2,'10⁻²'],[1,'1'],[1e2,'10²'],[1e4,'10⁴'],[1e6,'10⁶'],[1e8,'10⁸']];
+  function lfF(f){return Math.log10(f);} function lfL(m){return Math.log10(c/m);}
+  function lfE(ev){return Math.log10(ev*eC/h);} function lfW(cm){return Math.log10(cm*100*c);}
+  function bandName(lf){for(var i=0;i<BANDS.length;i++)if(lf>=BANDS[i].a&&lf<BANDS[i].b)return BANDS[i].n;return lf<3?'—':'Rayos gamma';}
+  function fmtF(f){var u=[['Hz',1],['kHz',1e3],['MHz',1e6],['GHz',1e9],['THz',1e12],['PHz',1e15],['EHz',1e18],['ZHz',1e21],['YHz',1e24]];for(var i=u.length-1;i>=0;i--)if(f>=u[i][1])return (f/u[i][1]).toFixed(2)+' '+u[i][0];return f.toExponential(2)+' Hz';}
+  function fmtL(m){if(m>=1e3)return (m/1e3).toFixed(2)+' km';if(m>=1)return m.toFixed(2)+' m';if(m>=1e-2)return (m*100).toFixed(2)+' cm';if(m>=1e-3)return (m*1e3).toFixed(2)+' mm';if(m>=1e-6)return (m*1e6).toFixed(2)+' µm';if(m>=1e-9)return (m*1e9).toFixed(2)+' nm';if(m>=1e-12)return (m*1e12).toFixed(2)+' pm';return (m*1e15).toFixed(2)+' fm';}
+  function fmtEeV(ev){var u=[['eV',1],['keV',1e3],['MeV',1e6],['GeV',1e9]];if(ev<1e-6)return (ev*1e9).toFixed(2)+' neV';if(ev<1e-3)return (ev*1e6).toFixed(2)+' µeV';if(ev<1)return (ev*1e3).toFixed(2)+' meV';for(var i=u.length-1;i>=0;i--)if(ev>=u[i][1])return (ev/u[i][1]).toFixed(2)+' '+u[i][0];return ev.toFixed(2)+' eV';}
+  function drawAxis(x,w,yBase,title,ticks,tofl,narrow){
+    var TF=narrow?9:11, LF=narrow?11:12;
+    x.strokeStyle='rgba(255,255,255,.45)';x.lineWidth=1.4;x.beginPath();x.moveTo(PADL,yBase);x.lineTo(w-PADR,yBase);x.stroke();
+    x.fillStyle='rgba(255,255,255,.92)';x.font='600 '+LF+'px '+CV('--sans')+',sans-serif';x.fillText(title,PADL,yBase-22);
+    x.font=TF+'px '+CV('--mono')+',monospace';
+    for(var i=0;i<ticks.length;i++){var lf=tofl(ticks[i][0]);if(lf<LMIN-0.05||lf>LMAX+0.05)continue;var px=X(lf,w);
+      x.strokeStyle='rgba(255,255,255,.45)';x.lineWidth=1;x.beginPath();x.moveTo(px,yBase-5);x.lineTo(px,yBase+5);x.stroke();
+      var showLabel = !narrow || (i%2===0) || i===ticks.length-1;
+      if(showLabel){var lab=ticks[i][1];var tw=x.measureText(lab).width;var lx=Math.max(2,Math.min(w-tw-2,px-tw/2));
+        x.fillStyle='rgba(255,255,255,.78)';x.fillText(lab,lx,yBase+16);}
+    }
+  }
+  function draw(){
+    var o=fit(document.getElementById('spec'),430),x=o.x,w=o.w,H=o.h,narrow=w<520;
+    x.fillStyle=CV('--panel');x.fillRect(0,0,w,H);
+    var byTop=24,bh=narrow?22:26;
+    for(var i=0;i<BANDS.length;i++){var B=BANDS[i],x0=X(Math.max(LMIN,B.a),w),x1=X(Math.min(LMAX,B.b),w);
+      if(B.c==='rainbow'){var g=x.createLinearGradient(x0,0,x1,0);g.addColorStop(0,'#d81f1f');g.addColorStop(.35,'#e8d21a');g.addColorStop(.6,'#28b24a');g.addColorStop(.8,'#00a2c8');g.addColorStop(1,'#6a00b8');x.fillStyle=g;}else x.fillStyle=B.c;
+      x.fillRect(x0,byTop,x1-x0,bh);
+      if(!narrow && x1-x0>56){x.fillStyle='rgba(255,255,255,.95)';x.font='600 11px '+CV('--sans')+',sans-serif';x.textAlign='center';x.fillText(B.n,(x0+x1)/2,byTop+bh/2+4);x.textAlign='left';}
+    }
+    // tech flags
+    var fy=byTop+bh+6, flags=narrow?FLAGS_N:FLAGS;
+    x.font=(narrow?9:10)+'px '+CV('--mono')+',monospace';
+    for(var k=0;k<flags.length;k++){var px=X(flags[k].lf,w);
+      x.strokeStyle='rgba(255,255,255,.4)';x.lineWidth=1;x.beginPath();x.moveTo(px,fy);x.lineTo(px,fy+8);x.stroke();
+      x.save();x.translate(px,fy+10);x.rotate(-Math.PI/4);x.fillStyle='rgba(255,255,255,.72)';x.fillText(flags[k].t,4,4);x.restore();}
+    // four axes
+    var y0=narrow?150:180, dy=(H-40-y0)/3;
+    drawAxis(x,w,y0,           narrow?'Frecuencia f':'Frecuencia  f',FTICKS,lfF,narrow);
+    drawAxis(x,w,y0+dy,        narrow?'λ = c/f':'Longitud de onda  λ = c/f',LTICKS,lfL,narrow);
+    drawAxis(x,w,y0+2*dy,      narrow?'E = h·f':'Energía del fotón  E = h·f',ETICKS,lfE,narrow);
+    drawAxis(x,w,y0+3*dy,      narrow?'ν̄  (cm⁻¹)':'Número de onda  ν̄ = 1/λ  (cm⁻¹)',WTICKS,lfW,narrow);
+    // cursor + handle
+    var cx=X(logf,w);
+    x.strokeStyle=CV('--accent');x.lineWidth=2.5;x.beginPath();x.moveTo(cx,byTop-4);x.lineTo(cx,y0+3*dy+8);x.stroke();
+    x.fillStyle=CV('--accent');x.beginPath();x.arc(cx,byTop-8,7,0,6.2832);x.fill();
+  }
+  function readout(){
+    var f=Math.pow(10,logf),lam=c/f,EJ=h*f,EeV=EJ/eC,wn=f/(100*c);
+    document.getElementById('oBand').textContent=bandName(logf);
+    document.getElementById('oF').textContent=fmtF(f);
+    document.getElementById('oL').textContent=fmtL(lam);
+    document.getElementById('oEeV').textContent=fmtEeV(EeV);
+    document.getElementById('oEJ').textContent=EJ.toExponential(2)+' J';
+    document.getElementById('oWn').textContent=(wn>=1e4||wn<1e-2?wn.toExponential(2):wn.toFixed(3))+' cm⁻¹';
+  }
+  function upd(){document.getElementById('pos').value=logf;draw();readout();}
+  // band legend
+  var bl=document.getElementById('bandleg');
+  BANDS.forEach(function(B){var col=B.c==='rainbow'?'linear-gradient(90deg,#d81f1f,#28b24a,#6a00b8)':B.c;var s=document.createElement('span');s.innerHTML='<i style="background:'+col+'"></i>'+B.n;bl.appendChild(s);});
+  // presets
+  var PRE=[['FM 100 MHz',lfF(1e8)],['WiFi 2.4 GHz',lfF(2.4e9)],['5G 3.5 GHz',lfF(3.5e9)],['5G mmW 28 GHz',lfF(28e9)],['1 THz',lfF(1e12)],['IR 10 µm',lfL(10e-6)],['Visible 550 nm',lfL(550e-9)],['UV 300 nm',lfL(300e-9)],['Rayos X 0.1 nm',lfL(0.1e-9)],['Gamma 1 pm',lfL(1e-12)]];
+  var pc=document.getElementById('presets');
+  PRE.forEach(function(p){var b=document.createElement('button');b.className='btn';b.textContent=p[0];b.addEventListener('click',function(){logf=Math.max(LMIN,Math.min(LMAX,p[1]));upd();});pc.appendChild(b);});
+  // slider
+  document.getElementById('pos').addEventListener('input',function(e){logf=+e.target.value;draw();readout();});
+  // drag / tap on canvas
+  var cv=document.getElementById('spec'),drag=false;
+  function setFromE(e){var r=cv.getBoundingClientRect();logf=Math.max(LMIN,Math.min(LMAX,invX(e.clientX-r.left,r.width)));upd();}
+  cv.addEventListener('pointerdown',function(e){drag=true;cv.setPointerCapture(e.pointerId);setFromE(e);});
+  cv.addEventListener('pointermove',function(e){if(drag)setFromE(e);});
+  cv.addEventListener('pointerup',function(){drag=false;});
+  cv.addEventListener('pointercancel',function(){drag=false;});
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',upd);
+  window.addEventListener('resize',upd);
+  upd();
+})();
+</script>
