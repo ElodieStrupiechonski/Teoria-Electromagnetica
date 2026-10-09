@@ -1,12 +1,12 @@
 <meta charset="utf-8">
-<title>Reflexión · incidencia normal</title>
+<title>Capa dieléctrica · 3 medios, 2 interfaces</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#f4f1ea;--card:#fff;--ink:#1a1a1a;--muted:#5a5a5a;--navy:#1F3864;--blue:#2E5496;--accent:#C1571B;--green:#2E7D32;--line:#e2dcc9;--panel:#0e1420;--m2:#12303a;--inc:#7aa2e0;--tr:#8bd08f;--env:#e6924a;--plane:#f2c14e;--serif:'Spectral',Georgia,'Times New Roman',serif;}
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--line:#333a44;--panel:#0b0f16;--m2:#0f2830;}}
-  :root[data-theme="dark"]{--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--line:#333a44;--panel:#0b0f16;--m2:#0f2830;}
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#1a1a1a;--muted:#5a5a5a;--navy:#1F3864;--blue:#2E5496;--accent:#C1571B;--green:#2E7D32;--line:#e2dcc9;--panel:#0e1420;--m2:#2a2410;--m3:#12303a;--inc:#7aa2e0;--lay:#e0c66f;--tr:#8bd08f;--env:#e6924a;--plane:#f2c14e;--serif:'Spectral',Georgia,'Times New Roman',serif;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--line:#333a44;--panel:#0b0f16;--m2:#231e0c;--m3:#0f2830;}}
+  :root[data-theme="dark"]{--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--line:#333a44;--panel:#0b0f16;--m2:#231e0c;--m3:#0f2830;}
   *{box-sizing:border-box}
   body{background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45}
   .wrap{max-width:960px;margin:0 auto;padding-block:22px;padding-left:16px;padding-right:16px}
@@ -14,31 +14,36 @@
   .sub{color:var(--muted);font-size:15px;margin-bottom:16px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
   canvas{width:100%;border-radius:10px;display:block;touch-action:none}
-  .controls{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end}
-  .ctl{flex:1 1 260px;min-width:220px}
+  .controls{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+  .ctl{flex:1 1 230px;min-width:200px}
   .ctl label{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-bottom:6px}
   .ctl label span{color:var(--accent);font-variant-numeric:tabular-nums}
   input[type=range]{width:100%;accent-color:var(--accent)}
-  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  select,input[type=number]{font:inherit;font-size:14px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  select{width:100%}
+  input[type=number]{width:76px}
+  .mats{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .mat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .mat .t{font-weight:700;font-size:13.5px;margin-bottom:6px}
+  .mat .t em{font-style:normal;color:var(--accent)}
+  .mat .row{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:13px;color:var(--muted)}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   .btn{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
   .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
   .tile{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
   .tile .k{font-size:12px;color:var(--muted)}
   .tile .v{font-size:18px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .tile .v.good{color:var(--green)}
   .legend{display:flex;gap:16px;font-size:13.5px;margin:8px 0 0;flex-wrap:wrap}
   .legend i{display:inline-block;width:16px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
-  .foot{font-size:13px;color:var(--muted);text-align:center;margin-top:6px}
   .credits{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
   .credits a{color:var(--blue)} .credits b{color:var(--ink)}
-  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq{font-family:var(--serif);font-size:16px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
   .eq var{font-style:italic}
   .eq sub,.eq sup{font-style:normal;font-size:.72em}
   .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
-  .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
-  .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
   @media (max-width:560px){
-    .wrap{padding-left:16px;padding-right:16px}
     .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
     input[type=range]{height:26px}
     .btn{padding:8px 13px}
@@ -47,170 +52,226 @@
   }
 </style>
 <div class="wrap">
-  <h1>Reflexión de una onda plana: incidencia normal</h1>
-  <div class="sub">La onda llega del medio 1 a la frontera (z = 0). Parte se refleja (formando una onda estacionaria) y parte se transmite al medio 2. Arrastra el <b>plano amarillo</b> (z = −d) para medir la impedancia de onda η(d) que “se ve” desde ahí.</div>
+  <h1>Capa dieléctrica: 3 medios, 2 interfaces</h1>
+  <div class="sub">La onda llega del medio 1, atraviesa la capa (medio 2) y sale al medio 3. La interfaz capa–medio 3 está fija en z = 0; <b>arrastra la interfaz 2→1 (z = −d)</b> para cambiar el espesor y ver variar la impedancia efectiva η(d) y la reflexión. Comprueba los casos d = λ₂/2 (capa transparente: radomo) y d = λ₂/4 con η₂ = √(η₁η₃) (antirreflejante).</div>
 
   <div class="card">
     <canvas id="cv" height="360"></canvas>
     <div class="legend">
-      <span><i style="background:var(--inc)"></i>Campo total en el medio 1 (incidente + reflejada)</span>
-      <span><i style="background:var(--tr)"></i>Onda transmitida (medio 2)</span>
-      <span><i style="background:var(--env)"></i>Envolvente (onda estacionaria)</span>
-      <span><i style="background:var(--plane)"></i>Plano de medición z = −d (arrástralo)</span>
+      <span><i style="background:var(--inc)"></i>Medio 1 (incidente + reflejada)</span>
+      <span><i style="background:var(--lay)"></i>Campo en la capa</span>
+      <span><i style="background:var(--tr)"></i>Transmitida (medio 3)</span>
+      <span><i style="background:var(--env)"></i>Envolvente</span>
+      <span><i style="background:var(--plane)"></i>Interfaz móvil z = −d</span>
     </div>
   </div>
 
   <div class="card">
-    <div class="controls">
-      <div class="ctl"><label><span>Medio 2: ε<sub>r</sub></span> <span id="erv">4.0</span></label><input id="er" type="range" min="1" max="16" step="0.5" value="4"></div>
-      <div class="ctl"><label>Plano de medición: d/λ₁ <span id="dv">0.250</span></label><input id="dr" type="range" min="0" max="2" step="0.005" value="0.25"></div>
+    <div class="mats">
+      <div class="mat"><div class="t">Medio 1 · <em>n₁</em></div>
+        <select id="s1"></select>
+        <div class="row">n₁ = <input id="n1" type="number" min="1" max="4" step="0.01" value="1.00"> <span id="h1v">η₁ = 377 Ω</span></div></div>
+      <div class="mat"><div class="t">Capa (medio 2) · <em>n₂</em></div>
+        <select id="s2"></select>
+        <div class="row">n₂ = <input id="n2" type="number" min="1" max="4" step="0.01" value="1.38"> <span id="h2v">η₂ = 273 Ω</span></div></div>
+      <div class="mat"><div class="t">Medio 3 · <em>n₃</em></div>
+        <select id="s3"></select>
+        <div class="row">n₃ = <input id="n3" type="number" min="1" max="4" step="0.01" value="1.50"> <span id="h3v">η₃ = 251 Ω</span></div></div>
+    </div>
+    <div class="controls" style="margin-top:12px">
+      <div class="ctl"><label><span>Espesor de la capa: d/λ₂</span> <span id="dv">0.250</span></label><input id="dr" type="range" min="0.02" max="1.5" step="0.005" value="0.25"></div>
       <div class="btns">
         <button class="btn primary" id="play">Pausar</button>
-        <button class="btn" id="cond">Conductor perfecto</button>
-        <button class="btn" id="match">Medios adaptados</button>
-        <button class="btn" id="dq">d = λ₁/4</button>
-        <button class="btn" id="dh">d = λ₁/2</button>
+        <button class="btn" id="dq">d = λ₂/4</button>
+        <button class="btn" id="dh">d = λ₂/2</button>
+        <button class="btn" id="ideal">n₂ ideal = √(n₁n₃)</button>
       </div>
     </div>
     <div class="tiles">
-      <div class="tile"><div class="k">Γ = (η₂−η₁)/(η₂+η₁)</div><div class="v" id="G">—</div></div>
-      <div class="tile"><div class="k">τ = 1+Γ</div><div class="v" id="tau">—</div></div>
-      <div class="tile"><div class="k">S = (1+|Γ|)/(1−|Γ|)</div><div class="v" id="S">—</div></div>
+      <div class="tile" style="grid-column:span 2"><div class="k">η(d) vista desde el medio 1 (Ω)</div><div class="v" id="etad">—</div></div>
+      <div class="tile"><div class="k">|Γ| en z = −d</div><div class="v" id="G">—</div></div>
       <div class="tile"><div class="k">Potencia reflejada |Γ|²</div><div class="v" id="R">—</div></div>
     </div>
     <div class="tiles">
-      <div class="tile"><div class="k">η₂ (Ω)</div><div class="v" id="eta2">—</div></div>
-      <div class="tile" style="grid-column:span 2"><div class="k">η(d) vista en z = −d (Ω)</div><div class="v" id="etad">—</div></div>
-      <div class="tile"><div class="k">|E| en el plano / |Eᵢ|</div><div class="v" id="Ad">—</div></div>
+      <div class="tile"><div class="k">S en el medio 1</div><div class="v" id="S">—</div></div>
+      <div class="tile"><div class="k">Potencia transmitida</div><div class="v" id="Tt">—</div></div>
+      <div class="tile" style="grid-column:span 2"><div class="k">Sin capa (1→3 directo): |Γ₁₃|²</div><div class="v" id="R13">—</div></div>
     </div>
   </div>
+
   <div class="card">
-    <p style="margin:.2em 0 .7em;color:var(--muted);font-size:14px">En la frontera (<var>z</var> = 0) el campo eléctrico total del medio 1 es la suma del vector incidente y el reflejado:</p>
-    <div class="eq"><span class="vec">E</span><sub>1</sub> <span class="op">=</span> <span class="vec">E</span><sub>i</sub> <span class="op">+</span> <span class="vec">E</span><sub>r</sub></div>
-    <div class="eq"><var>&Gamma;</var> <span class="op">=</span> (<var>&eta;</var><sub>2</sub> <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub>) / (<var>&eta;</var><sub>2</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub>)</div>
-    <div class="eq"><var>&tau;</var> <span class="op">=</span> 1 <span class="op">+</span> <var>&Gamma;</var> <span class="op">=</span> 2<var>&eta;</var><sub>2</sub> / (<var>&eta;</var><sub>2</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub>)</div>
-    <div class="eq">SWR <span class="op">=</span> (1 <span class="op">+</span> |<var>&Gamma;</var>|) / (1 <span class="op">&minus;</span> |<var>&Gamma;</var>|)</div>
-    <div class="eq"><var>R</var> <span class="op">=</span> |<var>&Gamma;</var>|<sup>2</sup> <span style="display:inline-block;width:1.4em"></span> <var>T</var> <span class="op">=</span> 1 <span class="op">&minus;</span> |<var>&Gamma;</var>|<sup>2</sup></div>
-    <p style="margin:.9em 0 .4em;color:var(--muted);font-size:14px">Impedancia de onda vista en el plano <var>z</var> = &minus;<var>d</var> (cociente del campo eléctrico total entre el magnético total). En <var>d</var> = λ₁/2 se repite η(<var>d</var>) = η₂; en <var>d</var> = λ₁/4 se invierte: η(<var>d</var>) = η₁²/η₂. Con conductor perfecto, η(<var>d</var>) = j<var>&eta;</var><sub>1</sub> tan(β₁<var>d</var>): reactancia pura.</p>
-    <div class="eq"><var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>1</sub> &middot; [<var>&eta;</var><sub>2</sub> <span class="op">+</span> j<var>&eta;</var><sub>1</sub> tan(β₁<var>d</var>)] / [<var>&eta;</var><sub>1</sub> <span class="op">+</span> j<var>&eta;</var><sub>2</sub> tan(β₁<var>d</var>)]</div>
+    <p style="margin:.2em 0 .7em;color:var(--muted);font-size:14px">La frontera trasera también refleja; lo que la onda “ve” al llegar a z = &minus;<var>d</var> es la impedancia efectiva:</p>
+    <div class="eq"><var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>2</sub> &middot; [<var>&eta;</var><sub>3</sub> <span class="op">+</span> j<var>&eta;</var><sub>2</sub> tan(&beta;<sub>2</sub><var>d</var>)] / [<var>&eta;</var><sub>2</sub> <span class="op">+</span> j<var>&eta;</var><sub>3</sub> tan(&beta;<sub>2</sub><var>d</var>)]</div>
+    <div class="eq"><var>&Gamma;</var> <span class="op">=</span> [<var>&eta;</var>(<var>d</var>) <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub>] / [<var>&eta;</var>(<var>d</var>) <span class="op">+</span> <var>&eta;</var><sub>1</sub>] <span style="display:inline-block;width:1.6em"></span> <var>d</var> <span class="op">=</span> &lambda;<sub>2</sub>/2 &rarr; <var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>3</sub> <span style="display:inline-block;width:1.6em"></span> <var>d</var> <span class="op">=</span> &lambda;<sub>2</sub>/4 &rarr; <var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>2</sub><sup>2</sup>/<var>&eta;</var><sub>3</sub></div>
+    <p style="margin:.6em 0 .2em;color:var(--muted);font-size:14px">Sugerencias: <b>Antirreflejante</b> — aire | MgF₂ | vidrio con d = λ₂/4 (compara |Γ|² con el 4 % del vidrio sin capa). <b>Radomo</b> — aire | teflón | aire con d = λ₂/2: la capa desaparece sin importar su material. Con n₂ ideal = √(n₁n₃) el mínimo en λ₂/4 baja a cero exacto.</p>
   </div>
+
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Reflexión con incidencia normal — Explorador interactivo</i> (Versión 1.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Capa dieléctrica: 3 medios, 2 interfaces — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
   </div>
 </div>
 <script>
 (function(){
   var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
-  var er=4, cond=false, playing=true, t=0;
-  var dLam=0.25, dragging=false;            // plano de medición en z = -d (en unidades de lambda1)
-  var ETA1=377, lam1=88;                    // px por lambda1 en el lienzo
+  var ETA0=377, LAM0=160;                 // px que mide lambda en n=1
+  var MATS=[["Aire",1.00],["Agua",1.33],["MgF₂",1.38],["Teflón",1.44],["Sílice fundida",1.46],["Vidrio (BK7)",1.52],["Poliestireno",1.59],["Zafiro",1.77],["ZnS",2.35],["Otro…",-1]];
+  var n=[1.00,1.38,1.50], dLam=0.25, playing=true, dragging=false, t=0;
   var cv=document.getElementById('cv');
-  function params(){
-    var G,tau;
-    if(cond){G=-1;tau=0;} else {var r=1/Math.sqrt(er); G=(r-1)/(r+1); tau=1+G;}
-    return {G:G,tau:tau};
+  // ---- complejos ----
+  function cmul(a,b){return [a[0]*b[0]-a[1]*b[1], a[0]*b[1]+a[1]*b[0]];}
+  function cdiv(a,b){var d=b[0]*b[0]+b[1]*b[1];return [(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d];}
+  function cabs(a){return Math.hypot(a[0],a[1]);}
+  function cexp(ph){return [Math.cos(ph),Math.sin(ph)];}
+  // ---- fisica ----
+  function etas(){return [ETA0/n[0],ETA0/n[1],ETA0/n[2]];}
+  function solve(){
+    var h=etas(), h1=h[0], h2=h[1], h3=h[2];
+    var bd=2*Math.PI*dLam, c=Math.cos(bd), s=Math.sin(bd);
+    var Z=cdiv(cmul([h2,0],[h3*c, h2*s]),[h2*c, h3*s]);        // eta(d)
+    var Gin=cdiv([Z[0]-h1,Z[1]],[Z[0]+h1,Z[1]]);               // Gamma en z=-d
+    var r23=(h3-h2)/(h3+h2);
+    // A: amplitud de la onda +z dentro de la capa (Ei = 1)
+    var den=[Math.cos(bd)+r23*Math.cos(bd), 0];                 // placeholder, se calcula abajo
+    var eP=cexp(bd), eM=cexp(-bd);                              // e^{+j b2 d}, e^{-j b2 d}
+    den=[eP[0]+r23*eM[0], eP[1]+r23*eM[1]];
+    var A=cdiv([1+Gin[0],Gin[1]],den);
+    var tau3=cmul(A,[1+r23,0]);                                 // amplitud en medio 3
+    return {h:h,Gin:Gin,Z:Z,r23:r23,A:A,tau3:tau3};
   }
-  function eta2(){ return cond?0:ETA1/Math.sqrt(er); }
-  function etaD(){
-    // eta(d) = eta1 (eta2 c + j eta1 s)/(eta1 c + j eta2 s), con c=cos(b1 d), s=sen(b1 d)
-    var h2=eta2(), bd=2*Math.PI*dLam, c=Math.cos(bd), s=Math.sin(bd);
-    var a=h2*c, b=ETA1*s, p=ETA1*c, q=h2*s, den=p*p+q*q;
-    if(den<1e-9) return [Infinity,Infinity];
-    return [ETA1*(a*p+b*q)/den, ETA1*(b*p-a*q)/den];
+  // ---- UI materiales ----
+  function fillSel(sel,idx){
+    MATS.forEach(function(m,i){var o=document.createElement('option');o.value=i;o.textContent=m[1]>0?(m[0]+'  (n = '+m[1].toFixed(2)+')'):m[0];sel.appendChild(o);});
   }
-  function fmtEta(){
-    var z=etaD();
-    if(!isFinite(z[0])) return '±j∞';
-    var re=z[0], im=z[1];
-    if(Math.abs(im)<0.05) return re.toFixed(1);
-    if(Math.abs(re)<0.05) return (im>=0?'j':'−j')+Math.abs(im).toFixed(1);
-    return re.toFixed(1)+(im>=0?' + j':' − j')+Math.abs(im).toFixed(1);
+  var sels=[], nums=[];
+  [1,2,3].forEach(function(k,i){
+    var s=document.getElementById('s'+k), num=document.getElementById('n'+k);
+    fillSel(s,i); sels.push(s); nums.push(num);
+    s.addEventListener('change',function(){
+      var m=MATS[+s.value];
+      if(m[1]>0){ n[i]=m[1]; num.value=m[1].toFixed(2); }
+      labels();
+    });
+    num.addEventListener('input',function(){
+      var v=parseFloat(num.value); if(!(v>=1))return;
+      n[i]=v;
+      var hit=MATS.findIndex(function(m){return m[1]>0&&Math.abs(m[1]-v)<0.005;});
+      s.value=(hit>=0?hit:MATS.length-1);
+      labels();
+    });
+  });
+  // defaults: aire | MgF2 | vidrio
+  sels[0].value=0; sels[1].value=2; sels[2].value=5; n=[1.00,1.38,1.52];
+  nums[0].value='1.00'; nums[1].value='1.38'; nums[2].value='1.52';
+
+  function fmtC(z){
+    if(!isFinite(z[0])||!isFinite(z[1]))return '±j∞';
+    if(Math.abs(z[1])<0.05)return z[0].toFixed(1);
+    if(Math.abs(z[0])<0.05)return (z[1]>=0?'j':'−j')+Math.abs(z[1]).toFixed(1);
+    return z[0].toFixed(1)+(z[1]>=0?' + j':' − j')+Math.abs(z[1]).toFixed(1);
   }
   function labels(){
-    var p=params(),aG=Math.abs(p.G),S=aG>=1?Infinity:(1+aG)/(1-aG);
-    document.getElementById('G').textContent=p.G.toFixed(3);
-    document.getElementById('tau').textContent=p.tau.toFixed(3);
-    document.getElementById('S').textContent=isFinite(S)?S.toFixed(2):'∞';
-    document.getElementById('R').textContent=(aG*aG*100).toFixed(1)+' %';
-    document.getElementById('erv').textContent=cond?'—':er.toFixed(1);
+    var r=solve(), g=cabs(r.Gin), R=g*g;
+    document.getElementById('h1v').textContent='η₁ = '+r.h[0].toFixed(0)+' Ω';
+    document.getElementById('h2v').textContent='η₂ = '+r.h[1].toFixed(0)+' Ω';
+    document.getElementById('h3v').textContent='η₃ = '+r.h[2].toFixed(0)+' Ω';
+    document.getElementById('etad').textContent=fmtC(r.Z);
+    document.getElementById('G').textContent=g.toFixed(3);
+    var Re=document.getElementById('R');Re.textContent=(100*R).toFixed(2)+' %';
+    Re.className='v'+(R<0.005?' good':'');
+    document.getElementById('S').textContent=g>=0.999?'∞':((1+g)/(1-g)).toFixed(2);
+    document.getElementById('Tt').textContent=(100*(1-R)).toFixed(2)+' %';
+    var g13=Math.abs((r.h[2]-r.h[0])/(r.h[2]+r.h[0]));
+    document.getElementById('R13').textContent=(100*g13*g13).toFixed(2)+' %  (referencia sin capa)';
     document.getElementById('dv').textContent=dLam.toFixed(3);
     document.getElementById('dr').value=dLam;
-    document.getElementById('eta2').textContent=cond?'0':eta2().toFixed(1);
-    document.getElementById('etad').textContent=fmtEta();
-    var A=Math.sqrt(1+p.G*p.G+2*p.G*Math.cos(2*2*Math.PI*dLam)); // |E(-d)|/|Ei|, cos(2 b1 d)
-    document.getElementById('Ad').textContent=A.toFixed(2);
+  }
+  // ---- dibujo ----
+  function geom(W){
+    var x0=Math.round(W*0.66);                 // interfaz fija capa|medio3 (z=0)
+    var lam2=LAM0/n[1], dpx=dLam*lam2;
+    var xf=x0-dpx;                             // interfaz movil (z=-d)
+    return {x0:x0,xf:xf,lam2:lam2};
   }
   function draw(){
-    var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(320,r.width),H=360;
+    var dpr=window.devicePixelRatio||1,rc=cv.getBoundingClientRect(),W=Math.max(320,rc.width),H=360;
     cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
-    var p=params(),G=p.G,tau=p.tau;
-    var xb=Math.round(W*0.46), mid=H/2, amp=H*0.30/2.0;
-    // backgrounds
+    var r=solve(), g=geom(W), mid=H/2, amp=H*0.30/2.0;
+    var b1=2*Math.PI*n[0]/LAM0, b2=2*Math.PI*n[1]/LAM0, b3=2*Math.PI*n[2]/LAM0;
+    // fondos
     x.fillStyle=css('--panel');x.fillRect(0,0,W,H);
-    x.fillStyle=css('--m2');x.fillRect(xb,0,W-xb,H);
-    // boundary
-    x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=2;x.beginPath();x.moveTo(xb,0);x.lineTo(xb,H);x.stroke();
-    // zero line
+    x.fillStyle=css('--m2');x.fillRect(g.xf,0,g.x0-g.xf,H);
+    x.fillStyle=css('--m3');x.fillRect(g.x0,0,W-g.x0,H);
+    // interfaz fija
+    x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=2;x.beginPath();x.moveTo(g.x0,0);x.lineTo(g.x0,H);x.stroke();
+    // eje cero
     x.strokeStyle='rgba(255,255,255,.18)';x.lineWidth=1;x.beginPath();x.moveTo(0,mid);x.lineTo(W,mid);x.stroke();
-    // labels
-    x.fillStyle='rgba(255,255,255,.75)';x.font='13px sans-serif';
-    x.fillText('Medio 1  (η₁ = 377 Ω)',12,20); x.fillText('Medio 2  (η₂ = η₁/√εr)',xb+12,20);
-    x.fillText('z = 0',xb+6,H-10);
-    var b1=2*Math.PI/lam1, er2=cond?1:er, b2=b1*Math.sqrt(er2);
-    // envelope in medium 1 (standing wave): A(z)=sqrt(1+G^2+2G cos(2 b1 z)), z measured left of boundary
-    x.strokeStyle=css('--env');x.setLineDash([5,5]);x.lineWidth=1.6;x.globalAlpha=.9;
-    for(var s=0;s<2;s++){x.beginPath();for(var px=0;px<=xb;px++){var z=(px-xb)/1; var A=Math.sqrt(1+G*G+2*G*Math.cos(2*b1*z)); var y=mid-(s?-1:1)*A*amp; if(px===0)x.moveTo(px,y);else x.lineTo(px,y);}x.stroke();}
-    x.setLineDash([]);x.globalAlpha=1;
-    // field medium 1: incident + reflected
-    x.strokeStyle=css('--inc');x.lineWidth=2.8;x.beginPath();
-    for(var px1=0;px1<=xb;px1++){var z1=(px1-xb); var E=Math.cos(t-b1*z1)+G*Math.cos(t+b1*z1); var y=mid-E*amp; if(px1===0)x.moveTo(px1,y);else x.lineTo(px1,y);}
-    x.stroke();
-    // field medium 2: transmitted
-    x.strokeStyle=css('--tr');x.lineWidth=2.8;x.beginPath();
-    for(var px2=xb;px2<=W;px2++){var z2=(px2-xb); var Et=tau*Math.cos(t-b2*z2); var y2=mid-Et*amp; if(px2===xb)x.moveTo(px2,y2);else x.lineTo(px2,y2);}
-    x.stroke();
-    // ---- plano de medición z = -d ----
-    var xd=xb-dLam*lam1;
-    if(xd>=0){
-      var plane=css('--plane');
-      x.strokeStyle=plane;x.lineWidth=2.2;x.setLineDash([7,5]);
-      x.beginPath();x.moveTo(xd,8);x.lineTo(xd,H-8);x.stroke();x.setLineDash([]);
-      // asa (handle) arriba
-      x.fillStyle=plane;x.beginPath();x.arc(xd,16,8,0,7);x.fill();
-      x.strokeStyle='rgba(0,0,0,.45)';x.lineWidth=1.5;x.stroke();
-      x.fillStyle='rgba(0,0,0,.65)';x.font='bold 10px sans-serif';x.textAlign='center';
-      x.fillText('⇔',xd,19);
-      // puntos sobre la envolvente
-      var Ad=Math.sqrt(1+G*G+2*G*Math.cos(2*b1*(xd-xb)));
-      x.fillStyle=plane;
-      x.beginPath();x.arc(xd,mid-Ad*amp,4.5,0,7);x.fill();
-      x.beginPath();x.arc(xd,mid+Ad*amp,4.5,0,7);x.fill();
-      // etiqueta
-      x.textAlign='left';x.fillStyle=plane;x.font='bold 12.5px sans-serif';
-      var lbl='z = −d   (d = '+dLam.toFixed(2)+' λ₁)';
-      var lx=Math.min(Math.max(xd+8,4),xb-150);
-      x.fillText(lbl,lx,H-28);
-      x.textAlign='left';
+    // etiquetas
+    x.fillStyle='rgba(255,255,255,.75)';x.font='13px sans-serif';x.textAlign='left';
+    x.fillText('Medio 1  (n₁ = '+n[0].toFixed(2)+')',12,20);
+    x.fillText('Medio 3  (n₃ = '+n[2].toFixed(2)+')',g.x0+10,20);
+    x.textAlign='center';
+    if(g.x0-g.xf>70)x.fillText('capa  n₂ = '+n[1].toFixed(2),(g.xf+g.x0)/2,20);
+    x.textAlign='left';
+    x.fillText('z = 0',g.x0+5,H-10);
+    // campo complejo por pixel
+    function E(px){
+      if(px<g.xf){                                  // medio 1 ; z+d en px desde xf
+        var u=(px-g.xf);                            // = b1*(z+d)/... px
+        var e1=cexp(-b1*u), e2=cexp(b1*u);
+        return [e1[0]+r.Gin[0]*e2[0]-r.Gin[1]*e2[1], e1[1]+r.Gin[0]*e2[1]+r.Gin[1]*e2[0]];
+      } else if(px<g.x0){                           // capa ; z en px desde x0 (negativo)
+        var z=px-g.x0;
+        var ep=cexp(-b2*z), em=cexp(b2*z);
+        var w=[ep[0]+r.r23*em[0], ep[1]+r.r23*em[1]];
+        return cmul(r.A,w);
+      } else {                                      // medio 3
+        var z3=px-g.x0;
+        return cmul(r.tau3,cexp(-b3*z3));
+      }
     }
-    // incidence direction arrow
+    // envolventes (medios 1 y capa)
+    x.strokeStyle=css('--env');x.setLineDash([5,5]);x.lineWidth=1.5;x.globalAlpha=.85;
+    for(var s=0;s<2;s++){x.beginPath();
+      for(var p0=0;p0<=g.x0;p0++){var Av=cabs(E(p0));var y=mid-(s?-1:1)*Av*amp;p0?x.lineTo(p0,y):x.moveTo(p0,y);}
+      x.stroke();}
+    x.setLineDash([]);x.globalAlpha=1;
+    // campo instantaneo Re[E e^{jwt}] por tramos con su color
+    var ct=Math.cos(t), st=Math.sin(t);
+    function reE(px){var e=E(px);return e[0]*ct-e[1]*st;}
+    function trace(a,b,col){x.strokeStyle=col;x.lineWidth=2.8;x.beginPath();
+      for(var p=a;p<=b;p++){var y=mid-reE(p)*amp;(p===a)?x.moveTo(p,y):x.lineTo(p,y);}x.stroke();}
+    trace(0,Math.floor(g.xf),css('--inc'));
+    trace(Math.floor(g.xf),g.x0,css('--lay'));
+    trace(g.x0,W,css('--tr'));
+    // interfaz movil
+    var plane=css('--plane');
+    x.strokeStyle=plane;x.lineWidth=2.4;x.setLineDash([7,5]);
+    x.beginPath();x.moveTo(g.xf,8);x.lineTo(g.xf,H-8);x.stroke();x.setLineDash([]);
+    x.fillStyle=plane;x.beginPath();x.arc(g.xf,16,8,0,7);x.fill();
+    x.strokeStyle='rgba(0,0,0,.45)';x.lineWidth=1.5;x.stroke();
+    x.fillStyle='rgba(0,0,0,.65)';x.font='bold 10px sans-serif';x.textAlign='center';x.fillText('⇔',g.xf,19);
+    x.fillStyle=plane;x.font='bold 12.5px sans-serif';
+    x.fillText('z = −d  (d = '+dLam.toFixed(2)+' λ₂)',Math.max(70,g.xf),H-26);
+    x.textAlign='left';
+    // flecha incidente
     x.strokeStyle='rgba(255,255,255,.6)';x.fillStyle='rgba(255,255,255,.6)';x.lineWidth=2;
     x.beginPath();x.moveTo(20,H-26);x.lineTo(70,H-26);x.stroke();
     x.beginPath();x.moveTo(70,H-26);x.lineTo(62,H-30);x.lineTo(62,H-22);x.closePath();x.fill();
     x.fillText('onda incidente →',20,H-34);
   }
   function frame(){ if(playing){t+=0.06;} draw(); requestAnimationFrame(frame); }
-  // --- arrastre del plano ---
+  // ---- arrastre de la interfaz movil ----
   function evX(e){var r=cv.getBoundingClientRect();return (e.clientX!==undefined?e.clientX:e.touches[0].clientX)-r.left;}
   function setFromX(px){
-    var r=cv.getBoundingClientRect(),W=Math.max(320,r.width),xb=Math.round(W*0.46);
-    dLam=Math.min(2,Math.max(0,(xb-px)/lam1));
+    var rc=cv.getBoundingClientRect(),W=Math.max(320,rc.width),g=geom(W);
+    var lam2=LAM0/n[1];
+    dLam=Math.min(1.5,Math.max(0.02,(g.x0-px)/lam2));
     labels();
   }
   cv.addEventListener('pointerdown',function(e){
-    var r=cv.getBoundingClientRect(),W=Math.max(320,r.width),xb=Math.round(W*0.46);
-    var xd=xb-dLam*lam1, px=evX(e);
-    if(Math.abs(px-xd)<22 || px<xb){ dragging=true; cv.setPointerCapture(e.pointerId); setFromX(px); e.preventDefault(); }
+    var rc=cv.getBoundingClientRect(),W=Math.max(320,rc.width),g=geom(W),px=evX(e);
+    if(Math.abs(px-g.xf)<24 || (px<g.x0 && px>g.xf-60)){ dragging=true; cv.setPointerCapture(e.pointerId); setFromX(px); e.preventDefault(); }
   });
   cv.addEventListener('pointermove',function(e){ if(dragging){ setFromX(evX(e)); e.preventDefault(); } });
   cv.addEventListener('pointerup',function(){dragging=false;});
@@ -218,9 +279,13 @@
   document.getElementById('dr').addEventListener('input',function(e){dLam=+e.target.value;labels();});
   document.getElementById('dq').addEventListener('click',function(){dLam=0.25;labels();});
   document.getElementById('dh').addEventListener('click',function(){dLam=0.5;labels();});
-  document.getElementById('er').addEventListener('input',function(e){er=+e.target.value;cond=false;labels();});
-  document.getElementById('cond').addEventListener('click',function(){cond=true;labels();});
-  document.getElementById('match').addEventListener('click',function(){cond=false;er=1;document.getElementById('er').value=1;labels();});
+  document.getElementById('ideal').addEventListener('click',function(){
+    var v=Math.sqrt(n[0]*n[2]); n[1]=Math.round(v*100)/100;
+    nums[1].value=n[1].toFixed(2);
+    var hit=MATS.findIndex(function(m){return m[1]>0&&Math.abs(m[1]-n[1])<0.005;});
+    sels[1].value=(hit>=0?hit:MATS.length-1);
+    labels();
+  });
   document.getElementById('play').addEventListener('click',function(){playing=!playing;this.textContent=playing?'Pausar':'Reanudar';});
   var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',draw);
   labels();frame();
