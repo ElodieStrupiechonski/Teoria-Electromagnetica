@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anatomía de una gráfica — Miniproyecto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#1a1a1a;--muted:#5a5a5a;--navy:#1F3864;--blue:#2E5496;--accent:#C1571B;--green:#2E7D32;--red:#B3261E;--line:#e2dcc9;--codebg:#0e1420;--codeink:#e8eaf0;--hl:#2b3a55;--serif:'Spectral',Georgia,serif;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--red:#e88a80;--line:#333a44;--codebg:#0b0f16;}}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45;margin:0}
+  .wrap{max-width:1080px;margin:0 auto;padding:22px 16px}
+  h1{font-size:24px;color:var(--navy);margin:.1em 0}
+  h2{font-size:17px;color:var(--navy);margin:0 0 8px}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  canvas{width:100%;border-radius:10px;display:block;background:#fff}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:800px){.grid2{grid-template-columns:1fr}}
+  .ctl{margin-bottom:10px}
+  .ctl label,.lab{display:block;font-weight:700;font-size:13.5px;margin-bottom:4px}
+  input[type=text],select{font:inherit;font-size:14px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  .ctl input[type=text],.ctl select{width:100%}
+  input.err{border-color:var(--red);outline:1px solid var(--red)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .tog{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .tog button{font:inherit;font-size:13px;font-weight:700;border:0;background:var(--bg);color:var(--muted);padding:6px 12px;cursor:pointer}
+  .tog button.on{background:var(--accent);color:#fff}
+  .chk{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+  .chk input{accent-color:var(--accent);width:17px;height:17px}
+  .btn{font:inherit;font-size:13.5px;font-weight:700;border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:8px;padding:8px 14px;cursor:pointer}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#14161a}}
+  .btn.sec{background:transparent;color:var(--navy)}
+  pre{background:var(--codebg);color:var(--codeink);border-radius:10px;padding:13px 15px;font-size:12.6px;line-height:1.55;overflow-x:auto;margin:0;font-family:Consolas,Menlo,monospace}
+  pre .c{color:#7d8799}  pre .s{color:#9ecb88}  pre .k{color:#8ab4f8}
+  pre .hl{background:var(--hl);display:inline-block;min-width:100%;border-radius:3px}
+  code{font-family:Consolas,Menlo,monospace;font-size:.92em}
+  .check{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:10px}
+  .ck{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13px}
+  .ck b{font-size:14px}
+  .ok{color:var(--green)} .bad{color:var(--red)}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .tabs button{font:inherit;font-size:13.5px;font-weight:700;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tabs button.on{color:#14161a}}
+  .panel{display:none} .panel.on{display:block}
+  .eq{font-family:var(--serif);font-size:21px;text-align:center;margin:10px 0 12px}
+  .note{font-size:13px;color:var(--muted);margin-top:8px}
+  .opt{display:block;width:100%;text-align:left;font-family:Consolas,Menlo,monospace;font-size:12.5px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:6px;cursor:pointer}
+  .opt.good{border-color:var(--green);outline:1px solid var(--green)} .opt.wrong{border-color:var(--red);outline:1px solid var(--red)}
+  .tblwrap{overflow-x:auto}
+  table.mats{border-collapse:collapse;width:100%;font-size:13px;min-width:640px}
+  table.mats th{text-align:left;font-size:12px;color:var(--muted);padding:3px 4px}
+  table.mats td{padding:3px 4px}
+  table.mats input[type=text]{width:100%;padding:5px 6px;font-size:13px}
+  table.mats select{padding:5px 4px;font-size:13px}
+  table.mats input[type=color]{width:34px;height:28px;padding:0;border:1px solid var(--line);border-radius:6px;background:none}
+  .del{border:1px solid var(--line);background:var(--bg);color:var(--red);border-radius:6px;font-weight:700;cursor:pointer;padding:3px 9px}
+  ol.retos{padding-left:20px;margin:6px 0;font-size:14px} ol.retos li{margin-bottom:7px}
+  .credits{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+</style>
+<body>
+<div class="wrap">
+  <h1>Anatomía de una gráfica científica — Miniproyecto</h1>
+  <div class="sub">Construimos paso a paso la figura δ(<i>f</i>) de la P6: escribimos la función, elegimos el barrido de frecuencias, agregamos materiales y cuidamos ejes, leyenda y estilo. Cada pestaña modifica la gráfica en vivo y muestra el código de matplotlib correspondiente; la última entrega el script completo.</div>
+
+  <div class="card"><canvas id="cv" width="1000" height="520"></canvas>
+    <div class="check" id="checklist"></div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button data-tab="1" class="on">1 · Función</button>
+    <button data-tab="2">2 · Frecuencias</button>
+    <button data-tab="3">3 · Materiales</button>
+    <button data-tab="4">4 · Ejes y escala</button>
+    <button data-tab="5">5 · Leyenda y estilo</button>
+    <button data-tab="6">6 · Script y retos</button>
+  </div>
+
+  <!-- 1 FUNCIÓN -->
+  <div class="panel on" id="p1"><div class="grid2">
+    <div class="card">
+      <h2>De la ecuación a la función</h2>
+      <div class="eq">δ = 1 / √(π <i>f</i> μ₀ μ<sub>r</sub> σ)</div>
+      <div class="note" style="margin:0 0 10px">δ en m, <i>f</i> en Hz, σ en S/m, μ₀ = 4π×10⁻⁷ H/m. Válida para un buen conductor (σ ≫ 2π<i>f</i>ε).</div>
+      <div class="lab">¿Cuál línea implementa correctamente la ecuación para un arreglo <code>f</code>?</div>
+      <div id="quiz"></div>
+      <div class="note" id="quizfb">Elegimos una opción para ver la retroalimentación.</div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">
+      <div class="row">
+        <div class="ctl" style="flex:1;min-width:130px"><label>Unidad de δ en la gráfica</label>
+          <select data-k="unit"><option value="m">m</option><option value="mm" selected>mm</option><option value="µm">µm</option></select></div>
+      </div>
+      <div class="lab">Probar la función antes de graficar</div>
+      <div class="row">
+        <input type="text" id="calcf" value="1e6" style="width:100px" aria-label="frecuencia"> <span>Hz en</span>
+        <select id="calcm"></select>
+      </div>
+      <div style="margin-top:8px;font-size:15px"><b id="calcout"></b></div>
+      <div class="note">Verificar un valor a mano (p. ej. cobre a 1 MHz ≈ 66 µm) antes de graficar evita arrastrar un error de unidades a toda la figura.</div>
+    </div>
+    <div class="card"><div class="lab">Código de este paso</div><pre id="c1"></pre></div>
+  </div></div>
+
+  <!-- 2 FRECUENCIAS -->
+  <div class="panel" id="p2"><div class="grid2">
+    <div class="card">
+      <h2>Barrido de frecuencias</h2>
+      <div class="row">
+        <div class="ctl" style="flex:1;min-width:110px"><label>f mínima: 10^</label><input type="text" data-k="e1" data-t="num" value="2"></div>
+        <div class="ctl" style="flex:1;min-width:110px"><label>f máxima: 10^</label><input type="text" data-k="e2" data-t="num" value="10"></div>
+        <div class="ctl" style="flex:1;min-width:110px"><label>Número de puntos</label><input type="text" data-k="N" data-t="num" value="200"></div>
+      </div>
+      <div class="row" style="margin:4px 0 10px">
+        <span class="lab" style="margin:0">Muestreo:</span>
+        <div class="tog"><button data-tog="samp" data-v="lin">np.linspace</button><button data-tog="samp" data-v="log" class="on">np.logspace</button></div>
+      </div>
+      <div id="rangeinfo" style="font-size:14px"></div>
+      <div class="note">Experimento: activamos marcadores en todos los puntos (pestaña 5, «marcar cada» = 1) y cambiamos a <code>np.linspace</code> con eje x logarítmico. Los puntos se amontonan en la última década: de 10² a 10¹⁰ Hz, el 90 % de los puntos de un barrido lineal cae por encima de 10⁹ Hz. Por eso un eje log pide un muestreo log.</div>
+    </div>
+    <div class="card"><div class="lab">Código de este paso</div><pre id="c2"></pre></div>
+  </div></div>
+
+  <!-- 3 MATERIALES -->
+  <div class="panel" id="p3">
+    <div class="card">
+      <h2>Casos: un material por curva</h2>
+      <div class="tblwrap"><table class="mats">
+        <thead><tr><th></th><th>Etiqueta</th><th>σ [S/m]</th><th>μ<sub>r</sub></th><th>Color</th><th>Línea</th><th>Marcador</th><th></th></tr></thead>
+        <tbody id="mats"></tbody>
+      </table></div>
+      <div class="row" style="margin-top:10px">
+        <select id="lib"></select>
+        <button class="btn" id="addlib">Agregar de la biblioteca</button>
+        <button class="btn sec" id="addown">+ Material propio</button>
+      </div>
+      <div class="note">Valores orientativos a ~20 °C; conviene que cada equipo cite la fuente de sus σ. En materiales ferromagnéticos μ<sub>r</sub> depende de la frecuencia y del campo: tomarla constante es una primera aproximación. Para agua de mar (σ ≈ 4 S/m, ε<sub>r</sub> ≈ 80) la fórmula de buen conductor deja de valer hacia ~10⁸–10⁹ Hz.</div>
+    </div>
+    <div class="card"><div class="lab">Código de este paso — un diccionario de casos y un solo ciclo <code>for</code></div><pre id="c3"></pre></div>
+  </div>
+
+  <!-- 4 EJES -->
+  <div class="panel" id="p4"><div class="grid2">
+    <div class="card">
+      <h2>Ejes, unidades y escala</h2>
+      <div class="ctl"><label>Título de la figura</label><input type="text" data-k="tit" value="Efecto piel — Equipo N"></div>
+      <div class="ctl"><label>Etiqueta del eje x (unidades entre corchetes)</label><input type="text" data-k="lx" value="Frecuencia f [Hz]"></div>
+      <div class="ctl"><label>Etiqueta del eje y</label><input type="text" data-k="ly" id="lyin" value="Profundidad δ [mm]"></div>
+      <div class="row" style="margin:8px 0 10px">
+        <span class="lab" style="margin:0">Eje x:</span>
+        <div class="tog"><button data-tog="logx" data-v="0">lineal</button><button data-tog="logx" data-v="1" class="on">log</button></div>
+        <span class="lab" style="margin:0">Eje y:</span>
+        <div class="tog"><button data-tog="logy" data-v="0">lineal</button><button data-tog="logy" data-v="1" class="on">log</button></div>
+      </div>
+      <div class="note" id="scalenote"></div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">
+      <label class="chk"><input type="checkbox" data-k="ref" data-t="bool"> Línea de referencia horizontal (espesor de una lámina)</label>
+      <div class="row" style="margin-top:8px">
+        <span style="font-size:14px">Espesor:</span><input type="text" data-k="reft" data-t="num" value="0.035" style="width:90px"><span id="refunit" style="font-size:14px">mm</span>
+      </div>
+      <div class="note" id="refinfo"></div>
+    </div>
+    <div class="card"><div class="lab">Código de este paso</div><pre id="c4"></pre></div>
+  </div></div>
+
+  <!-- 5 LEYENDA Y ESTILO -->
+  <div class="panel" id="p5"><div class="grid2">
+    <div class="card">
+      <h2>Leyenda, rejilla y estilo</h2>
+      <div class="row" style="margin-bottom:10px">
+        <label class="chk"><input type="checkbox" data-k="leg" data-t="bool" checked> leyenda</label>
+        <label class="chk"><input type="checkbox" data-k="grd" data-t="bool" checked> rejilla</label>
+        <label class="chk"><input type="checkbox" data-k="grdm" data-t="bool"> rejilla menor</label>
+      </div>
+      <div class="row">
+        <div class="ctl" style="flex:1;min-width:150px"><label>Posición de la leyenda (<code>loc</code>)</label>
+          <select data-k="loc"><option value="best">best</option><option value="upper right">upper right</option><option value="upper left">upper left</option><option value="lower left">lower left</option><option value="lower right">lower right</option></select></div>
+        <div class="ctl" style="flex:1;min-width:150px"><label>Título de la leyenda</label><input type="text" data-k="legt" value=""></div>
+      </div>
+      <div class="row">
+        <div class="ctl" style="flex:1;min-width:120px"><label>Grosor de línea (<code>lw</code>)</label>
+          <select data-k="lw" data-t="num"><option>1</option><option>1.5</option><option selected>2</option><option>3</option></select></div>
+        <div class="ctl" style="flex:1;min-width:120px"><label>Marcar cada … puntos (<code>markevery</code>)</label><input type="text" data-k="me" data-t="num" value="20"></div>
+      </div>
+      <div class="note">El tipo de marcador y de línea de cada curva se elige en la pestaña 3. Distinguir las series por color <i>y</i> por marcador o trazo hace la figura legible en impresión en grises y para personas con daltonismo.</div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">
+      <div class="row">
+        <div class="ctl" style="flex:2;min-width:170px"><label>Nombre del archivo de salida</label><input type="text" data-k="fname" value="delta_equipoN.png"></div>
+        <div class="ctl" style="flex:1;min-width:90px"><label>dpi</label><select data-k="dpi" data-t="num"><option>100</option><option selected>150</option><option>300</option></select></div>
+      </div>
+      <button class="btn" id="save">Guardar la figura (savefig)</button>
+    </div>
+    <div class="card"><div class="lab">Código de este paso</div><pre id="c5"></pre></div>
+  </div></div>
+
+  <!-- 6 SCRIPT -->
+  <div class="panel" id="p6">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px">
+        <h2 style="margin:0">Script completo</h2>
+        <div class="row"><button class="btn" id="copy">Copiar</button><button class="btn sec" id="dlpy">Descargar .py</button></div>
+      </div>
+      <pre id="c6"></pre>
+      <div class="note">El script es autónomo: copiado tal cual en Spyder, Jupyter o Colab reproduce la figura de arriba.</div>
+    </div>
+    <div class="card">
+      <h2>Retos del miniproyecto</h2>
+      <ol class="retos">
+        <li><b>Pendiente.</b> En escala log–log todas las curvas son rectas paralelas. Medimos la pendiente con dos puntos de la gráfica y la comparamos con el valor teórico −1/2 (δ ∝ <i>f</i><sup>−1/2</sup>). ¿Qué distingue entonces a un material de otro?</li>
+        <li><b>Lámina de circuito impreso.</b> Con la línea de referencia en 0.035 mm (cobre de 1 oz), ¿a partir de qué frecuencia δ es menor que el espesor de la pista? Comparamos la lectura gráfica con <i>f</i> = 1/(π μ₀ μ<sub>r</sub> σ <i>t</i>²).</li>
+        <li><b>Efecto de μ<sub>r</sub>.</b> Agregamos hierro y acero inoxidable. ¿Por qué el hierro, peor conductor que el cobre, tiene menor δ?</li>
+        <li><b>Escala equivocada.</b> Pasamos ambos ejes a lineal y describimos qué información se pierde. ¿En qué caso sí convendría un eje lineal?</li>
+        <li><b>Límite de validez.</b> Agregamos agua de mar y estimamos la frecuencia donde σ = 2π<i>f</i>ε. ¿Hasta dónde es legítimo trazar su curva?</li>
+        <li><b>Extensión.</b> Modificamos el script para graficar la resistencia superficial R<sub>s</sub> = 1/(σδ) con los mismos materiales, con unidades y título correctos.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="credits">
+    <p><b>Referencias.</b> J. D. Jackson, <i>Classical Electrodynamics</i>, 3.ª ed., Wiley (1999), §5.18 y §8.1 · J. D. Hunter, «Matplotlib: A 2D graphics environment», <i>Comput. Sci. Eng.</i> 9, 90–95 (2007), DOI <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">10.1109/MCSE.2007.55</a> · C. R. Harris <i>et al.</i>, «Array programming with NumPy», <i>Nature</i> 585, 357–362 (2020), DOI <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">10.1038/s41586-020-2649-2</a> · N. P. Rougier, M. Droettboom, P. E. Bourne, «Ten Simple Rules for Better Figures», <i>PLoS Comput. Biol.</i> 10, e1003833 (2014), DOI <a href="https://doi.org/10.1371/journal.pcbi.1003833" target="_blank" rel="noopener">10.1371/journal.pcbi.1003833</a>.</p>
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Anatomía de una gráfica — Explorador interactivo</i> (Versión 2.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+  </div>
+</div>
+<script>
+(function(){
+"use strict";
+var MU=4e-7*Math.PI;
+var LIB=[
+  ["Cobre",5.8e7,1,"#2a78d6"],["Aluminio",3.5e7,1,"#eb6834"],["Plata",6.3e7,1,"#7a7a7a"],
+  ["Oro",4.1e7,1,"#c9a100"],["Hierro",1.0e7,1000,"#8e3b8e"],["Acero inoxidable 304",1.4e6,1,"#2e9d6a"],
+  ["Grafito",1e5,1,"#444444"],["Agua de mar",4,1,"#17a2b8"]
+];
+var PAL=["#2a78d6","#eb6834","#2e9d6a","#8e3b8e","#c9a100","#17a2b8","#b3261e","#444444"];
+var MKS=[["","sin"],["o","o círculo"],["s","s cuadro"],["^","^ triángulo"],["D","D rombo"],["x","x cruz"]];
+var LSS=[["-","— continua"],["--","-- guiones"],[":",": puntos"],["-.","-. mixta"]];
+var UF={"m":1,"mm":1e3,"µm":1e6};
+function mat(l,ls,mk){return {name:l[0],sigma:l[1],mur:l[2],color:l[3],ls:ls||"-",mk:mk||"",on:true,ok:true};}
+var st={unit:"mm",e1:2,e2:10,N:200,samp:"log",
+  mats:[mat(LIB[0],"-","o"),mat(LIB[1],"--","s")],
+  tit:"Efecto piel — Equipo N",lx:"Frecuencia f [Hz]",ly:"Profundidad δ [mm]",logx:true,logy:true,
+  ref:false,reft:0.035,leg:true,grd:true,grdm:false,loc:"best",legt:"",lw:2,me:20,fname:"delta_equipoN.png",dpi:150};
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+function $(id){return document.getElementById(id);}
+function delta(f,s,mu){return 1/Math.sqrt(Math.PI*f*MU*mu*s);} // m
+function sup(e){var S={"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹",".":"·"};
+  return String(e).split("").map(function(c){return S[c]||c;}).join("");}
+function sci(x){if(!isFinite(x)||x===0)return String(x);var e=Math.floor(Math.log10(Math.abs(x))),m=x/Math.pow(10,e);
+  if(e>=-2&&e<=3)return String(+x.toPrecision(3));return m.toFixed(2)+"×10"+sup(e);}
+function pyNum(x){if(x===0)return "0";var a=Math.abs(x);
+  if(a>=1e4||a<1e-3)return x.toExponential().replace("e+","e");return String(x);}
+function pyStr(s){return '"'+String(s).replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"';}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function range(){var a=st.e1,b=st.e2; if(!isFinite(a))a=2; if(!isFinite(b))b=10;
+  a=Math.max(-3,Math.min(14,a)); b=Math.max(-3,Math.min(15,b)); if(b<=a)b=a+1; return [a,b];}
+function npts(){var n=Math.round(st.N); if(!isFinite(n)||n<2)n=2; return Math.min(n,3000);}
+function freqs(){var r=range(),n=npts(),F=[],i,f1=Math.pow(10,r[0]),f2=Math.pow(10,r[1]);
+  for(i=0;i<n;i++)F.push(st.samp==="log"?Math.pow(10,r[0]+(r[1]-r[0])*i/(n-1)):f1+(f2-f1)*i/(n-1));
+  return F;}
+function active(){return st.mats.filter(function(m){return m.on&&m.ok;});}
+function niceTicks(a,b){var span=b-a,raw=span/5,step=Math.pow(10,Math.floor(Math.log10(raw))),er=raw/step;
+  step*=er>=7.5?10:er>=3.5?5:er>=1.5?2:1;var t=[],v=Math.ceil(a/step-1e-9)*step;
+  for(;v<=b+step*1e-6;v+=step)t.push(Math.abs(v)<step*1e-9?0:v);return {t:t,step:step};}
+function fmtLin(v,step,maxabs){if(v===0)return "0";var e=Math.floor(Math.log10(maxabs));
+  if(e>=4||e<=-3){var m=v/Math.pow(10,e);return (+m.toFixed(2))+"×10"+sup(e);}
+  var d=Math.max(0,-Math.floor(Math.log10(step)+1e-9));return v.toFixed(d);}
+
+function marker(t,x,y,c){ctx.fillStyle=c;ctx.strokeStyle=c;ctx.lineWidth=1.8;ctx.setLineDash([]);var r=3.8;ctx.beginPath();
+  if(t==="o"){ctx.arc(x,y,r,0,7);ctx.fill();}
+  else if(t==="s"){ctx.fillRect(x-r,y-r,2*r,2*r);}
+  else if(t==="^"){ctx.moveTo(x,y-r-1);ctx.lineTo(x+r+1,y+r);ctx.lineTo(x-r-1,y+r);ctx.closePath();ctx.fill();}
+  else if(t==="D"){ctx.moveTo(x,y-r-1);ctx.lineTo(x+r+1,y);ctx.lineTo(x,y+r+1);ctx.lineTo(x-r-1,y);ctx.closePath();ctx.fill();}
+  else if(t==="x"){ctx.moveTo(x-r,y-r);ctx.lineTo(x+r,y+r);ctx.moveTo(x+r,y-r);ctx.lineTo(x-r,y+r);ctx.stroke();}}
+function dash(ls,lw){return ls==="--"?[7*lw/2+3,4]:ls===":"?[lw,lw*1.8+1]:ls==="-."?[8,3,lw,3]:[];}
+
+function draw(){
+  var dpr=window.devicePixelRatio||1,rc=cv.getBoundingClientRect(),W=Math.max(340,rc.width),H=Math.round(W*(W<560?0.7:0.52));
+  cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle="#ffffff";ctx.fillRect(0,0,W,H);
+  var ml=78,mr=24,mt=44,mb=54,pw=W-ml-mr,ph=H-mt-mb;
+  var r=range(),F=freqs(),A=active(),uf=UF[st.unit],fmin=Math.pow(10,r[0]),fmax=Math.pow(10,r[1]);
+  var data=A.map(function(m){return F.map(function(f){return delta(f,m.sigma,m.mur)*uf;});});
+  var dmin=Infinity,dmax=-Infinity;
+  data.forEach(function(d){d.forEach(function(v){if(v<dmin)dmin=v;if(v>dmax)dmax=v;});});
+  var refOn=st.ref&&isFinite(st.reft)&&st.reft>0;
+  if(refOn){dmin=Math.min(dmin,st.reft);dmax=Math.max(dmax,st.reft);}
+  if(!isFinite(dmin)){dmin=1e-3;dmax=10;}
+  var yl0,yl1,y0,y1;
+  if(st.logy){yl0=Math.floor(Math.log10(dmin)+1e-9);yl1=Math.ceil(Math.log10(dmax)-1e-9);if(yl1<=yl0)yl1=yl0+1;}
+  else{y0=0;y1=dmax*1.05;}
+  function X(f){return st.logx?ml+pw*(Math.log10(f)-r[0])/(r[1]-r[0]):ml+pw*(f-fmin)/(fmax-fmin);}
+  function Y(d){return st.logy?mt+ph*(1-(Math.log10(d)-yl0)/(yl1-yl0)):mt+ph*(1-(d-y0)/(y1-y0));}
+  ctx.font="12px sans-serif";ctx.setLineDash([]);
+  function vline(x,minor){ctx.strokeStyle=minor?"#f0f0f0":"#dcdcdc";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,mt);ctx.lineTo(x,mt+ph);ctx.stroke();}
+  function hline(y,minor){ctx.strokeStyle=minor?"#f0f0f0":"#dcdcdc";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ml,y);ctx.lineTo(ml+pw,y);ctx.stroke();}
+  var e,k,stp;
+  // x ticks
+  ctx.fillStyle="#555";ctx.textAlign="center";
+  if(st.logx){stp=Math.max(1,Math.ceil((r[1]-r[0])/(W<560?5:9)));
+    if(st.grd&&st.grdm&&r[1]-r[0]<=12)for(e=Math.floor(r[0]);e<r[1];e++)for(k=2;k<10;k++){var fx=k*Math.pow(10,e);if(fx>fmin&&fx<fmax)vline(X(fx),true);}
+    for(e=Math.ceil(r[0]);e<=r[1];e++){if((e-Math.ceil(r[0]))%stp)continue;var x=X(Math.pow(10,e));if(st.grd)vline(x);ctx.fillStyle="#555";ctx.fillText("10"+sup(e),x,mt+ph+18);}
+  }else{var nt=niceTicks(fmin,fmax);nt.t.forEach(function(v,i){if(v<fmin)return;var x=X(v);if(st.grd)vline(x);
+      if(W<560&&i%2)return;ctx.fillStyle="#555";ctx.fillText(fmtLin(v,nt.step,fmax),x,mt+ph+18);});}
+  // y ticks
+  ctx.textAlign="right";
+  if(st.logy){stp=Math.max(1,Math.ceil((yl1-yl0)/8));
+    if(st.grd&&st.grdm&&yl1-yl0<=10)for(e=yl0;e<yl1;e++)for(k=2;k<10;k++)hline(Y(k*Math.pow(10,e)),true);
+    for(e=yl0;e<=yl1;e++){if((e-yl0)%stp)continue;var y=Y(Math.pow(10,e));if(st.grd)hline(y);ctx.fillStyle="#555";ctx.fillText("10"+sup(e),ml-8,y+4);}
+  }else{var ny=niceTicks(y0,y1);ny.t.forEach(function(v){var y=Y(v);if(st.grd)hline(y);ctx.fillStyle="#555";ctx.fillText(fmtLin(v,ny.step,y1),ml-8,y+4);});}
+  // series
+  ctx.save();ctx.beginPath();ctx.rect(ml,mt,pw,ph);ctx.clip();
+  var me=Math.max(1,Math.round(st.me)||1);
+  A.forEach(function(m,si){var d=data[si];
+    ctx.strokeStyle=m.color;ctx.lineWidth=st.lw;ctx.setLineDash(dash(m.ls,st.lw));ctx.beginPath();
+    for(var i=0;i<F.length;i++){var x=X(F[i]),y=Y(d[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+    ctx.stroke();ctx.setLineDash([]);
+    if(m.mk)for(var j=0;j<F.length;j+=me)marker(m.mk,X(F[j]),Y(d[j]),m.color);});
+  if(refOn){ctx.strokeStyle="#777";ctx.lineWidth=1.5;ctx.setLineDash([6,4]);var yr=Y(st.reft);ctx.beginPath();ctx.moveTo(ml,yr);ctx.lineTo(ml+pw,yr);ctx.stroke();ctx.setLineDash([]);}
+  ctx.restore();
+  ctx.strokeStyle="#333";ctx.lineWidth=1.3;ctx.strokeRect(ml,mt,pw,ph);
+  if(!A.length){ctx.fillStyle="#999";ctx.textAlign="center";ctx.font="14px sans-serif";ctx.fillText("Sin materiales activos — agregamos uno en la pestaña 3",ml+pw/2,mt+ph/2);}
+  // textos
+  ctx.fillStyle="#111";ctx.textAlign="center";
+  if(st.tit){ctx.font="bold 16px sans-serif";ctx.fillText(st.tit,ml+pw/2,26);}
+  if(st.lx){ctx.font="13.5px sans-serif";ctx.fillText(st.lx,ml+pw/2,H-12);}
+  if(st.ly){ctx.save();ctx.translate(18,mt+ph/2);ctx.rotate(-Math.PI/2);ctx.font="13.5px sans-serif";ctx.fillText(st.ly,0,0);ctx.restore();}
+  // leyenda
+  var ent=A.map(function(m){return {c:m.color,ls:m.ls,mk:m.mk,t:m.name};});
+  if(refOn)ent.push({c:"#777",ls:"--",mk:"",t:refLabel(),ref:1});
+  if(st.leg&&ent.length){ctx.font="13px sans-serif";var tw=0;ent.forEach(function(q){tw=Math.max(tw,ctx.measureText(q.t).width);});
+    if(st.legt){ctx.font="bold 13px sans-serif";tw=Math.max(tw,ctx.measureText(st.legt).width-36);}
+    var bw=tw+54,bh=ent.length*19+10+(st.legt?19:0),loc=st.loc==="best"?"upper right":st.loc;
+    var bx=/left/.test(loc)?ml+10:ml+pw-bw-10,by=/upper/.test(loc)?mt+10:mt+ph-bh-10;
+    ctx.fillStyle="rgba(255,255,255,.9)";ctx.fillRect(bx,by,bw,bh);ctx.strokeStyle="#ccc";ctx.lineWidth=1;ctx.strokeRect(bx,by,bw,bh);
+    var yy=by+15;
+    if(st.legt){ctx.font="bold 13px sans-serif";ctx.fillStyle="#222";ctx.textAlign="center";ctx.fillText(st.legt,bx+bw/2,yy+4);yy+=19;}
+    ctx.font="13px sans-serif";ctx.textAlign="left";
+    ent.forEach(function(q){ctx.strokeStyle=q.c;ctx.lineWidth=q.ref?1.5:Math.min(st.lw,2.6);ctx.setLineDash(dash(q.ls,2));
+      ctx.beginPath();ctx.moveTo(bx+8,yy);ctx.lineTo(bx+36,yy);ctx.stroke();ctx.setLineDash([]);
+      if(q.mk)marker(q.mk,bx+22,yy,q.c);ctx.fillStyle="#222";ctx.fillText(q.t,bx+44,yy+4);yy+=19;});}
+  info();checklist();codigo();
+}
+function refLabel(){return "Espesor "+pyNum(st.reft)+" "+st.unit;}
+
+function info(){
+  var r=range(),n=npts(),A=active();
+  $('rangeinfo').innerHTML="Barrido: <b>"+sci(Math.pow(10,r[0]))+" Hz → "+sci(Math.pow(10,r[1]))+" Hz</b> ("+(+(r[1]-r[0]).toFixed(2))+" décadas, "+n+" puntos)."+
+    ((st.samp==="lin"&&st.logx)?' <span class="bad"><b>Atención:</b> muestreo lineal con eje log.</span>':'');
+  $('scalenote').innerHTML=(st.logx&&st.logy)?"δ ∝ <i>f</i><sup>−1/2</sup> es una ley de potencia: en log–log se ve como una recta de pendiente −1/2.":
+    "Con algún eje lineal, casi toda la curva queda aplastada contra un borde: varias décadas de información caben en unos pocos píxeles.";
+  $('refunit').textContent=st.unit;
+  var t=st.reft/UF[st.unit];
+  $('refinfo').innerHTML=(st.ref&&t>0&&A.length)?"Frecuencia a la que δ = espesor: "+A.map(function(m){
+    return esc(m.name)+" <b>"+sci(1/(Math.PI*MU*m.mur*m.sigma*t*t))+" Hz</b>";}).join(" · "):
+    "Al activarla calculamos la frecuencia a la que δ iguala el espesor para cada material.";
+  // calculadora
+  var sel=$('calcm'),idx=sel.selectedIndex<0?0:sel.selectedIndex;
+  sel.innerHTML=A.map(function(m){return "<option>"+esc(m.name)+"</option>";}).join("");
+  sel.selectedIndex=Math.min(idx,A.length-1);
+  var f=parseFloat($('calcf').value),m=A[sel.selectedIndex];
+  $('calcout').textContent=(m&&f>0)?"δ = "+sci(delta(f,m.sigma,m.mur)*UF[st.unit])+" "+st.unit:"—";
+}
+function checklist(){
+  var A=active(),names=A.map(function(m){return m.name.trim();}),uniq=names.every(function(n,i){return n&&names.indexOf(n)===i;});
+  var styled=A.every(function(m,i){return A.every(function(q,j){return i===j||q.ls!==m.ls||q.mk!==m.mk;});});
+  var items=[
+    ["Título", !!st.tit.trim()],
+    ["Eje x con unidades", /\[.+\]/.test(st.lx)],
+    ["Eje y con la unidad usada ("+st.unit+")", st.ly.indexOf("["+st.unit+"]")>=0],
+    ["Al menos 3 materiales", A.length>=3],
+    ["Etiquetas distintas y no vacías", A.length>0&&uniq],
+    ["Leyenda visible", st.leg],
+    ["Series distinguibles sin color (trazo o marcador)", A.length>1&&styled],
+    ["Escala adecuada (ley de potencia → log–log)", st.logx&&st.logy],
+    ["Muestreo coherente con el eje x", (st.samp==="log")===st.logx],
+    ["Nombre de archivo propio", /\.(png|pdf|svg)$/i.test(st.fname)&&!/equipoN|^mi_grafica/i.test(st.fname)]
+  ];
+  $('checklist').innerHTML=items.map(function(it){
+    return '<div class="ck"><b class="'+(it[1]?'ok':'bad')+'">'+(it[1]?'✓':'✗')+'</b> '+it[0]+'</div>';}).join("");
+}
+
+/* ---------- código ---------- */
+function sections(){
+  var r=range(),n=npts(),A=active(),u=st.unit,S={};
+  S.imp=["import numpy as np","import matplotlib.pyplot as plt",""];
+  S.func=["MU0 = 4e-7 * np.pi   # permeabilidad del vacío [H/m]","",
+    "def delta(f, sigma, mu_r=1.0):",
+    '    """Profundidad de piel [m]. f en Hz, sigma en S/m."""',
+    "    return 1.0 / np.sqrt(np.pi * f * MU0 * mu_r * sigma)",""];
+  var cf=parseFloat($('calcf').value),cm=A[Math.max(0,$('calcm').selectedIndex)];
+  S.test=(cm&&cf>0)?["# prueba rápida: "+cm.name+" a "+pyNum(cf)+" Hz","print(delta("+pyNum(cf)+", "+pyNum(cm.sigma)+(cm.mur!==1?", "+pyNum(cm.mur):"")+"))   # en metros",""]:[];
+  S.freq=[st.samp==="log"?"f = np.logspace("+pyNum(r[0])+", "+pyNum(r[1])+", "+n+")   # 10^"+pyNum(r[0])+" a 10^"+pyNum(r[1])+" Hz, paso logarítmico"
+    :"f = np.linspace(1e"+pyNum(r[0])+", 1e"+pyNum(r[1])+", "+n+")   # Hz, paso uniforme",""];
+  S.mat=["materiales = {"].concat(A.map(function(m){
+    return "    "+pyStr(m.name)+": dict(sigma="+pyNum(m.sigma)+", mu_r="+pyNum(m.mur)+", color="+pyStr(m.color)+", ls="+pyStr(m.ls)+", marker="+pyStr(m.mk)+"),";}),["}",""]);
+  var conv=u==="m"?"":" * "+(u==="mm"?"1e3":"1e6")+"   # m → "+u;
+  S.loop=["fig, ax = plt.subplots(figsize=(7, 4.5))","for nombre, m in materiales.items():",
+    '    d = delta(f, m["sigma"], m["mu_r"])'+conv,
+    '    ax.plot(f, d, color=m["color"], ls=m["ls"], marker=m["marker"],',
+    "            markevery="+Math.max(1,Math.round(st.me)||1)+", lw="+st.lw+", label=nombre)",""];
+  S.axes=[st.logx?'ax.set_xscale("log")':"# eje x lineal (omitimos set_xscale)",
+    st.logy?'ax.set_yscale("log")':"# eje y lineal (omitimos set_yscale)",
+    "ax.set_xlabel("+pyStr(st.lx)+")","ax.set_ylabel("+pyStr(st.ly)+")","ax.set_title("+pyStr(st.tit)+")"];
+  if(st.ref&&st.reft>0)S.axes.push("ax.axhline("+pyNum(st.reft)+', color="gray", ls="--", label='+pyStr(refLabel())+")");
+  S.axes.push("");
+  S.leg=[st.leg?"ax.legend(loc="+pyStr(st.loc)+(st.legt?", title="+pyStr(st.legt):"")+")":"# sin leyenda (omitimos ax.legend)",
+    st.grd?(st.grdm?'ax.grid(True, which="both", alpha=0.4)':"ax.grid(True)"):"# sin rejilla (omitimos ax.grid)",""];
+  S.save=["fig.tight_layout()","fig.savefig("+pyStr(st.fname)+", dpi="+st.dpi+")","plt.show()"];
+  return S;
+}
+var KW=/("(?:[^"\\]|\\.)*")|(#.*$)|\b(import|as|def|return|for|in|True|False|print)\b/g;
+function hlLine(s){var out="",i=0,m;KW.lastIndex=0;
+  while((m=KW.exec(s))){out+=esc(s.slice(i,m.index))+'<span class="'+(m[1]?'s':m[2]?'c':'k')+'">'+esc(m[0])+'</span>';i=m.index+m[0].length;}
+  return out+esc(s.slice(i));}
+var prevSet=null,fullCode="";
+function codigo(){
+  var S=sections(),all=[].concat(S.imp,S.func,S.freq,S.mat,S.loop,S.axes,S.leg,S.save);
+  var cur={};all.forEach(function(l){cur[l]=1;});
+  var chg=prevSet?all.filter(function(l){return l&&!prevSet[l];}):[];
+  if(prevSet&&!chg.length&&codigo.keep)chg=codigo.keep; else codigo.keep=chg;
+  var H={};chg.forEach(function(l){H[l]=1;});
+  function put(id,lines){while(lines.length&&lines[lines.length-1]==="")lines=lines.slice(0,-1);
+    $(id).innerHTML=lines.map(function(l){return H[l]?'<span class="hl">'+hlLine(l)+'</span>':hlLine(l);}).join("\n");}
+  put('c1',[].concat(S.imp,S.func,S.test));put('c2',S.freq);put('c3',[].concat(S.mat,S.loop));
+  put('c4',S.axes);put('c5',[].concat(S.loop.slice(1),S.leg,S.save));put('c6',all);
+  prevSet=cur;fullCode=all.join("\n")+"\n";
+}
+
+/* ---------- materiales UI ---------- */
+function opts(list,val){return list.map(function(o){return '<option value="'+esc(o[0])+'"'+(o[0]===val?' selected':'')+'>'+esc(o[1])+'</option>';}).join("");}
+function renderMats(){
+  $('mats').innerHTML=st.mats.map(function(m,i){
+    return '<tr data-i="'+i+'"><td><input type="checkbox" data-m="on"'+(m.on?' checked':'')+' aria-label="activo" style="accent-color:var(--accent);width:17px;height:17px"></td>'+
+      '<td><input type="text" data-m="name" value="'+esc(m.name).replace(/"/g,"&quot;")+'"></td>'+
+      '<td><input type="text" data-m="sigma" value="'+pyNum(m.sigma)+'" style="min-width:76px"></td>'+
+      '<td><input type="text" data-m="mur" value="'+pyNum(m.mur)+'" style="min-width:54px"></td>'+
+      '<td><input type="color" data-m="color" value="'+m.color+'"></td>'+
+      '<td><select data-m="ls">'+opts(LSS,m.ls)+'</select></td>'+
+      '<td><select data-m="mk">'+opts(MKS,m.mk)+'</select></td>'+
+      '<td><button class="del" data-del="1" title="Quitar">×</button></td></tr>';}).join("");
+}
+function matEvt(ev){
+  var el=ev.target,tr=el.closest('tr');if(!tr||!el.dataset.m)return;
+  var m=st.mats[+tr.dataset.i],k=el.dataset.m;
+  if(k==="on")m.on=el.checked;
+  else if(k==="sigma"||k==="mur"){var v=parseFloat(el.value);m[k]=v;
+    m.ok=m.sigma>0&&m.mur>0&&isFinite(m.sigma)&&isFinite(m.mur);el.classList.toggle('err',!(v>0));}
+  else m[k]=el.value;
+  draw();
+}
+$('mats').addEventListener('input',matEvt);$('mats').addEventListener('change',matEvt);
+$('mats').addEventListener('click',function(ev){if(!ev.target.dataset.del)return;
+  st.mats.splice(+ev.target.closest('tr').dataset.i,1);renderMats();draw();});
+$('lib').innerHTML=LIB.map(function(l,i){return '<option value="'+i+'">'+l[0]+' (σ = '+sci(l[1])+' S/m'+(l[2]!==1?', μr = '+l[2]:'')+')</option>';}).join("");
+function nextStyle(m){var n=st.mats.length;m.ls=LSS[n%LSS.length][0];m.mk=MKS[1+n%(MKS.length-1)][0];return m;}
+$('addlib').addEventListener('click',function(){var m=nextStyle(mat(LIB[+$('lib').value]));
+  if(st.mats.some(function(q){return q.color===m.color;}))m.color=PAL[st.mats.length%PAL.length];
+  st.mats.push(m);renderMats();draw();});
+$('addown').addEventListener('click',function(){
+  st.mats.push(nextStyle(mat(["Material "+(st.mats.length+1),1e6,1,PAL[st.mats.length%PAL.length]])));renderMats();draw();});
+
+/* ---------- quiz ---------- */
+var QZ=[
+  ["return 1.0 / np.pi * f * MU0 * mu_r * sigma",0,"Falta la raíz y faltan paréntesis: Python evalúa (1/π)·f·μ₀·μr·σ, que además crece con f."],
+  ["return 1.0 / math.sqrt(np.pi * f * MU0 * mu_r * sigma)",0,"La expresión es correcta para un número, pero math.sqrt no acepta arreglos de NumPy: falla al pasarle todo el barrido f."],
+  ["return 1.0 / np.sqrt(np.pi * f * MU0 * mu_r * sigma)",1,"Correcto: np.sqrt opera elemento a elemento sobre el arreglo f y el resultado queda en metros."],
+  ["return np.sqrt(np.pi * f * MU0 * mu_r * sigma)",0,"Es el inverso de δ: tiene unidades de 1/m y crece con la frecuencia."]
+];
+$('quiz').innerHTML=QZ.map(function(q,i){return '<button class="opt" data-q="'+i+'">'+esc(q[0])+'</button>';}).join("");
+$('quiz').addEventListener('click',function(ev){var b=ev.target.closest('.opt');if(!b)return;var q=QZ[+b.dataset.q];
+  [].forEach.call(document.querySelectorAll('.opt'),function(o){o.classList.remove('good','wrong');});
+  b.classList.add(q[1]?'good':'wrong');$('quizfb').innerHTML='<b class="'+(q[1]?'ok':'bad')+'">'+(q[1]?'✓':'✗')+'</b> '+q[2];});
+
+/* ---------- controles generales ---------- */
+[].forEach.call(document.querySelectorAll('[data-k]'),function(el){
+  function h(){var k=el.dataset.k,t=el.dataset.t,v=t==="bool"?el.checked:t==="num"?parseFloat(el.value):el.value;
+    if(t==="num")el.classList.toggle('err',!isFinite(v));
+    if(k==="unit"){st.ly=st.ly.replace(/\[[^\]]*\]/,"["+v+"]");$('lyin').value=st.ly;
+      var old=UF[st.unit];st.reft=+(st.reft/old*UF[v]).toPrecision(6);document.querySelector('[data-k=reft]').value=pyNum(st.reft);}
+    st[k]=v;draw();}
+  el.addEventListener('input',h);el.addEventListener('change',h);});
+[].forEach.call(document.querySelectorAll('[data-tog]'),function(b){b.addEventListener('click',function(){
+  var k=b.dataset.tog;st[k]=k==="samp"?b.dataset.v:b.dataset.v==="1";
+  [].forEach.call(document.querySelectorAll('[data-tog="'+k+'"]'),function(o){o.classList.toggle('on',o===b);});draw();});});
+$('calcf').addEventListener('input',draw);$('calcm').addEventListener('change',draw);
+$('tabs').addEventListener('click',function(ev){var b=ev.target.closest('button');if(!b)return;
+  [].forEach.call($('tabs').children,function(o){o.classList.toggle('on',o===b);});
+  [].forEach.call(document.querySelectorAll('.panel'),function(p){p.classList.toggle('on',p.id==="p"+b.dataset.tab);});});
+$('save').addEventListener('click',function(){var a=document.createElement('a');
+  a.download=(st.fname||'grafica.png').replace(/\.(pdf|svg)$/i,'.png');a.href=cv.toDataURL('image/png');a.click();});
+$('copy').addEventListener('click',function(){var b=$('copy');
+  function done(){b.textContent="Copiado ✓";setTimeout(function(){b.textContent="Copiar";},1500);}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(fullCode).then(done,fallback);else fallback();
+  function fallback(){var t=document.createElement('textarea');t.value=fullCode;document.body.appendChild(t);t.select();
+    try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(t);}});
+$('dlpy').addEventListener('click',function(){var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([fullCode],{type:"text/x-python"}));
+  a.download=(st.fname||'grafica').replace(/\.[a-z]+$/i,'')+".py";a.click();});
+window.addEventListener('resize',draw);
+renderMats();draw();
+})();
+</script>
+</body>
+</html>
