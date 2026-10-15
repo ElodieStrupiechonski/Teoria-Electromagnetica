@@ -1,0 +1,179 @@
+<meta charset="utf-8">
+<title>Fresnel · incidencia oblicua</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#1a1a1a;--muted:#5a5a5a;--navy:#1F3864;--blue:#2E5496;--accent:#C1571B;--green:#2E7D32;--red:#B3261E;--line:#e2dcc9;--panel:#fcfbf7;--sperp:#2a78d6;--spar:#eb6834;--plane:#f2c14e;--serif:'Spectral',Georgia,serif;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--red:#e88a80;--line:#333a44;--panel:#181c22;}}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45;margin:0}
+  .wrap{max-width:960px;margin:0 auto;padding:22px 16px}
+  h1{font-size:24px;color:var(--navy);margin:.1em 0}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  canvas{width:100%;border-radius:10px;display:block;touch-action:none}
+  .controls{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+  .ctl{flex:1 1 230px;min-width:210px}
+  .ctl label{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-bottom:6px}
+  .ctl label span{color:var(--accent);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  select{font:inherit;font-size:14px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:100%}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .btn{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+  .tile .k{font-size:12px;color:var(--muted)}
+  .tile .v{font-size:18px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .legend{display:flex;gap:16px;font-size:13.5px;margin:8px 0 0;flex-wrap:wrap}
+  .legend i{display:inline-block;width:16px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .eq{font-family:var(--serif);font-size:16px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;line-height:1.7}
+  .eq var{font-style:italic} .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .credits{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}input[type=range]{height:26px}h1{font-size:26px}}
+</style>
+<div class="wrap">
+  <h1>Coeficientes de Fresnel: incidencia oblicua</h1>
+  <div class="sub">Potencia reflejada de cada polarización contra el ángulo de incidencia. Arrastra la línea amarilla (o usa el deslizador) para mover θᵢ; cambia los medios y observa el <b>ángulo de Brewster</b> (R∥ = 0) y, cuando n₁ &gt; n₂, el <b>ángulo crítico</b> con reflexión total.</div>
+
+  <div class="card">
+    <canvas id="cv" height="430"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--sperp)"></i>R⊥ (E fuera del plano de incidencia, s/TE)</span>
+      <span><i style="background:var(--spar)"></i>R∥ (E en el plano, p/TM)</span>
+      <span><i style="background:var(--plane)"></i>θᵢ (arrástralo)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <div class="ctl"><label>Medio 1 (de donde llega)</label><select id="m1"></select></div>
+      <div class="ctl"><label>Medio 2 (al que entra)</label><select id="m2"></select></div>
+      <div class="ctl"><label><span>Ángulo de incidencia θᵢ</span> <span id="av">30.0°</span></label><input id="ang" type="range" min="0" max="89.9" step="0.1" value="30"></div>
+    </div>
+    <div class="btns">
+      <button class="btn" id="bB">Ir a Brewster</button>
+      <button class="btn" id="bC">Ir al ángulo crítico</button>
+      <button class="btn" id="b0">θᵢ = 0 (normal)</button>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">θₜ (Snell)</div><div class="v" id="tt">—</div></div>
+      <div class="tile"><div class="k">Γ⊥ · R⊥</div><div class="v" id="gs">—</div></div>
+      <div class="tile"><div class="k">Γ∥ · R∥</div><div class="v" id="gp">—</div></div>
+      <div class="tile"><div class="k">θ Brewster · θ crítico</div><div class="v" id="bb">—</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="eq">&Gamma;<sub>&#8869;</sub> <span class="op">=</span> (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>i</sub> <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>t</sub>) / (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>i</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>t</sub>)
+    <span style="display:inline-block;width:1.6em"></span>
+    &Gamma;<sub>&#8741;</sub> <span class="op">=</span> (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>t</sub> <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>i</sub>) / (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>t</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>i</sub>)</div>
+    <div class="eq">tan&thinsp;<var>&theta;</var><sub>B</sub> <span class="op">=</span> <var>n</var><sub>2</sub>/<var>n</var><sub>1</sub>&nbsp;&nbsp;(R<sub>&#8741;</sub> = 0)
+    <span style="display:inline-block;width:1.6em"></span>
+    sen&thinsp;<var>&theta;</var><sub>c</sub> <span class="op">=</span> <var>n</var><sub>2</sub>/<var>n</var><sub>1</sub>&nbsp;&nbsp;(solo si <var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>; m&aacute;s all&aacute;, R = 1)</div>
+    <div style="font-size:13.5px;color:var(--muted)">En θᵢ = 0 ambas curvas coinciden con el caso de incidencia normal, R = |(η₂−η₁)/(η₂+η₁)|². En θᵢ → 90° toda superficie se vuelve espejo (R → 1): por eso el lago refleja el atardecer. Medios sin pérdidas, μᵣ = 1.</div>
+  </div>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Coeficientes de Fresnel — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.XXXXXXX (se completa al publicar en Zenodo).</p>
+  </div>
+</div>
+<script>
+(function(){
+"use strict";
+var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+var MATS=[["Aire",1.00],["Agua",1.33],["MgF₂",1.38],["Teflón",1.44],["Sílice fundida",1.46],["Vidrio (BK7)",1.52],["Zafiro",1.77],["Diamante",2.42]];
+var n1=1.00, n2=1.52, th=30, dragging=false;
+var cv=document.getElementById('cv');
+function sel(id,def,cb){var s=document.getElementById(id);
+  MATS.forEach(function(mm,i){var o=document.createElement('option');o.value=i;o.textContent=mm[0]+'  (n = '+mm[1].toFixed(2)+')';s.appendChild(o);});
+  s.value=def; s.addEventListener('change',function(){cb(MATS[+s.value][1]);update();});
+  return s;}
+sel('m1',0,function(v){n1=v;}); sel('m2',5,function(v){n2=v;});
+
+// Fresnel con posible cos(theta_t) imaginario (reflexion total)
+function coefs(thDeg){
+  var ti=thDeg*Math.PI/180, si=Math.sin(ti), ci=Math.cos(ti);
+  var st=n1/n2*si, e1=377/n1, e2=377/n2;
+  if(st<=1){
+    var ct=Math.sqrt(1-st*st);
+    var gs=(e2*ci-e1*ct)/(e2*ci+e1*ct);
+    var gp=(e2*ct-e1*ci)/(e2*ct+e1*ci);
+    return {tt:Math.asin(st)*180/Math.PI, gs:gs, gp:gp, Rs:gs*gs, Rp:gp*gp, tir:false};
+  }
+  // cos(theta_t) = -j b  → |Γ| = 1 en ambas polarizaciones
+  return {tt:NaN, gs:NaN, gp:NaN, Rs:1, Rp:1, tir:true};
+}
+function thB(){return Math.atan(n2/n1)*180/Math.PI;}
+function thC(){return n1>n2 ? Math.asin(n2/n1)*180/Math.PI : NaN;}
+
+function draw(){
+  var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(340,r.width),H=430;
+  cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),line=css('--line');
+  x.fillStyle=panel;x.fillRect(0,0,W,H);
+  var ml=58,mr=18,mt=18,mb=46,pw=W-ml-mr,ph=H-mt-mb;
+  function X(t){return ml+pw*t/90;} function Y(R){return mt+ph*(1-R);}
+  // rejilla
+  x.strokeStyle=line;x.lineWidth=1;x.font="12px sans-serif";x.fillStyle=mut;
+  for(var i=0;i<=5;i++){var y=Y(i/5);x.beginPath();x.moveTo(ml,y);x.lineTo(ml+pw,y);x.stroke();
+    x.textAlign="right";x.fillText((i*20)+" %",ml-7,y+4);}
+  for(var t=0;t<=90;t+=15){var xx=X(t);x.beginPath();x.moveTo(xx,mt);x.lineTo(xx,mt+ph);x.stroke();
+    x.textAlign="center";x.fillText(t+"°",xx,mt+ph+17);}
+  x.fillText("ángulo de incidencia θᵢ",ml+pw/2,H-8);
+  x.save();x.translate(14,mt+ph/2);x.rotate(-Math.PI/2);x.textAlign="center";
+  x.fillText("potencia reflejada R",0,0);x.restore();
+  // marcas Brewster / critico
+  var tb=thB(), tc=thC();
+  x.setLineDash([5,5]);x.lineWidth=1.4;
+  x.strokeStyle=css('--green');x.beginPath();x.moveTo(X(tb),mt);x.lineTo(X(tb),mt+ph);x.stroke();
+  x.fillStyle=css('--green');x.textAlign="left";x.fillText("θB "+tb.toFixed(1)+"°",X(tb)+4,mt+14);
+  if(!isNaN(tc)){x.strokeStyle=css('--red');x.beginPath();x.moveTo(X(tc),mt);x.lineTo(X(tc),mt+ph);x.stroke();
+    x.fillStyle=css('--red');x.fillText("θc "+tc.toFixed(1)+"°",X(tc)+4,mt+30);}
+  x.setLineDash([]);
+  // curvas
+  [["Rs",css('--sperp')],["Rp",css('--spar')]].forEach(function(S){
+    x.strokeStyle=S[1];x.lineWidth=2.6;x.beginPath();
+    for(var i2=0;i2<=360;i2++){var t2=i2*90/360,c=coefs(t2);
+      var y2=Y(c[S[0]]); i2?x.lineTo(X(t2),y2):x.moveTo(X(t2),y2);}
+    x.stroke();});
+  // linea de theta actual
+  var plane=css('--plane'),c0=coefs(th);
+  x.strokeStyle=plane;x.lineWidth=2.4;x.setLineDash([7,5]);
+  x.beginPath();x.moveTo(X(th),mt);x.lineTo(X(th),mt+ph);x.stroke();x.setLineDash([]);
+  x.fillStyle=plane;x.beginPath();x.arc(X(th),mt+8,7,0,7);x.fill();
+  x.strokeStyle="rgba(0,0,0,.4)";x.lineWidth=1.4;x.stroke();
+  [["Rs",css('--sperp')],["Rp",css('--spar')]].forEach(function(S){
+    x.fillStyle=S[1];x.beginPath();x.arc(X(th),Y(c0[S[0]]),5,0,7);x.fill();
+    x.strokeStyle=panel;x.lineWidth=1.6;x.stroke();});
+  // readouts
+  document.getElementById('av').textContent=th.toFixed(1)+"°";
+  document.getElementById('ang').value=th;
+  document.getElementById('tt').textContent=c0.tir?"— (reflexión total)":c0.tt.toFixed(1)+"°";
+  document.getElementById('gs').textContent=c0.tir?"|Γ|=1 · 100 %":c0.gs.toFixed(3)+" · "+(100*c0.Rs).toFixed(1)+" %";
+  document.getElementById('gp').textContent=c0.tir?"|Γ|=1 · 100 %":c0.gp.toFixed(3)+" · "+(100*c0.Rp).toFixed(1)+" %";
+  document.getElementById('bb').textContent=tb.toFixed(1)+"° · "+(isNaN(tc)?"—":tc.toFixed(1)+"°");
+}
+function update(){draw();}
+document.getElementById('ang').addEventListener('input',function(e){th=+e.target.value;draw();});
+document.getElementById('bB').addEventListener('click',function(){th=thB();draw();});
+document.getElementById('bC').addEventListener('click',function(){var c=thC();if(!isNaN(c)){th=c;}draw();});
+document.getElementById('b0').addEventListener('click',function(){th=0;draw();});
+// arrastre
+function evX(e){var r=cv.getBoundingClientRect();return (e.clientX!==undefined?e.clientX:e.touches[0].clientX)-r.left;}
+function setFromX(px){
+  var r=cv.getBoundingClientRect(),W=Math.max(340,r.width),ml=58,pw=W-58-18;
+  th=Math.min(89.9,Math.max(0,(px-ml)/pw*90)); draw();
+}
+cv.addEventListener('pointerdown',function(e){dragging=true;cv.setPointerCapture(e.pointerId);setFromX(evX(e));e.preventDefault();});
+cv.addEventListener('pointermove',function(e){if(dragging){setFromX(evX(e));e.preventDefault();}});
+cv.addEventListener('pointerup',function(){dragging=false;});
+cv.addEventListener('pointercancel',function(){dragging=false;});
+window.addEventListener('resize',draw);
+var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',draw);
+draw();
+})();
+</script>
