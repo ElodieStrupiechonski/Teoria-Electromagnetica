@@ -24,5 +24,5 @@ keywords:
   - UNAM
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.XXXXXXX"
+    value: "10.5281/zenodo.23423157"
     description: "DOI de concepto (todas las versiones); se completa al publicar en Zenodo."
