@@ -11,7 +11,7 @@ authors:
     given-names: "Andrés"
     orcid: "https://orcid.org/0000-0002-7591-5235"
     affiliation: "Centro de Física Aplicada y Tecnología Avanzada (CFATA), UNAM"
-version: "1.2"
+version: "1.3"
 date-released: "2026-10-19"
 license: CC-BY-4.0
 keywords:
@@ -24,5 +24,5 @@ keywords:
   - UNAM
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.23423157"
+    value: "10.5281/zenodo.23423156"
     description: "DOI de concepto (apunta a todas las versiones en Zenodo)."

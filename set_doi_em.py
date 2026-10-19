@@ -8,7 +8,8 @@ Uso (desde la carpeta del repo):
     python3 set_doi_em.py 10.5281/zenodo.23423157 --dir RUTA
 
 Reemplaza el marcador 10.5281/zenodo.XXXXXXX — o cualquier DOI de Zenodo
-anterior — en .html, .md, .cff y .json; quita la nota «(se completa al
+anterior — en .html, .md, .cff y .json (salvo CHANGELOG.md, que guarda los
+DOI de versión; la carpeta auditoria/ tampoco se toca); quita la nota «(se completa al
 publicar en Zenodo)»; en las páginas HTML convierte el DOI en enlace a
 doi.org, y añade la insignia de Zenodo al inicio del README si no está.
 Es idempotente: puede correrse de nuevo con un DOI más reciente.
@@ -27,6 +28,8 @@ def main():
     n = 0
     for f in sorted(os.listdir(d)):
         if not f.endswith((".html", ".md", ".cff", ".json")):
+            continue
+        if f == "CHANGELOG.md":   # conserva los DOI de versión de cada entrada
             continue
         p = os.path.join(d, f)
         s0 = open(p, encoding="utf-8").read()

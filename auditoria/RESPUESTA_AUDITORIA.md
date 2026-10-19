@@ -1,28 +1,28 @@
-# Respuesta a la auditoría del sitio — versión 1.2
+# Respuesta a la auditoría del sitio — versión 1.3
 
-**Recurso:** Teoría Electromagnética — Exploradores interactivos (ENES Juriquilla, UNAM) · DOI de concepto [10.5281/zenodo.23423157](https://doi.org/10.5281/zenodo.23423157)
-**Auditoría recibida:** 19 de octubre de 2026, sobre la versión 1.1 del sitio.
-**Respuesta:** versión 1.2, 19 de octubre de 2026.
+**Recurso:** Teoría Electromagnética — Exploradores interactivos (ENES Juriquilla, UNAM) · DOI de concepto (todas las versiones) [10.5281/zenodo.23423156](https://doi.org/10.5281/zenodo.23423156)
+**Auditoría recibida:** 19 de octubre de 2026, sobre la versión publicada el 16 de octubre de 2026 (páginas rotuladas «1.1»; archivada en Zenodo como v1.2, DOI de versión [10.5281/zenodo.23423157](https://doi.org/10.5281/zenodo.23423157)).
+**Respuesta:** versión 1.3, 19 de octubre de 2026 · DOI de versión [10.5281/zenodo.23482923](https://doi.org/10.5281/zenodo.23482923).
 
 ## Método de atención
 
-Cada hallazgo se reprodujo primero en la versión 1.1 con los valores indicados por la auditoría; se aplicó la corrección; y se volvió a medir en la versión 1.2 con un navegador automatizado (Chromium/Playwright). Además de los casos de la auditoría, se verificó la ausencia de errores de JavaScript en las 20 páginas y la ausencia de desborde horizontal a 390 px de ancho.
+Cada hallazgo se reprodujo primero en la versión auditada con los valores indicados por la auditoría; se aplicó la corrección; y se volvió a medir en la versión 1.3 con un navegador automatizado (Chromium/Playwright). Además de los casos de la auditoría, se verificó la ausencia de errores de JavaScript en las 20 páginas y la ausencia de desborde horizontal a 390 px de ancho.
 
 Leyenda: **Adoptado** — corregido tal como se propuso · **Adoptado (variante)** — corregido con una solución distinta, explicada · **Diferido** — aceptado, programado para una versión posterior · **No adoptado** — con justificación.
 
 ## 1. Estructura y metadatos
 
-| ID | Hallazgo | Decisión | Cambio | Verificación en v1.2 |
+| ID | Hallazgo | Decisión | Cambio | Verificación en v1.3 |
 |---|---|---|---|---|
 | S1 | 18 de 20 páginas sin doctype, `lang` ni viewport: miniatura en teléfono | Adoptado | Script idempotente `add_doctype_em.py` aplicado a las 20 páginas; CSS móvil (ancho mínimo de tarjetas e inputs, ecuaciones envolventes) | Las 20 páginas miden ≤ 390 px de ancho a 390 px de pantalla |
 | S2 | README (13), Zenodo («nueve») y sitio (19) no coinciden; tipo y fecha de CITATION.cff | Adoptado (variante) | Tabla del README con los 19 exploradores; descripción de Zenodo por unidades; fecha de publicación actualizada. Además, `zenodo.json` se renombra a `.zenodo.json`, nombre que Zenodo lee en la integración con GitHub (sin el punto, Zenodo usaba CITATION.cff). `CITATION.cff` conserva `type: dataset` porque el formato CFF solo admite `software` o `dataset`; el tipo «lección» se declara en `.zenodo.json` | Inspección de archivos |
-| S3 | Versiones citadas 1.0 / 1.1 / 2.0 según la página | Adoptado | Script `set_version_em.py`: una sola versión (1.2) en las 20 páginas, README, `.zenodo.json` y CITATION.cff | Búsqueda de «Versión»: 1.2 en todas |
+| S3 | Versiones citadas 1.0 / 1.1 / 2.0 según la página | Adoptado | Script `set_version_em.py`: una sola versión (1.3) en las 20 páginas, README, `.zenodo.json` y CITATION.cff | Búsqueda de «Versión»: 1.3 en todas |
 | S4 | Orden distinto entre portada y barra de navegación | Adoptado | Unidad 4 antes de Transversales en la portada | Inspección |
 | S5 | Inducción etiquetada «1.6–1.7» sin tratar 1.7 | Adoptado | «tema 1.6» en portada, menú y página | Inspección |
 
 ## 2. Errores de física y coherencia
 
-| ID | Archivo | Hallazgo | Decisión | Verificación en v1.2 (caso de la auditoría) |
+| ID | Archivo | Hallazgo | Decisión | Verificación en v1.3 (caso de la auditoría) |
 |---|---|---|---|---|
 | E1 | Doppler | Fórmula acústica para ondas EM (error del 40 % a v/c = 0.7) | Adoptado (variante) | f′ = f√((1+β)/(1−β)); la aproximación clásica se conserva punteada en la gráfica para que el estudiante vea dónde diverge; corrimiento al rojo z relativista exacto. β = 0.5 → 1.73 f (antes 2.00 f); v/c = 0.1 → z = 0.106 |
 | E2 | Efecto piel | H dibujada adelantada respecto de E | Adoptado | H retrasada θ_η |
@@ -48,12 +48,12 @@ Leyenda: **Adoptado** — corregido tal como se propuso · **Adoptado (variante)
 | Capacitor: aviso de ruptura del aire | Adoptado | Aviso a E > 3 MV/m |
 | Línea de transmisión: Γ como \|Γ\|∠θ | Adoptado | 0.333 ∠ 0.0° |
 | Accesibilidad: nombre accesible de lienzos | Adoptado | `role="img"` y `aria-label` en los lienzos de 17 páginas |
-| Accesibilidad: `<label for>` en todos los controles; fuente mínima 11 px en lienzos | Diferido | Versión 1.3 |
-| Fresnel: τ, T, R + T = 1, fase en reflexión total | Diferido | Versión 1.3 |
-| Smith: admitancia, stubs, escala en λ | Diferido | Versión 1.3 |
-| Guía de onda: modos TM y Z_TE | Diferido (parcial) | Etiquetas TE/TM ya en 1.2; Z_TE en 1.3 |
-| Snell: apertura numérica | Diferido | Versión 1.3 |
-| Preguntas guía y recuadro «Para la práctica Pn» | Diferido | Prioridad pedagógica para 1.3 |
+| Accesibilidad: `<label for>` en todos los controles; fuente mínima 11 px en lienzos | Diferido | Versión 1.4 |
+| Fresnel: τ, T, R + T = 1, fase en reflexión total | Diferido | Versión 1.4 |
+| Smith: admitancia, stubs, escala en λ | Diferido | Versión 1.4 |
+| Guía de onda: modos TM y Z_TE | Diferido (parcial) | Etiquetas TE/TM ya en 1.3; Z_TE en 1.4 |
+| Snell: apertura numérica | Diferido | Versión 1.4 |
+| Preguntas guía y recuadro «Para la práctica Pn» | Diferido | Prioridad pedagógica para 1.4 |
 
 ## 4. Ampliación de cobertura (sección 7.3)
 
@@ -61,7 +61,7 @@ Aceptada como hoja de ruta, en el orden propuesto por la auditoría: onda TEM y 
 
 ## 5. Puntos de criterio de la autoría (sección 6)
 
-Se adoptaron los umbrales de régimen 100/0.01 en efecto piel y la nota sobre la convención de signo de Γ∥ en Fresnel. Los demás puntos (valor del teflón, umbral L/d del solenoide, convención del triángulo de impedancias, nomenclatura RHCP/LHCP) quedan para revisión en la versión 1.3.
+Se adoptaron los umbrales de régimen 100/0.01 en efecto piel y la nota sobre la convención de signo de Γ∥ en Fresnel. Los demás puntos (valor del teflón, umbral L/d del solenoide, convención del triángulo de impedancias, nomenclatura RHCP/LHCP) quedan para revisión en la versión 1.4.
 
 ---
 Agradecemos a la auditoría su rigor: todos los errores reportados se reprodujeron y resultaron reales.
