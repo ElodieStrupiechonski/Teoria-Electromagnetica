@@ -377,3 +377,64 @@
 })();
 </script>
 <!-- contador:fin -->
+<!-- navegacion:inicio -->
+<style>
+  body{margin-top:50px!important}
+  .nvbar{position:fixed;top:0;left:0;right:0;z-index:9999;height:44px;display:flex;align-items:center;
+    gap:14px;padding:0 16px;background:var(--card,#fff);border-bottom:1px solid var(--line,#e2dcc9);
+    font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+  .nvbar a{text-decoration:none;color:var(--navy,var(--ink,#1F3864))}
+  .nv-home{font-weight:700;letter-spacing:.01em}
+  .nv-home small{font-weight:400;color:var(--muted,#5a5a5a)}
+  .nvbar details{margin-left:auto;position:relative}
+  .nvbar summary{list-style:none;cursor:pointer;font-weight:700;color:var(--accent,#C1571B);
+    border:1px solid var(--line,#e2dcc9);border-radius:8px;padding:5px 12px;user-select:none}
+  .nvbar summary::-webkit-details-marker{display:none}
+  .nv-menu{position:absolute;right:0;top:40px;min-width:300px;max-height:min(70vh,520px);overflow:auto;
+    background:var(--card,#fff);border:1px solid var(--line,#e2dcc9);border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.18);padding:8px}
+  .nv-grp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8a8fa0);
+    padding:9px 10px 4px;border-top:1px solid var(--line,#eee)}
+  .nv-grp:first-child{border-top:0}
+  .nv-menu a{display:block;padding:6px 10px;border-radius:7px;color:var(--ink,#1a1a1a)}
+  .nv-menu a small{color:var(--muted,#8a8fa0);margin-left:4px}
+  .nv-menu a:hover{background:var(--bg,#f4f1ea)}
+  .nv-menu a.nv-aqui{background:var(--bg,#f4f1ea);font-weight:700;color:var(--accent,#C1571B)}
+  @media print{.nvbar{display:none} body{margin-top:0!important}}
+</style>
+<nav class="nvbar" aria-label="Navegación del sitio">
+  <a class="nv-home" href="index.html">⌁ Exploradores EM <small>· ENES Juriquilla</small></a>
+  <details id="nvdet"><summary>Temario ▾</summary>
+    <div class="nv-menu">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel <small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización <small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler <small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal <small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios) <small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d) <small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell <small>3.5 · P10, P11</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel <small>3.6–3.8</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético <small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica <small>cómputo · P6</small></a>
+    </div>
+  </details>
+</nav>
+<script>
+(function(){
+  var aqui=(location.pathname.split('/').pop()||'index.html');
+  var l=document.querySelectorAll('.nv-menu a[data-nv]');
+  for(var i=0;i<l.length;i++) if(l[i].getAttribute('data-nv')===aqui) l[i].className='nv-aqui';
+  document.addEventListener('click',function(e){
+    var d=document.getElementById('nvdet');
+    if(d&&d.open&&!d.contains(e.target)) d.open=false;
+  });
+})();
+</script>
+<!-- navegacion:fin -->
