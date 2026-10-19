@@ -38,6 +38,20 @@
   .status.tir{border-color:var(--red)} .status.br{border-color:var(--green)}
   .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
   .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .inrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:var(--mono);font-size:14px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){
     .wrap{padding-left:16px;padding-right:16px}
     .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
@@ -51,7 +65,7 @@
   <header>
     <p class="eyebrow">Teoría Electromagnética · Unidad 3 · temas 3.5 a 3.8</p>
     <h1>Ley de Snell, reflexión total y ángulo de Brewster</h1>
-    <p class="lede">Cuando una onda cruza la frontera entre dos medios, se refracta según n₁ sen θ₁ = n₂ sen θ₂. Cambia el ángulo de incidencia y los medios, y observa aparecer el ángulo crítico (reflexión total interna) y el ángulo de Brewster.</p>
+    <p class="lede">Cuando una onda cruza la frontera entre dos medios, se refracta según n₁ sen θ₁ = n₂ sen θ₂. Modifica el ángulo de incidencia y los medios — o teclea tus propios índices — y observa aparecer el ángulo crítico (reflexión total interna) y el ángulo de Brewster. En el curso de la ENES Juriquilla este explorador acompaña las prácticas P10 y P11.</p>
   </header>
 
   <section class="card">
@@ -69,6 +83,11 @@
           <button class="btn" data-n="1.33,1">agua → aire</button>
           <button class="btn" data-n="1.50,1.48">fibra óptica</button>
         </div>
+        <div class="inrow">
+          <div class="inbox"><label><span class="vinc">n</span><sub>1</sub></label><input id="inN1" type="number" step="any" min="1" inputmode="decimal"></div>
+          <div class="inbox"><label><span class="vinc">n</span><sub>2</sub></label><input id="inN2" type="number" step="any" min="1" inputmode="decimal"></div>
+          <div class="inbox"><label><span class="vinc">θ</span><sub>1</sub> (grados)</label><input id="inT1" type="number" step="any" min="0" max="89" inputmode="decimal"></div>
+        </div>
         <div class="tiles">
           <div class="tile"><div class="k">n₁ (incidencia)</div><div class="v" id="n1v">1.00</div></div>
           <div class="tile"><div class="k">n₂ (transmisión)</div><div class="v" id="n2v">1.50</div></div>
@@ -79,10 +98,17 @@
       </div>
     </div>
     <p class="note" style="margin-top:12px">El ángulo crítico solo existe al pasar a un medio menos denso (<var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>); más allá de él hay reflexión total interna, el principio de la fibra óptica. En el ángulo de Brewster la luz reflejada queda linealmente polarizada.</p>
-    <div class="eq"><var>n</var><sub>1</sub> sen <var>&theta;</var><sub>1</sub> <span class="op">=</span> <var>n</var><sub>2</sub> sen <var>&theta;</var><sub>2</sub></div>
-    <div class="eq"><var>&theta;</var><sub>c</sub> <span class="op">=</span> arcsen(<var>n</var><sub>2</sub><span class="op">/</span><var>n</var><sub>1</sub>)</div>
-    <div class="eq"><var>&theta;</var><sub>B</sub> <span class="op">=</span> arctan(<var>n</var><sub>2</sub><span class="op">/</span><var>n</var><sub>1</sub>)</div>
   </section>
+
+  <details class="card" open>
+    <summary>Formulario</summary>
+    <div class="eq"><var>n</var><sub>1</sub> sen <var>&theta;</var><sub>1</sub> <span class="op">=</span> <var>n</var><sub>2</sub> sen <var>&theta;</var><sub>2</sub></div>
+    <div class="eq"><var>&theta;</var><sub>c</sub> <span class="op">=</span> arcsen(<var>n</var><sub>2</sub><span class="op">/</span><var>n</var><sub>1</sub>) &nbsp;(solo si <var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>)</div>
+    <div class="eq"><var>&theta;</var><sub>B</sub> <span class="op">=</span> arctan(<var>n</var><sub>2</sub><span class="op">/</span><var>n</var><sub>1</sub>)</div>
+    <div class="eq"><var>n</var> <span class="op">=</span> <span class="cnat">c</span>/<var>v</var> <span class="op">=</span> √<var>ε</var><sub>r</sub> &nbsp;(medio no magnético)</div>
+    <p class="kv" style="margin-top:10px;font-size:13.5px">Velocidad de la luz &nbsp; <b class="cnat" style="font-family:var(--mono)">c = 2.998×10⁸ m/s</b></p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
@@ -95,7 +121,7 @@
   function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(240,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
   var n1=1, n2=1.5, t1=40*Math.PI/180;
   function arrow(x,ax,ay,bx,by,col,w){x.strokeStyle=col;x.fillStyle=col;x.lineWidth=w||3;x.beginPath();x.moveTo(ax,ay);x.lineTo(bx,by);x.stroke();var a=Math.atan2(by-ay,bx-ax);x.beginPath();x.moveTo(bx,by);x.lineTo(bx-12*Math.cos(a-0.42),by-12*Math.sin(a-0.42));x.lineTo(bx-12*Math.cos(a+0.42),by-12*Math.sin(a+0.42));x.closePath();x.fill();}
-  function draw(){
+  var draw=function(){
     var o=fit(document.getElementById('ray'),330),x=o.x,W=o.w,H=o.h,cx=W/2,cy=H/2,L=Math.min(W/2,H/2)-16;
     // media backgrounds
     x.fillStyle=C('--panel');x.fillRect(0,0,W,cy);
@@ -134,7 +160,16 @@
     document.getElementById('t1v').textContent=Math.round(d1)+'°';
     document.getElementById('n1v').textContent=n1.toFixed(2);
     document.getElementById('n2v').textContent=n2.toFixed(2);
-  }
+  };
+  var IN={N1:document.getElementById('inN1'),N2:document.getElementById('inN2'),T1:document.getElementById('inT1')};
+  function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+  function syncInputs(){ponSiLibre(IN.N1,+n1.toFixed(2));ponSiLibre(IN.N2,+n2.toFixed(2));
+    ponSiLibre(IN.T1,Math.round(t1*180/Math.PI));}
+  var draw0=draw; draw=function(){draw0();syncInputs();};
+  IN.N1.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n1=v;draw();});
+  IN.N2.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n2=v;draw();});
+  IN.T1.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;
+    v=Math.min(89,v);t1=v*Math.PI/180;document.getElementById('t1').value=Math.round(v);draw();});
   document.getElementById('t1').addEventListener('input',function(e){t1=(+e.target.value)*Math.PI/180;draw();});
   document.querySelectorAll('[data-n]').forEach(function(btn){btn.addEventListener('click',function(){var p=btn.getAttribute('data-n').split(',');n1=parseFloat(p[0]);n2=parseFloat(p[1]);draw();});});
   var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',draw);

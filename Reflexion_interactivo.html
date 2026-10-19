@@ -37,6 +37,21 @@
   .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
   .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
   .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .kv{font-size:13.5px;margin:5px 0} .kv b{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
+  .inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  details.card summary{cursor:pointer;font-size:15px;font-weight:700;color:var(--navy);list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){
     .wrap{padding-left:16px;padding-right:16px}
     .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
@@ -48,7 +63,7 @@
 </style>
 <div class="wrap">
   <h1>Reflexión de una onda plana: incidencia normal</h1>
-  <div class="sub">La onda llega del medio 1 a la frontera (z = 0). Parte se refleja (formando una onda estacionaria) y parte se transmite al medio 2. Arrastra el <b>plano amarillo</b> (z = −d) para medir la impedancia de onda η(d) que “se ve” desde ahí.</div>
+  <div class="sub">La onda llega del medio 1 a la frontera (z = 0). Parte se refleja (formando una onda estacionaria) y parte se transmite al medio 2. Arrastra el <b>plano amarillo</b> (z = −d) para medir la impedancia de onda η(d) que “se ve” desde ahí. En el curso de la ENES Juriquilla este explorador acompaña la práctica P8 (ondas estacionarias).</div>
 
   <div class="card">
     <canvas id="cv" height="360"></canvas>
@@ -64,6 +79,10 @@
     <div class="controls">
       <div class="ctl"><label><span>Medio 2: ε<sub>r</sub></span> <span id="erv">4.0</span></label><input id="er" type="range" min="1" max="16" step="0.5" value="4"></div>
       <div class="ctl"><label>Plano de medición: d/λ₁ <span id="dv">0.250</span></label><input id="dr" type="range" min="0" max="2" step="0.005" value="0.25"></div>
+      <div class="inrow" style="flex:1 1 100%;margin-top:0">
+        <div class="inbox"><label><span class="vinc">ε</span><sub>r</sub> del medio 2</label><input id="inEr" type="number" step="any" min="1" inputmode="decimal"></div>
+        <div class="inbox"><label><span class="vinc">d</span>/λ₁ (0–2)</label><input id="inD" type="number" step="any" min="0" max="2" inputmode="decimal"></div>
+      </div>
       <div class="btns">
         <button class="btn primary" id="play">Pausar</button>
         <button class="btn" id="cond">Conductor perfecto</button>
@@ -84,8 +103,9 @@
       <div class="tile"><div class="k">|E| en el plano / |Eᵢ|</div><div class="v" id="Ad">—</div></div>
     </div>
   </div>
-  <div class="card">
-    <p style="margin:.2em 0 .7em;color:var(--muted);font-size:14px">En la frontera (<var>z</var> = 0) el campo eléctrico total del medio 1 es la suma del vector incidente y el reflejado:</p>
+  <details class="card" open>
+    <summary>Formulario · reflexión con incidencia normal</summary>
+    <p style="margin:.6em 0 .7em;color:var(--muted);font-size:14px">En la frontera (<var>z</var> = 0) el campo eléctrico total del medio 1 es la suma del vector incidente y el reflejado:</p>
     <div class="eq"><span class="vec">E</span><sub>1</sub> <span class="op">=</span> <span class="vec">E</span><sub>i</sub> <span class="op">+</span> <span class="vec">E</span><sub>r</sub></div>
     <div class="eq"><var>&Gamma;</var> <span class="op">=</span> (<var>&eta;</var><sub>2</sub> <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub>) / (<var>&eta;</var><sub>2</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub>)</div>
     <div class="eq"><var>&tau;</var> <span class="op">=</span> 1 <span class="op">+</span> <var>&Gamma;</var> <span class="op">=</span> 2<var>&eta;</var><sub>2</sub> / (<var>&eta;</var><sub>2</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub>)</div>
@@ -93,7 +113,9 @@
     <div class="eq"><var>R</var> <span class="op">=</span> |<var>&Gamma;</var>|<sup>2</sup> <span style="display:inline-block;width:1.4em"></span> <var>T</var> <span class="op">=</span> 1 <span class="op">&minus;</span> |<var>&Gamma;</var>|<sup>2</sup></div>
     <p style="margin:.9em 0 .4em;color:var(--muted);font-size:14px">Impedancia de onda vista en el plano <var>z</var> = &minus;<var>d</var> (cociente del campo eléctrico total entre el magnético total). En <var>d</var> = λ₁/2 se repite η(<var>d</var>) = η₂; en <var>d</var> = λ₁/4 se invierte: η(<var>d</var>) = η₁²/η₂. Con conductor perfecto, η(<var>d</var>) = j<var>&eta;</var><sub>1</sub> tan(β₁<var>d</var>): reactancia pura.</p>
     <div class="eq"><var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>1</sub> &middot; [<var>&eta;</var><sub>2</sub> <span class="op">+</span> j<var>&eta;</var><sub>1</sub> tan(β₁<var>d</var>)] / [<var>&eta;</var><sub>1</sub> <span class="op">+</span> j<var>&eta;</var><sub>2</sub> tan(β₁<var>d</var>)]</div>
-  </div>
+    <p class="kv" style="margin-top:10px">Impedancia intrínseca del vacío &nbsp; <b class="cnat">η₀ = √(μ₀/ε₀) ≈ 376.73 Ω ≈ 377 Ω</b> &nbsp;<span style="color:var(--muted)">(el medio 1 es aire/vacío: η₁ = η₀; en un dieléctrico, η = η₀/√ε<sub>r</sub>)</span></p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
     <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Reflexión con incidencia normal — Explorador interactivo</i> (Versión 1.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
@@ -127,7 +149,7 @@
     if(Math.abs(re)<0.05) return (im>=0?'j':'−j')+Math.abs(im).toFixed(1);
     return re.toFixed(1)+(im>=0?' + j':' − j')+Math.abs(im).toFixed(1);
   }
-  function labels(){
+  var labels=function(){
     var p=params(),aG=Math.abs(p.G),S=aG>=1?Infinity:(1+aG)/(1-aG);
     document.getElementById('G').textContent=p.G.toFixed(3);
     document.getElementById('tau').textContent=p.tau.toFixed(3);
@@ -140,7 +162,7 @@
     document.getElementById('etad').textContent=fmtEta();
     var A=Math.sqrt(1+p.G*p.G+2*p.G*Math.cos(2*2*Math.PI*dLam)); // |E(-d)|/|Ei|, cos(2 b1 d)
     document.getElementById('Ad').textContent=A.toFixed(2);
-  }
+  };
   function draw(){
     var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(320,r.width),H=360;
     cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
@@ -215,6 +237,13 @@
   cv.addEventListener('pointermove',function(e){ if(dragging){ setFromX(evX(e)); e.preventDefault(); } });
   cv.addEventListener('pointerup',function(){dragging=false;});
   cv.addEventListener('pointercancel',function(){dragging=false;});
+  var IN={Er:document.getElementById('inEr'),D:document.getElementById('inD')};
+  function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+  var labels0=labels;
+  labels=function(){labels0();ponSiLibre(IN.Er,cond?'':+er.toFixed(2));ponSiLibre(IN.D,+dLam.toFixed(3));};
+  IN.Er.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;er=v;cond=false;
+    var sl=document.getElementById('er');sl.value=Math.min(+sl.max,Math.max(+sl.min,v));labels();});
+  IN.D.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;dLam=Math.min(2,v);labels();});
   document.getElementById('dr').addEventListener('input',function(e){dLam=+e.target.value;labels();});
   document.getElementById('dq').addEventListener('click',function(){dLam=0.25;labels();});
   document.getElementById('dh').addEventListener('click',function(){dLam=0.5;labels();});

@@ -32,11 +32,26 @@
   .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
   .credits{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
   .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .kv{font-size:13.5px;margin:5px 0} .kv b{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
+  .inrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  details.card summary{cursor:pointer;font-size:15px;font-weight:700;color:var(--navy);list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}input[type=range]{height:26px}h1{font-size:26px}}
 </style>
 <div class="wrap">
   <h1>Coeficientes de Fresnel: incidencia oblicua</h1>
-  <div class="sub">Potencia reflejada de cada polarización contra el ángulo de incidencia. Arrastra la línea amarilla (o usa el deslizador) para mover θᵢ; cambia los medios y observa el <b>ángulo de Brewster</b> (R∥ = 0) y, cuando n₁ &gt; n₂, el <b>ángulo crítico</b> con reflexión total.</div>
+  <div class="sub">Potencia reflejada de cada polarización contra el ángulo de incidencia. Arrastra la línea amarilla (o usa el deslizador) para mover θᵢ; cambia los medios y observa el <b>ángulo de Brewster</b> (R∥ = 0) y, cuando n₁ &gt; n₂, el <b>ángulo crítico</b> con reflexión total. En el curso de la ENES Juriquilla este explorador acompaña los temas 3.6 a 3.8.</div>
 
   <div class="card">
     <canvas id="cv" height="430"></canvas>
@@ -58,6 +73,11 @@
       <button class="btn" id="bC">Ir al ángulo crítico</button>
       <button class="btn" id="b0">θᵢ = 0 (normal)</button>
     </div>
+    <div class="inrow">
+      <div class="inbox"><label><span class="vinc">n</span><sub>1</sub> (personalizado)</label><input id="inN1" type="number" step="any" min="1" inputmode="decimal"></div>
+      <div class="inbox"><label><span class="vinc">n</span><sub>2</sub> (personalizado)</label><input id="inN2" type="number" step="any" min="1" inputmode="decimal"></div>
+      <div class="inbox"><label><span class="vinc">θ</span><sub>i</sub> (grados)</label><input id="inT" type="number" step="any" min="0" max="89.9" inputmode="decimal"></div>
+    </div>
     <div class="tiles">
       <div class="tile"><div class="k">θₜ (Snell)</div><div class="v" id="tt">—</div></div>
       <div class="tile"><div class="k">Γ⊥ · R⊥</div><div class="v" id="gs">—</div></div>
@@ -66,15 +86,18 @@
     </div>
   </div>
 
-  <div class="card">
-    <div class="eq">&Gamma;<sub>&#8869;</sub> <span class="op">=</span> (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>i</sub> <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>t</sub>) / (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>i</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>t</sub>)
+  <details class="card" open>
+    <summary>Formulario y constantes</summary>
+    <div class="eq" style="margin-top:10px">&Gamma;<sub>&#8869;</sub> <span class="op">=</span> (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>i</sub> <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>t</sub>) / (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>i</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>t</sub>)
     <span style="display:inline-block;width:1.6em"></span>
     &Gamma;<sub>&#8741;</sub> <span class="op">=</span> (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>t</sub> <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>i</sub>) / (<var>&eta;</var><sub>2</sub> cos&thinsp;<var>&theta;</var><sub>t</sub> <span class="op">+</span> <var>&eta;</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>i</sub>)</div>
     <div class="eq">tan&thinsp;<var>&theta;</var><sub>B</sub> <span class="op">=</span> <var>n</var><sub>2</sub>/<var>n</var><sub>1</sub>&nbsp;&nbsp;(R<sub>&#8741;</sub> = 0)
     <span style="display:inline-block;width:1.6em"></span>
     sen&thinsp;<var>&theta;</var><sub>c</sub> <span class="op">=</span> <var>n</var><sub>2</sub>/<var>n</var><sub>1</sub>&nbsp;&nbsp;(solo si <var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>; m&aacute;s all&aacute;, R = 1)</div>
     <div style="font-size:13.5px;color:var(--muted)">En θᵢ = 0 ambas curvas coinciden con el caso de incidencia normal, R = |(η₂−η₁)/(η₂+η₁)|². En θᵢ → 90° toda superficie se vuelve espejo (R → 1): por eso el lago refleja el atardecer. Medios sin pérdidas, μᵣ = 1.</div>
-  </div>
+    <p class="kv" style="margin-top:10px">Impedancia intrínseca del vacío &nbsp; <b class="cnat">η₀ = √(μ₀/ε₀) ≈ 376.73 Ω</b> &nbsp;<span style="color:var(--muted)">(en cada medio, η = η₀/n)</span></p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
@@ -157,6 +180,13 @@ function draw(){
   document.getElementById('gp').textContent=c0.tir?"|Γ|=1 · 100 %":c0.gp.toFixed(3)+" · "+(100*c0.Rp).toFixed(1)+" %";
   document.getElementById('bb').textContent=tb.toFixed(1)+"° · "+(isNaN(tc)?"—":tc.toFixed(1)+"°");
 }
+var IN={N1:document.getElementById('inN1'),N2:document.getElementById('inN2'),T:document.getElementById('inT')};
+function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+var draw0=draw; draw=function(){draw0();
+  ponSiLibre(IN.N1,+n1.toFixed(2));ponSiLibre(IN.N2,+n2.toFixed(2));ponSiLibre(IN.T,+th.toFixed(1));};
+IN.N1.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n1=v;draw();});
+IN.N2.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n2=v;draw();});
+IN.T.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;th=Math.min(89.9,v);draw();});
 function update(){draw();}
 document.getElementById('ang').addEventListener('input',function(e){th=+e.target.value;draw();});
 document.getElementById('bB').addEventListener('click',function(){th=thB();draw();});

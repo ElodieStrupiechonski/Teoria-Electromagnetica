@@ -41,6 +41,21 @@ sub,sup{font-size:.7em}
 .eq{font-family:Cambria,Georgia,serif;text-align:center;margin:6px 0;color:var(--ink)}
 .note{font-size:.8rem;color:var(--mut)}
 footer{font-size:.72rem;color:var(--mut);text-align:center;margin:14px 0 6px}
+/* convención de color del sitio: constantes de la naturaleza y variables */
+.eq var{color:var(--acc)}
+.cnat{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+.vinc{font-style:italic;color:var(--acc);font-weight:600}
+.convleg{font-size:.78rem;color:var(--mut);margin-top:8px}
+.convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+.kv{font-size:.82rem;margin:5px 0} .kv b{font-family:ui-monospace,Menlo,Consolas,monospace}
+.inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}
+.inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.inbox label{display:block;font-size:.72rem;color:var(--mut);margin-bottom:3px}
+.inbox input{width:100%;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9rem;background:var(--card);color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;padding:5px 7px}
+details.card summary{cursor:pointer;font-size:.95rem;font-weight:700;color:var(--navy);list-style:none}
+details.card summary::-webkit-details-marker{display:none}
+details.card summary::after{content:" ▸";color:var(--acc)} details.card[open] summary::after{content:" ▾"}
 </style>
 </head>
 <body>
@@ -69,6 +84,14 @@ footer{font-size:.72rem;color:var(--mut);text-align:center;margin:14px 0 6px}
     <button id="br">Radomo (1 | 4 | 1)</button>
     <button id="ba">Antirreflejante (1 | 2 | 4)</button>
   </div>
+  <div class="inrow">
+    <div class="inbox"><label><span class="vinc">ε</span><sub>r1</sub></label><input id="in1" type="number" step="any" min="1" inputmode="decimal"></div>
+    <div class="inbox"><label><span class="vinc">ε</span><sub>r2</sub></label><input id="in2" type="number" step="any" min="1" inputmode="decimal"></div>
+    <div class="inbox"><label><span class="vinc">ε</span><sub>r3</sub></label><input id="in3" type="number" step="any" min="1" inputmode="decimal"></div>
+    <div class="inbox"><label><span class="vinc">d</span>/λ₂ (0–1)</label><input id="inD" type="number" step="any" min="0" max="1" inputmode="decimal"></div>
+    <div class="inbox"><label><span class="vinc">f</span> (GHz)</label><input id="inF" type="number" step="any" min="0" inputmode="decimal"></div>
+  </div>
+  <p class="note" style="margin:6px 0 0">También puedes teclear los valores (incluso fuera del rango de los deslizadores); la curva y las lecturas se actualizan.</p>
   <div class="read">
     <div class="tile"><div class="k">η₁ · η₂ · η₃ (Ω)</div><div class="v" id="retas">377 · 188 · 94</div></div>
     <div class="tile"><div class="k">η(d) = R + jX (Ω)</div><div class="v" id="rz">—</div></div>
@@ -77,9 +100,16 @@ footer{font-size:.72rem;color:var(--mut);text-align:center;margin:14px 0 6px}
     <div class="tile"><div class="k">S.W.R. en el medio 1</div><div class="v" id="rs">—</div></div>
     <div class="tile"><div class="k">d físico a esta f</div><div class="v" id="rd">—</div></div>
   </div>
-  <div class="eq">η(<var>d</var>) = η₂ · [η₃ + jη₂ tan(β₂<var>d</var>)] / [η₂ + jη₃ tan(β₂<var>d</var>)]&nbsp;&nbsp;&nbsp;&nbsp;Γ = [η(<var>d</var>) − η₁] / [η(<var>d</var>) + η₁]</div>
-  <div class="note">Línea punteada naranja: d = λ₂/4 · línea punteada verde: d = λ₂/2. En λ₂/2, η(d) = η₃ sin importar ε<sub>r2</sub>; en λ₂/4 con η₂ = √(η₁η₃) (es decir, ε<sub>r2</sub> = √(ε<sub>r1</sub>ε<sub>r3</sub>)), la reflexión se anula. Medios sin pérdidas, μ<sub>r</sub> = 1.</div>
 </div>
+
+<details class="card" open>
+  <summary>Formulario y constantes</summary>
+  <div class="eq" style="margin-top:10px">η(<var>d</var>) = η₂ · [η₃ + jη₂ tan(β₂<var>d</var>)] / [η₂ + jη₃ tan(β₂<var>d</var>)]&nbsp;&nbsp;&nbsp;&nbsp;Γ = [η(<var>d</var>) − η₁] / [η(<var>d</var>) + η₁]</div>
+  <div class="eq">η<sub>i</sub> = <span class="cnat">η₀</span>/√ε<sub>ri</sub>&nbsp;&nbsp;&nbsp;&nbsp;λ₂ = <span class="cnat">c</span>/(<var>f</var>√ε<sub>r2</sub>)&nbsp;&nbsp;&nbsp;&nbsp;<var>d</var> = λ₂/2 → η(<var>d</var>) = η₃&nbsp;&nbsp;&nbsp;&nbsp;<var>d</var> = λ₂/4 → η(<var>d</var>) = η₂²/η₃</div>
+  <div class="note">Línea punteada naranja: d = λ₂/4 · línea punteada verde: d = λ₂/2. En λ₂/2, η(d) = η₃ sin importar ε<sub>r2</sub>; en λ₂/4 con η₂ = √(η₁η₃) (es decir, ε<sub>r2</sub> = √(ε<sub>r1</sub>ε<sub>r3</sub>)), la reflexión se anula. Medios sin pérdidas, μ<sub>r</sub> = 1.</div>
+  <p class="kv" style="margin-top:8px">Impedancia intrínseca del vacío &nbsp; <b class="cnat">η₀ = √(μ₀/ε₀) ≈ 376.73 Ω</b> &nbsp;·&nbsp; Velocidad de la luz &nbsp; <b class="cnat">c = 2.998×10⁸ m/s</b></p>
+  <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--acc)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+</details>
 
 <footer>Exploradores de Teoría Electromagnética · ENES Juriquilla, UNAM · CC BY 4.0 · DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></footer>
 </div>
@@ -209,14 +239,22 @@ function arrow(xa,ya,xb,yb){
   ctx.closePath();ctx.fill();
 }
 
+function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
 function sync(){
   $("o1").textContent=st.e1.toFixed(1); $("o2").textContent=st.e2.toFixed(1);
   $("o3").textContent=st.e3.toFixed(1); $("od").textContent=st.dr.toFixed(3);
   $("of").textContent=st.f.toFixed(1);
   $("e1").value=st.e1; $("e2").value=st.e2; $("e3").value=st.e3;
   $("dd").value=st.dr; $("ff").value=st.f;
+  ponSiLibre($("in1"),+st.e1.toFixed(2)); ponSiLibre($("in2"),+st.e2.toFixed(2));
+  ponSiLibre($("in3"),+st.e3.toFixed(2)); ponSiLibre($("inD"),+st.dr.toFixed(3));
+  ponSiLibre($("inF"),+st.f.toFixed(2));
   draw();
 }
+[["in1","e1",1],["in2","e2",1],["in3","e3",1],["inD","dr",0],["inF","f",0.001]].forEach(([id,k,mn])=>{
+  $(id).addEventListener("input",e=>{const v=parseFloat(e.target.value);
+    if(!(v>=mn))return; st[k]=(k==="dr")?Math.min(1,v):v; sync();});
+});
 [["e1","e1"],["e2","e2"],["e3","e3"],["dd","dr"],["ff","f"]].forEach(([id,k])=>{
   $(id).addEventListener("input",e=>{st[k]=parseFloat(e.target.value);sync();});
 });

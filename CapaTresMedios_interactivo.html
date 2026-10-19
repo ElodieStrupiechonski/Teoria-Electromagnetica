@@ -43,6 +43,16 @@
   .eq var{font-style:italic}
   .eq sub,.eq sup{font-style:normal;font-size:.72em}
   .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .kv{font-size:13.5px;margin:5px 0} .kv b{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
+  details.card summary{cursor:pointer;font-size:15px;font-weight:700;color:var(--navy);list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){
     .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
     input[type=range]{height:26px}
@@ -99,12 +109,15 @@
     </div>
   </div>
 
-  <div class="card">
-    <p style="margin:.2em 0 .7em;color:var(--muted);font-size:14px">La frontera trasera también refleja; lo que la onda “ve” al llegar a z = &minus;<var>d</var> es la impedancia efectiva:</p>
+  <details class="card" open>
+    <summary>Formulario · capa de tres medios</summary>
+    <p style="margin:.6em 0 .7em;color:var(--muted);font-size:14px">La frontera trasera también refleja; lo que la onda “ve” al llegar a z = &minus;<var>d</var> es la impedancia efectiva:</p>
     <div class="eq"><var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>2</sub> &middot; [<var>&eta;</var><sub>3</sub> <span class="op">+</span> j<var>&eta;</var><sub>2</sub> tan(&beta;<sub>2</sub><var>d</var>)] / [<var>&eta;</var><sub>2</sub> <span class="op">+</span> j<var>&eta;</var><sub>3</sub> tan(&beta;<sub>2</sub><var>d</var>)]</div>
     <div class="eq"><var>&Gamma;</var> <span class="op">=</span> [<var>&eta;</var>(<var>d</var>) <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub>] / [<var>&eta;</var>(<var>d</var>) <span class="op">+</span> <var>&eta;</var><sub>1</sub>] <span style="display:inline-block;width:1.6em"></span> <var>d</var> <span class="op">=</span> &lambda;<sub>2</sub>/2 &rarr; <var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>3</sub> <span style="display:inline-block;width:1.6em"></span> <var>d</var> <span class="op">=</span> &lambda;<sub>2</sub>/4 &rarr; <var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>2</sub><sup>2</sup>/<var>&eta;</var><sub>3</sub></div>
     <p style="margin:.6em 0 .2em;color:var(--muted);font-size:14px">Sugerencias: <b>Antirreflejante</b> — aire | MgF₂ | vidrio con d = λ₂/4 (compara |Γ|² con el 4 % del vidrio sin capa). <b>Radomo</b> — aire | teflón | aire con d = λ₂/2: la capa desaparece sin importar su material. Con n₂ ideal = √(n₁n₃) el mínimo en λ₂/4 baja a cero exacto.</p>
-  </div>
+    <p class="kv" style="margin-top:10px">Impedancia intrínseca del vacío &nbsp; <b class="cnat">η₀ = √(μ₀/ε₀) ≈ 376.73 Ω ≈ 377 Ω</b> &nbsp;<span style="color:var(--muted)">(en cada medio no magnético, η<sub>i</sub> = η₀/n<sub>i</sub>)</span></p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>

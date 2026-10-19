@@ -97,13 +97,13 @@
         <select id="unF"><option value="1e12">THz</option><option value="1e9">GHz</option><option value="1e6">MHz</option><option value="1e3">kHz</option><option value="1">Hz</option></select></div></div>
       <div class="inbox"><label>Energía del fotón <span class="vinc">E</span></label>
         <div class="fila"><input id="inE" type="number" step="any" min="0" placeholder="2.25" aria-label="Valor de energía">
-        <select id="unE"><option value="1">eV</option><option value="1e-3">meV</option><option value="1e3">keV</option><option value="1e6">MeV</option></select></div></div>
+        <select id="unE"><option value="1">eV</option><option value="1e-3">meV</option><option value="1e3">keV</option><option value="1e6">MeV</option><option value="6.242e18">J</option></select></div></div>
     </div>
     <p class="note" style="margin-top:8px">Basta llenar una de las tres: las otras dos y las casillas de lectura se actualizan con las conversiones <span class="vinc">λ</span> = <span class="cnat">c</span>/<span class="vinc">f</span> y <span class="vinc">E</span> = <span class="cnat">h</span><span class="vinc">f</span>.</p>
   </section>
 
   <section class="card">
-    <p class="sec-tag">Zoom · la ventana visible (380–750 nm) con el nombre de cada color</p>
+    <p class="sec-tag">Zoom · la ventana visible (750–380 nm) con el nombre de cada color</p>
     <canvas id="vis" height="150"></canvas>
     <p class="note" style="margin-top:8px">Arrastra dentro de la franja para mover el cursor principal. El ojo humano solo percibe esta rendija: menos de una octava de las ~60 que abarca el espectro completo.</p>
   </section>
@@ -262,36 +262,39 @@
     syncInputs(); drawVis();
   };
   // ---------- zoom del visible ----------
+  // Orientación invertida (rojo a la izquierda, violeta a la derecha): la frecuencia
+  // crece hacia la derecha, en continuidad con el espectro completo de arriba.
   var NMA=380,NMB=750;
+  function nm2px(nm,x0,x1){return x0+(x1-x0)*(NMB-nm)/(NMB-NMA);}
   function drawVis(){
     var o=fit(g('vis'),150),x=o.x,w=o.w;
     x.fillStyle=CV('--panel');x.fillRect(0,0,w,150);
     var x0=PADL,x1=w-PADR,bt=36,bh=54;
-    for(var px=x0;px<=x1;px++){var nm=NMA+(NMB-NMA)*(px-x0)/(x1-x0);x.fillStyle=nmRGB(nm);x.fillRect(px,bt,1.5,bh);}
+    for(var px=x0;px<=x1;px++){var nm=NMB-(NMB-NMA)*(px-x0)/(x1-x0);x.fillStyle=nmRGB(nm);x.fillRect(px,bt,1.5,bh);}
     x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=1;
     x.font='10px '+CV('--mono')+',monospace';x.textAlign='center';
     NOMBRES.forEach(function(N){
-      var pa=x0+(x1-x0)*(N[0]-NMA)/(NMB-NMA), pb=x0+(x1-x0)*(N[1]-NMA)/(NMB-NMA);
+      var pa=nm2px(N[1],x0,x1), pb=nm2px(N[0],x0,x1);
       x.beginPath();x.moveTo(pa,bt);x.lineTo(pa,bt+bh+6);x.stroke();
       x.fillStyle='rgba(255,255,255,.85)';x.fillText(N[2],(pa+pb)/2,bt+bh+18);
     });
-    for(var nmt=400;nmt<=750;nmt+=50){var pt=x0+(x1-x0)*(nmt-NMA)/(NMB-NMA);
+    for(var nmt=400;nmt<=750;nmt+=50){var pt=nm2px(nmt,x0,x1);
       x.fillStyle='rgba(255,255,255,.6)';x.fillText(nmt+' nm',pt,24);}
     x.textAlign='left';
     var nmc=c/Math.pow(10,logf)*1e9;
-    if(nmc>=NMA&&nmc<=NMB){var pc=x0+(x1-x0)*(nmc-NMA)/(NMB-NMA);
+    if(nmc>=NMA&&nmc<=NMB){var pc=nm2px(nmc,x0,x1);
       x.strokeStyle=CV('--accent');x.lineWidth=2.5;x.beginPath();x.moveTo(pc,bt-8);x.lineTo(pc,bt+bh+8);x.stroke();
       x.fillStyle=CV('--accent');x.beginPath();x.arc(pc,bt-12,6,0,6.2832);x.fill();
       x.font='600 11px '+CV('--sans')+',sans-serif';
       x.fillText(nmc.toFixed(0)+' nm · '+(nombreColor(nmc)||''),Math.min(pc+10,w-110),bt-16);
     } else {
       x.fillStyle='rgba(255,255,255,.55)';x.font='11px '+CV('--sans')+',sans-serif';
-      x.fillText('El cursor principal está fuera del visible ('+(nmc<NMA?'ultravioleta o más allá':'infrarrojo o más acá')+')',x0,140);
+      x.fillText('El cursor principal está fuera del visible ('+(nmc<NMA?'ultravioleta o más allá, a la derecha':'infrarrojo o más acá, a la izquierda')+')',x0,140);
     }
   }
   var vz=g('vis'),vdrag=false;
   function setFromVis(e){var r=vz.getBoundingClientRect();var frac=(e.clientX-r.left-PADL)/(r.width-PADL-PADR);
-    var nm=Math.max(NMA,Math.min(NMB,NMA+(NMB-NMA)*frac));setLogf(Math.log10(c/(nm*1e-9)));}
+    var nm=Math.max(NMA,Math.min(NMB,NMB-(NMB-NMA)*frac));setLogf(Math.log10(c/(nm*1e-9)));}
   vz.addEventListener('pointerdown',function(e){vdrag=true;vz.setPointerCapture(e.pointerId);setFromVis(e);});
   vz.addEventListener('pointermove',function(e){if(vdrag)setFromVis(e);});
   vz.addEventListener('pointerup',function(){vdrag=false;});
