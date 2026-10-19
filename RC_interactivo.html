@@ -63,6 +63,20 @@
   .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
   .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
   .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  details.card summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--blue);list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   .eqgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .eqgrid .eq{margin:0}
   @media (max-width:560px){
@@ -78,7 +92,7 @@
 
 <div class="wrap">
   <h1>Circuito RC en serie: desfase entre voltaje y corriente</h1>
-  <div class="sub">Parte C de la P4. Mueve R, C, f y la amplitud, y observa cómo la corriente adelanta al voltaje.</div>
+  <div class="sub">Modifica R, C, f y la amplitud, y observa cómo la corriente adelanta al voltaje en un circuito RC en serie. En el curso de la ENES Juriquilla este explorador acompaña la parte C de la práctica P4 (mediciones con osciloscopio).</div>
 
   <div class="card">
     <div class="controls">
@@ -87,6 +101,13 @@
       <div class="ctl"><label>Frecuencia f <span id="fval">1000 Hz</span></label><input id="f" type="range" min="100" max="10000" step="50" value="1000"></div>
       <div class="ctl"><label>Amplitud V<sub>in</sub> <span id="vval">3.0 V</span></label><input id="v" type="range" min="1" max="5" step="0.5" value="3"></div>
     </div>
+    <div class="inrow">
+      <div class="inbox"><label><span class="vinc">R</span> (Ω)</label><input id="inR" type="number" step="any" min="0" inputmode="decimal"></div>
+      <div class="inbox"><label><span class="vinc">C</span> (nF)</label><input id="inC" type="number" step="any" min="0" inputmode="decimal"></div>
+      <div class="inbox"><label><span class="vinc">f</span> (Hz)</label><input id="inF" type="number" step="any" min="0" inputmode="decimal"></div>
+      <div class="inbox"><label><span class="vinc">V</span><sub>in</sub> (V)</label><input id="inV" type="number" step="any" min="0" inputmode="decimal"></div>
+    </div>
+    <p class="foot" style="text-align:left;margin-top:6px">También puedes teclear los valores de tu propio circuito; los deslizadores y las gráficas se actualizan.</p>
   </div>
 
   <div class="row">
@@ -153,8 +174,8 @@
     </svg>
   </div>
 
-  <div class="card">
-    <h3>Relaciones del circuito RC serie</h3>
+  <details class="card" open>
+    <summary>Formulario · relaciones del circuito RC serie</summary>
     <div class="eqgrid">
       <div class="eq"><var>X</var><sub>C</sub> <span class="op">=</span> 1 / (<var>&omega;</var><var>C</var>)<span class="op">,</span>&nbsp; <var>&omega;</var> <span class="op">=</span> 2&pi;<var>f</var></div>
       <div class="eq"><var>Z</var> <span class="op">=</span> <var>R</var> <span class="op">+</span> 1/(j<var>&omega;</var><var>C</var>) <span class="op">=</span> <var>R</var> <span class="op">&minus;</span> j/(<var>&omega;</var><var>C</var>)</div>
@@ -164,7 +185,8 @@
       <div class="eq">&Delta;<var>t</var> <span class="op">=</span> (<var>&phi;</var> / 360&deg;) <span class="op">&middot;</span> <var>T</var><span class="op">,</span>&nbsp; <var>T</var> <span class="op">=</span> 1/<var>f</var></div>
       <div class="eq"><var>f</var><sub>c</sub> <span class="op">=</span> 1 / (2&pi;<var>R</var><var>C</var>)</div>
     </div>
-  </div>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span>. En este explorador no interviene ninguna constante de la naturaleza: R, C, f y V<sub>in</sub> son parámetros que el experimentador elige.</p>
+  </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
@@ -176,11 +198,12 @@
 (function(){
   var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
   var R,C,f,Vp,w,Xc,Z,phi,Ip,VRp,VCp,T;
+  var ovr=null;   // valores tecleados que exceden el rango de los deslizadores
   function calc(){
-    R=+document.getElementById('r').value;
-    C=(+document.getElementById('c').value)*1e-9;
-    f=+document.getElementById('f').value;
-    Vp=+document.getElementById('v').value;
+    R=ovr&&ovr.R!=null?ovr.R:+document.getElementById('r').value;
+    C=ovr&&ovr.C!=null?ovr.C:(+document.getElementById('c').value)*1e-9;
+    f=ovr&&ovr.f!=null?ovr.f:+document.getElementById('f').value;
+    Vp=ovr&&ovr.Vp!=null?ovr.Vp:+document.getElementById('v').value;
     w=2*Math.PI*f; Xc=1/(w*C); Z=Math.hypot(R,Xc); phi=Math.atan2(Xc,R);
     Ip=Vp/Z; VRp=Ip*R; VCp=Ip*Xc; T=1/f;
   }
@@ -278,8 +301,19 @@
     x.fillStyle=css('--muted');x.font='11px sans-serif';x.fillText('φ',ox+28,oy-8);
   }
   var frozen=null;
-  function update(){calc();labels();drawScope();drawPhasor();drawZtri();updateCmp();}
-  ['r','c','f','v'].forEach(function(id){document.getElementById(id).addEventListener('input',update);});
+  var IN={R:document.getElementById('inR'),C:document.getElementById('inC'),
+          F:document.getElementById('inF'),V:document.getElementById('inV')};
+  function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+  function syncInputs(){ponSiLibre(IN.R,R);ponSiLibre(IN.C,Math.round(C*1e9));
+    ponSiLibre(IN.F,f);ponSiLibre(IN.V,+Vp.toFixed(2));}
+  function ponSlider(id,v){var el=document.getElementById(id);el.value=Math.min(+el.max,Math.max(+el.min,v));}
+  function desde(id,fn){IN[id].addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;fn(v);update();});}
+  function update(){calc();labels();syncInputs();drawScope();drawPhasor();drawZtri();updateCmp();}
+  ['r','c','f','v'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){ovr=null;update();});});
+  desde('R',function(v){ovr=ovr||{};ovr.R=v;ponSlider('r',v);});
+  desde('C',function(v){ovr=ovr||{};ovr.C=v*1e-9;ponSlider('c',v);});
+  desde('F',function(v){ovr=ovr||{};ovr.f=v;ponSlider('f',v);});
+  desde('V',function(v){ovr=ovr||{};ovr.Vp=v;ponSlider('v',v);});
   document.getElementById('showvc').addEventListener('change',drawScope);
   document.getElementById('freeze').addEventListener('click',function(){
     frozen={R:R,C:C,f:f,Vp:Vp,Xc:Xc,Z:Z,phi:phi,VRp:VRp,VCp:VCp};

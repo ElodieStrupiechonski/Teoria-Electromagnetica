@@ -46,14 +46,23 @@
   .safe b{color:var(--red)}
   .kv{font-size:14px;margin:5px 0} .kv b{font-family:var(--mono);color:var(--ink)}
   .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
-  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+.credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}h1{font-size:26px}}
 </style>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Teoría Electromagnética · Práctica P5 · velocidad de propagación</p>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 2 · tema 2.3 · velocidad de propagación</p>
     <h1>Medir la velocidad de la luz con un horno de microondas</h1>
-    <p class="lede">Dentro de un horno de microondas se forma una onda estacionaria. La comida se calienta más en los antinodos, y la distancia entre dos puntos calientes vecinos es media longitud de onda. Con la frecuencia de la placa del horno se obtiene <var>c</var> = <var>f</var>·<var>&lambda;</var>. Mide y compruébalo.</p>
+    <p class="lede">Dentro de un horno de microondas se forma una onda estacionaria. La comida se calienta más en los antinodos, y la distancia entre dos puntos calientes vecinos es media longitud de onda. Con la frecuencia de la placa del horno se obtiene una estimación de <span class="cnat">c</span> = <var>f</var>·<var>&lambda;</var>. Cualquier horno doméstico sirve para reproducir la medición; en el curso de la ENES Juriquilla corresponde a la práctica P5.</p>
   </header>
 
   <section class="card">
@@ -103,7 +112,7 @@
       <div class="tile res"><div class="k">c = 2·d·f</div><div class="v" id="uc">—</div></div>
       <div class="tile"><div class="k">Error vs c aceptada</div><div class="v" id="uerr">—</div></div>
     </div>
-    <p class="note" style="margin-top:12px">Precargado con tu experimento (queso rallado): <var>f</var> = 2450 MHz, 4 manchas → <var>n</var> = 3 espacios, <var>D</var> = 23 cm. Los hornos reales dan dispersión (±10–25 %): dentro de la cavidad se excitan varios modos 3D, no una onda plana ideal, así que las manchas no quedan exactamente a <var>λ</var>/2. Por eso conviene promediar varios ensayos y medir el mayor número de espacios posible.</p>
+    <p class="note" style="margin-top:12px">Precargado con una medición real del curso (queso rallado, práctica P5 de la ENES Juriquilla): <var>f</var> = 2450 MHz, 4 manchas → <var>n</var> = 3 espacios, <var>D</var> = 23 cm. Los hornos reales dan dispersión (±10–25 %): dentro de la cavidad se excitan varios modos 3D, no una onda plana ideal, así que las manchas no quedan exactamente a <var>λ</var>/2. Por eso conviene promediar varios ensayos y medir el mayor número de espacios posible.</p>
   </section>
 
   <section class="card">
@@ -113,10 +122,18 @@
     <div class="eq"><var>E</var>(<var>x</var>,<var>t</var>) <span class="op">=</span> 2<var>E</var><sub>0</sub> sen(<var>k</var><var>x</var>) cos(<var>&omega;</var><var>t</var>)</div>
     <p class="note">Nodos y antinodos consecutivos se repiten cada media longitud de onda, por eso los puntos calientes están separados por:</p>
     <div class="eq"><var>d</var> <span class="op">=</span> <var>&lambda;</var> / 2</div>
-    <p class="note">La onda viaja a <var>c</var> = <var>f</var>·<var>&lambda;</var>. Despejando con lo que medimos (<var>&lambda;</var> = 2<var>d</var>) y la frecuencia de la placa:</p>
-    <div class="eq"><var>c</var> <span class="op">=</span> <var>f</var> <var>&lambda;</var> <span class="op">=</span> <var>f</var> <span class="op">&middot;</span> 2<var>d</var></div>
-    <p class="note">Valor esperado: con <var>f</var> = 2.45 GHz, <var>&lambda;</var> ≈ 12.2 cm y <var>d</var> ≈ 6.1 cm. Este es el mismo principio de la onda estacionaria de la P8 (reflexión), ahora usado para medir. En el <b>espectro electromagnético</b>, 2.45 GHz cae en las <b>microondas</b>.</p>
+    <p class="note">La onda viaja a <span class="cnat">c</span> = <var>f</var>·<var>&lambda;</var>. Despejando con lo que medimos (<var>&lambda;</var> = 2<var>d</var>) y la frecuencia de la placa:</p>
+    <div class="eq"><span class="cnat">c</span> <span class="op">=</span> <var>f</var> <var>&lambda;</var> <span class="op">=</span> <var>f</var> <span class="op">&middot;</span> 2<var>d</var></div>
+    <p class="note">Valor esperado: con <var>f</var> = 2.45 GHz, <var>&lambda;</var> ≈ 12.2 cm y <var>d</var> ≈ 6.1 cm. Es el mismo principio de onda estacionaria que se estudia en el explorador de <a href="Reflexion_interactivo.html">incidencia normal</a>, ahora usado para medir. En el <b>espectro electromagnético</b>, 2.45 GHz cae en las <b>microondas</b>.</p>
   </section>
+
+  <details class="card">
+    <summary>Formulario y constantes</summary>
+    <div class="eq"><var>E</var>(<var>x</var>,<var>t</var>) <span class="op">=</span> 2<var>E</var><sub>0</sub> sen(<var>k</var><var>x</var>) cos(<var>ω</var><var>t</var>)<span class="op">,</span>&emsp;<var>d</var> <span class="op">=</span> <var>λ</var>/2</div>
+    <div class="eq"><span class="cnat">c</span> <span class="op">=</span> <var>f</var><var>λ</var> <span class="op">=</span> 2<var>d</var><var>f</var><span class="op">,</span>&emsp;<var>d</var> <span class="op">=</span> <var>D</var>/<var>n</var></div>
+    <p class="kv" style="margin-top:10px">Velocidad de la luz (valor aceptado) &nbsp; <b class="cnat">c = 299 792 458 m/s ≈ 2.998×10⁸ m/s</b></p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span>. Aquí <span class="cnat">c</span> es la constante que el experimento estima; <span class="vinc">f</span>, <span class="vinc">D</span> y <span class="vinc">n</span> son lo que se mide.</p>
+  </details>
 
   <section class="card">
     <p class="sec-tag">Seguridad · antes de encender</p>

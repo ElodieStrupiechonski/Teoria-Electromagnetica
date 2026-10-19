@@ -39,6 +39,23 @@
   .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
   .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
   .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .kv{font-size:13.5px;margin:5px 0} .kv b{font-family:var(--mono);color:var(--ink)}
+  .inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox .fila{display:flex;gap:6px}
+  .inbox input{flex:1;width:100%;min-width:0;font-family:var(--mono);font-size:14px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  .inbox select{font:inherit;font-size:13px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:0 6px}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){
     .wrap{padding-left:16px;padding-right:16px}
     .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
@@ -50,9 +67,9 @@
 </style>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Teoría Electromagnética · Unidad 2 · tema 2.6 · práctica P6</p>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 2 · tema 2.6</p>
     <h1>Efecto piel: hasta dónde entra la onda en el metal</h1>
-    <p class="lede">La onda sí entra en el conductor, pero se apaga muy rápido: su amplitud decae como e^(−z/δ) con la profundidad. La profundidad de penetración δ mide hasta dónde llega de forma apreciable — cae al 37 % en una δ y a ~5 % en tres δ. Cambia la frecuencia y el material, y observa cómo la onda se confina cerca de la superficie.</p>
+    <p class="lede">La onda sí entra en el conductor, pero se apaga muy rápido: su amplitud decae como e^(−z/δ) con la profundidad. La profundidad de penetración δ mide hasta dónde llega de forma apreciable — cae al 37 % en una δ y a ~5 % en tres δ. Modifica la frecuencia y el material — o teclea una conductividad propia — y observa cómo la onda se confina cerca de la superficie. En el curso de la ENES Juriquilla este explorador acompaña la práctica P6 (apantallamiento con jaula de Faraday).</p>
   </header>
 
   <section class="card">
@@ -72,6 +89,14 @@
           <button class="btn" data-m="mar">agua de mar</button>
         </div>
         <label><span>Frecuencia f</span> <b id="fv">1 MHz</b></label><input id="f" type="range" min="3" max="15" step="0.05" value="6">
+        <div class="inrow">
+          <div class="inbox"><label>Frecuencia <span class="vinc">f</span></label>
+            <div class="fila"><input id="inF" type="number" step="any" min="0" inputmode="decimal">
+            <select id="unF"><option value="1e3">kHz</option><option value="1e6" selected>MHz</option><option value="1e9">GHz</option><option value="1e12">THz</option></select></div></div>
+          <div class="inbox"><label>Conductividad <span class="vinc">σ</span> (S/m)</label><input id="inS" type="number" step="any" min="0" inputmode="decimal"></div>
+          <div class="inbox"><label>Permitividad relativa <span class="vinc">ε</span><sub>r</sub></label><input id="inEr" type="number" step="any" min="1" inputmode="decimal"></div>
+        </div>
+        <p class="note" style="font-size:12.5px;margin-top:6px">Teclea los valores de tu propio material (acepta notación científica, p. ej. <code>5.8e7</code>); al editarlos el material pasa a «personalizado».</p>
         <div class="tiles">
           <div class="tile"><div class="k">Conductividad σ</div><div class="v" id="sig">—</div></div>
           <div class="tile"><div class="k">Profundidad δ = 1/√(πfμσ)</div><div class="v" id="dl">—</div></div>
@@ -80,17 +105,23 @@
           <div class="tile"><div class="k">Desfase de H respecto de E</div><div class="v" id="ph">—</div></div>
           <div class="tile"><div class="k">Régimen</div><div class="v" id="reg">—</div></div>
         </div>
-        <p class="note" style="margin-top:12px">En un buen conductor H se retrasa 45° respecto de E (la impedancia intrínseca tiene ángulo de 45°). Por eso conviene usar conductores huecos o plateados, y por eso la jaula de Faraday de la P6 apantalla las señales: dentro apenas quedan unas cuantas δ de campo.</p>
+        <p class="note" style="margin-top:12px">En un buen conductor H se retrasa 45° respecto de E (la impedancia intrínseca tiene ángulo de 45°). Por eso conviene usar conductores huecos o plateados, y por eso una jaula de Faraday — como la construida con papel aluminio en la práctica P6 del curso — apantalla las señales: tras unas cuantas δ de material apenas queda campo.</p>
       </div>
     </div>
-    <p class="sec-tag" style="margin-top:20px">Relaciones clave</p>
+  </section>
+
+  <details class="card" open>
+    <summary>Formulario y constantes</summary>
     <div class="eq"><var>&delta;</var> <span class="op">=</span> 1 <span class="op">/</span> &radic;(&pi; <var>f</var> &middot; <var>&mu;</var> &middot; <var>&sigma;</var>)</div>
     <div class="eq"><span class="vec">E</span>(<var>z</var>) <span class="op">=</span> <span class="vec">E</span><sub>0</sub> <var>e</var><sup>&minus;<var>z</var>/<var>&delta;</var></sup></div>
     <div class="eq"><var>&alpha;</var> <span class="op">=</span> <var>&beta;</var> <span class="op">=</span> 1 <span class="op">/</span> <var>&delta;</var></div>
     <div class="eq"><var>&theta;</var><sub><var>&eta;</var></sub> <span class="op">=</span> &frac12; arctan(<var>&sigma;</var> <span class="op">/</span> <var>&omega;</var><var>&epsilon;</var>) <span class="op">&rarr;</span> 45&deg; = &pi;/4</div>
     <p class="note" style="margin-top:6px">En un buen conductor el ángulo de la impedancia intrínseca es de 45&deg;: la <span class="vec">H</span> se retrasa &pi;/4 respecto de la <span class="vec">E</span>. La amplitud decae como exp(&minus;<var>z</var>/<var>&delta;</var>) y cae al 37 % en una <var>&delta;</var>.</p>
     <p class="note" style="margin-top:6px">Nota: por arriba del infrarrojo (banda visible marcada en la gráfica) este modelo de buen conductor es solo orientativo; a esas frecuencias la conductividad deja de ser constante y aparecen efectos de plasma.</p>
-  </section>
+    <p class="kv" style="margin-top:10px">Permeabilidad del vacío &nbsp; <b class="cnat">μ₀ = 4π×10⁻⁷ T·m/A</b> &nbsp;(para los materiales no magnéticos de aquí, <var>μ</var> ≈ <span class="cnat">μ₀</span>)</p>
+    <p class="kv">Permitividad del vacío &nbsp; <b class="cnat">ε₀ = 8.854×10⁻¹² F/m</b> &nbsp;(<var>ε</var> = <var>ε</var><sub>r</sub><span class="cnat">ε₀</span>)</p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
@@ -102,7 +133,7 @@
   var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
   var MU0=4*Math.PI*1e-7, E0P=8.854e-12;
   function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(240,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
-  var MAT={cobre:{s:5.8e7,er:1},aluminio:{s:3.5e7,er:1},oro:{s:4.1e7,er:1},mar:{s:4,er:81}};
+  var MAT={cobre:{s:5.8e7,er:1},aluminio:{s:3.5e7,er:1},oro:{s:4.1e7,er:1},mar:{s:4,er:81},custom:{s:5.8e7,er:1}};
   var mat='cobre', fexp=6, t=0;
   function sigma(){return MAT[mat].s;} function er(){return MAT[mat].er;}
   function fval(){return Math.pow(10,fexp);}
@@ -170,7 +201,29 @@
     // dot
     x.fillStyle=C('--accent');x.beginPath();x.arc(X(fexp),Y(Math.log10(delta(fval()))),4.5,0,6.2832);x.fill();
   }
-  function statLabels(){labels();drawDF();}
+  var IN={F:document.getElementById('inF'),U:document.getElementById('unF'),
+          S:document.getElementById('inS'),Er:document.getElementById('inEr')};
+  function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+  function syncInputs(){
+    var f=fval(), us='1e3';
+    if(document.activeElement!==IN.F && document.activeElement!==IN.U){
+      if(f>=1e12)us='1e12';else if(f>=1e9)us='1e9';else if(f>=1e6)us='1e6';
+      IN.U.value=us; IN.F.value=+( (f/parseFloat(us)).toPrecision(4) );
+    }
+    ponSiLibre(IN.S,sigma());ponSiLibre(IN.Er,er());
+  }
+  function aCustom(){mat='custom';document.querySelectorAll('[data-m]').forEach(function(b){b.classList.remove('on');});}
+  function statLabels(){labels();syncInputs();drawDF();}
+  IN.F.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;
+    var f=v*(+IN.U.value);fexp=Math.max(3,Math.min(15,Math.log10(f)));
+    document.getElementById('f').value=fexp;labels();drawDF();ponSiLibre(IN.S,sigma());ponSiLibre(IN.Er,er());});
+  IN.U.addEventListener('change',function(){var v=parseFloat(IN.F.value);if(!(v>0))return;
+    var f=v*(+IN.U.value);fexp=Math.max(3,Math.min(15,Math.log10(f)));
+    document.getElementById('f').value=fexp;labels();drawDF();});
+  IN.S.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;
+    aCustom();MAT.custom.s=v;MAT.custom.er=parseFloat(IN.Er.value)||1;labels();drawDF();});
+  IN.Er.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;
+    aCustom();MAT.custom.er=v;MAT.custom.s=parseFloat(IN.S.value)||MAT.custom.s;labels();drawDF();});
   document.getElementById('f').addEventListener('input',function(e){fexp=+e.target.value;statLabels();});
   document.querySelectorAll('[data-m]').forEach(function(btn){btn.addEventListener('click',function(){
     mat=btn.getAttribute('data-m');document.querySelectorAll('[data-m]').forEach(function(b){b.classList.toggle('on',b===btn);});statLabels();});});

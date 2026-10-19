@@ -60,6 +60,18 @@
   .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
   .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
   .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .kv{font-size:13.5px;margin:5px 0} .kv b{font-family:var(--mono);color:var(--ink)}
+  .inbox{display:inline-flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-size:13px;color:var(--muted);margin-top:8px}
+  .inbox input{width:88px;font-family:var(--mono);font-size:14px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:5px 7px}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   select,input[type=number]{font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
   .calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:6px}
   .calc-grid label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)}
@@ -84,7 +96,7 @@
   <header>
     <p class="eyebrow">Teoría Electromagnética · Unidad 2 · tema 2.9</p>
     <h1>El efecto Doppler, de la sirena a las galaxias</h1>
-    <p class="lede">Cuando una fuente y un observador se mueven uno respecto al otro, la frecuencia recibida cambia. Mueve los controles para ver el mismo principio en tres escalas: los frentes de onda, la señal que llega a cada observador y la luz corrida al rojo de las galaxias.</p>
+    <p class="lede">Cuando una fuente y un observador se mueven uno respecto al otro, la frecuencia recibida cambia. Modifica los controles para ver el mismo principio en tres escalas: los frentes de onda, la señal que llega a cada observador y la luz corrida al rojo de las galaxias.</p>
   </header>
 
   <!-- ============ SECCIÓN 1 ============ -->
@@ -101,13 +113,15 @@
         <div class="row"><button class="btn on" id="wplay">Pausar</button></div>
         <label>Velocidad de la fuente&nbsp; v/c <b id="bval">0.30</b></label>
         <input id="beta" type="range" min="0" max="0.7" step="0.01" value="0.3">
+        <span class="inbox"><span class="vinc">v</span>/<span class="cnat">c</span> =<input id="inB" type="number" step="any" min="0" max="0.7" inputmode="decimal"></span>
+        <span class="inbox">o <span class="vinc">v</span> =<input id="inV" type="number" step="any" min="0" inputmode="decimal"> km/s</span>
         <div class="tiles">
           <div class="tile"><div class="k"><var>f</var> adelante  (se acerca)</div><div class="v up" id="fup">—</div></div>
           <div class="tile"><div class="k"><var>f</var> atrás  (se aleja)</div><div class="v dn" id="fdn">—</div></div>
         </div>
-        <div class="eq"><var>f</var>&prime; = <var>f</var> / (1 &#8723; <var>v</var>/<var>c</var>)</div>
-        <div class="eq">&Delta;<var>f</var> / <var>f</var> &asymp; <var>v</var>/<var>c</var></div>
-        <p class="note" style="margin-top:12px">Para <var>v</var> &#8810; <var>c</var>: &Delta;<var>f</var>/<var>f</var> &asymp; <var>v</var>/<var>c</var>. Aquí se usa la fuente en movimiento, <var>f</var>&prime; = <var>f</var>/(1&#8723;<var>v</var>/<var>c</var>), para que el efecto se vea con claridad. El signo &minus; corresponde a la fuente que se acerca y el + a la que se aleja.</p>
+        <div class="eq"><var>f</var>&prime; = <var>f</var> / (1 &#8723; <var>v</var>/<span class="cnat">c</span>)</div>
+        <div class="eq">&Delta;<var>f</var> / <var>f</var> &asymp; <var>v</var>/<span class="cnat">c</span></div>
+        <p class="note" style="margin-top:12px">Para <var>v</var> &#8810; <span class="cnat">c</span>: &Delta;<var>f</var>/<var>f</var> &asymp; <var>v</var>/<span class="cnat">c</span>. Aquí se usa la fuente en movimiento, <var>f</var>&prime; = <var>f</var>/(1&#8723;<var>v</var>/<span class="cnat">c</span>), para que el efecto se vea con claridad. El signo &minus; corresponde a la fuente que se acerca y el + a la que se aleja.</p>
       </div>
     </div>
   </section>
@@ -133,21 +147,23 @@
   <section class="card">
     <p class="sec-tag">Explorador 3 · corrimiento al rojo cosmológico</p>
     <h2>Las galaxias que se alejan se ven más rojas</h2>
-    <p class="note">Las galaxias lejanas se alejan de nosotros (expansión del universo). Su luz llega con la longitud de onda estirada: las líneas del espectro se corren hacia el rojo. Mueve la velocidad de alejamiento y observa cómo se desplazan las líneas conocidas del hidrógeno.</p>
+    <p class="note">Las galaxias lejanas se alejan de nosotros (expansión del universo). Su luz llega con la longitud de onda estirada: las líneas del espectro se corren hacia el rojo. Modifica la velocidad de alejamiento y observa cómo se desplazan las líneas conocidas del hidrógeno.</p>
     <canvas id="spectrum" height="200" style="margin-top:8px"></canvas>
     <div class="ctrl">
       <label>Velocidad de alejamiento&nbsp; v/c <b id="zbval">0.10</b></label>
       <input id="zbeta" type="range" min="0" max="0.30" step="0.005" value="0.10">
+      <span class="inbox"><span class="vinc">v</span>/<span class="cnat">c</span> =<input id="inZB" type="number" step="any" min="0" max="0.30" inputmode="decimal"></span>
+      <span class="inbox">o <span class="vinc">z</span> =<input id="inZ" type="number" step="any" min="0" max="0.30" inputmode="decimal"></span>
     </div>
     <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
       <div class="tile"><div class="k">Corrimiento <var>z</var> = &Delta;<var>&lambda;</var>/<var>&lambda;</var></div><div class="v dn" id="zval">—</div></div>
       <div class="tile"><div class="k">Hα: 656.3 nm  →</div><div class="v dn" id="haobs">—</div></div>
       <div class="tile"><div class="k">Velocidad de recesión</div><div class="v" id="vkm">—</div></div>
     </div>
-    <div class="eq"><var>z</var> = &Delta;<var>&lambda;</var>/<var>&lambda;</var> = (<var>&lambda;</var><sub>obs</sub> &minus; <var>&lambda;</var>)/<var>&lambda;</var> &asymp; <var>v</var>/<var>c</var></div>
+    <div class="eq"><var>z</var> = &Delta;<var>&lambda;</var>/<var>&lambda;</var> = (<var>&lambda;</var><sub>obs</sub> &minus; <var>&lambda;</var>)/<var>&lambda;</var> &asymp; <var>v</var>/<span class="cnat">c</span></div>
     <div class="eq"><var>&lambda;</var><sub>obs</sub> = <var>&lambda;</var>(1 + <var>z</var>)</div>
     <div class="eq"><var>v</var> = <var>H</var><sub>0</sub> <span class="op">&middot;</span> <var>d</var></div>
-    <p class="note" style="margin-top:12px">Aproximación clásica <var>z</var> &asymp; <var>v</var>/<var>c</var> (válida para <var>v</var> &#8810; <var>c</var>). Por la ley de Hubble, <var>v</var> = <var>H</var><sub>0</sub> <var>d</var>: cuanto más lejos está la galaxia, más rápido se aleja y mayor es su corrimiento al rojo. Así se descubrió que el universo se expande.</p>
+    <p class="note" style="margin-top:12px">Aproximación clásica <var>z</var> &asymp; <var>v</var>/<span class="cnat">c</span> (válida para <var>v</var> &#8810; <span class="cnat">c</span>). Por la ley de Hubble, <var>v</var> = <var>H</var><sub>0</sub> <var>d</var>: cuanto más lejos está la galaxia, más rápido se aleja y mayor es su corrimiento al rojo. Así se descubrió que el universo se expande.</p>
   </section>
 
   <!-- ============ SECCIÓN 4 ============ -->
@@ -161,9 +177,19 @@
       <label>Sentido<select id="cdir"><option value="1">se acerca (f sube)</option><option value="-1">se aleja (f baja)</option></select></label>
       <label>Trayecto<select id="cmode"><option value="2">radar (ida y vuelta)</option><option value="1">un solo trayecto</option></select></label>
     </div>
-    <div class="eq">&Delta;<var>f</var> = <var>k</var> <span class="op">&middot;</span> <var>f</var> <span class="op">&middot;</span> (<var>v</var>/<var>c</var>),&nbsp; con <var>k</var> = 2 para radar,&nbsp; <var>k</var> = 1 para un trayecto</div>
+    <div class="eq">&Delta;<var>f</var> = <var>k</var> <span class="op">&middot;</span> <var>f</var> <span class="op">&middot;</span> (<var>v</var>/<span class="cnat">c</span>),&nbsp; con <var>k</var> = 2 para radar,&nbsp; <var>k</var> = 1 para un trayecto</div>
     <div class="out" id="cout">—</div>
   </section>
+
+  <details class="card">
+    <summary>Formulario y constantes</summary>
+    <div class="eq"><var>f</var>&prime; <span class="op">=</span> <var>f</var> / (1 &#8723; <var>v</var>/<span class="cnat">c</span>)<span class="op">,</span>&emsp;&Delta;<var>f</var>/<var>f</var> &asymp; <var>v</var>/<span class="cnat">c</span> &nbsp;(<var>v</var> &#8810; <span class="cnat">c</span>)</div>
+    <div class="eq"><var>z</var> <span class="op">=</span> &Delta;<var>&lambda;</var>/<var>&lambda;</var> &asymp; <var>v</var>/<span class="cnat">c</span><span class="op">,</span>&emsp;<var>&lambda;</var><sub>obs</sub> <span class="op">=</span> <var>&lambda;</var>(1 + <var>z</var>)<span class="op">,</span>&emsp;<var>v</var> <span class="op">=</span> <var>H</var><sub>0</sub> <span class="op">&middot;</span> <var>d</var></div>
+    <div class="eq">&Delta;<var>f</var> <span class="op">=</span> <var>k</var> <span class="op">&middot;</span> <var>f</var> <span class="op">&middot;</span> (<var>v</var>/<span class="cnat">c</span>)<span class="op">,</span>&emsp;<var>k</var> = 2 (radar, ida y vuelta)<span class="op">,</span> <var>k</var> = 1 (un trayecto)</div>
+    <p class="kv" style="margin-top:10px">Velocidad de la luz &nbsp; <b class="cnat">c = 299 792 458 m/s ≈ 2.998×10⁸ m/s</b></p>
+    <p class="kv">Constante de Hubble &nbsp; <b>H₀ ≈ 70 km·s⁻¹·Mpc⁻¹</b> &nbsp;<span class="note">(parámetro cosmológico medido, no constante fundamental; su valor exacto sigue en discusión)</span></p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
@@ -286,13 +312,27 @@
   }
 
   // wire up
-  document.getElementById('beta').addEventListener('input',function(e){beta=+e.target.value;sec1labels();drawCurve();});
+  var CKM=299792.458;
+  var IN={B:document.getElementById('inB'),V:document.getElementById('inV'),
+          ZB:document.getElementById('inZB'),Z:document.getElementById('inZ')};
+  function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+  function syncB(){ponSiLibre(IN.B,+beta.toFixed(3));ponSiLibre(IN.V,Math.round(beta*CKM));}
+  function syncZ(){var zb=parseFloat(document.getElementById('zbeta').value);
+    ponSiLibre(IN.ZB,+zb.toFixed(3));ponSiLibre(IN.Z,+zb.toFixed(3));}
+  function setBeta(v){beta=Math.max(0,Math.min(0.7,v));document.getElementById('beta').value=beta;
+    sec1labels();syncB();drawCurve();}
+  function setZB(v){v=Math.max(0,Math.min(0.30,v));document.getElementById('zbeta').value=v;drawSpectrum();syncZ();}
+  IN.B.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;setBeta(v);});
+  IN.V.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;setBeta(v/CKM);});
+  IN.ZB.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;setZB(v);});
+  IN.Z.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;setZB(v);});
+  document.getElementById('beta').addEventListener('input',function(e){beta=+e.target.value;sec1labels();syncB();drawCurve();});
   document.getElementById('wplay').addEventListener('click',function(){playing=!playing;this.textContent=playing?'Pausar':'Reanudar';this.classList.toggle('on',playing);});
-  document.getElementById('zbeta').addEventListener('input',drawSpectrum);
+  document.getElementById('zbeta').addEventListener('input',function(){drawSpectrum();syncZ();});
   ['cf','cv','cdir','cmode'].forEach(function(id){document.getElementById(id).addEventListener('input',calc);});
   var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',function(){drawCurve();drawSpectrum();});
   function loop(){if(playing)tt+=0.09;drawWaves();drawSignals();requestAnimationFrame(loop);}
-  sec1labels();drawCurve();drawSpectrum();calc();loop();
+  sec1labels();syncB();drawCurve();drawSpectrum();syncZ();calc();loop();
 })();
 </script>
 <!-- contador:inicio -->

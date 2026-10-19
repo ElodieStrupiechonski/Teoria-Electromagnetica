@@ -46,6 +46,20 @@
   .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
   .vec{font-style:italic;font-weight:600;position:relative;white-space:nowrap;padding:0 .04em}
   .vec::after{content:"\2192";position:absolute;left:-.02em;right:0;top:-.60em;margin:auto;width:1em;font-size:.55em;font-weight:700;font-style:normal;text-align:center}
+  /* convención de color del sitio: constantes de la naturaleza y variables */
+  .eq var{color:var(--accent)}
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .inrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:var(--mono);font-size:14px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){
     .wrap{padding-left:16px;padding-right:16px}
     .tiles{grid-template-columns:1fr 1fr!important;gap:8px}
@@ -59,7 +73,7 @@
   <header>
     <p class="eyebrow">Teoría Electromagnética · Unidad 2 · tema 2.8</p>
     <h1>Polarización: la figura que dibuja el campo</h1>
-    <p class="lede">El campo eléctrico de una onda plana vive en el plano perpendicular a la propagación. Según las amplitudes de sus dos componentes y el desfase entre ellas, la punta del vector traza una recta, un círculo o una elipse. Muévelo y descúbrelo.</p>
+    <p class="lede">El campo eléctrico de una onda plana vive en el plano perpendicular a la propagación. Según las amplitudes de sus dos componentes y el desfase entre ellas, la punta del vector traza una recta, un círculo o una elipse. Modifica <var>A</var>, <var>B</var> y <var>δ</var> y observa la figura. En el curso de la ENES Juriquilla este explorador acompaña la práctica P7 (ley de Malus con polarizadores).</p>
   </header>
 
   <section class="card">
@@ -77,6 +91,12 @@
           <label><span>Amplitud E<sub>y</sub></span> <b id="ayv">1.00</b></label><input id="ay" type="range" min="0" max="1" step="0.02" value="1">
           <label><span>Desfase δ</span> <b id="dv">90°</b></label><input id="d" type="range" min="0" max="360" step="1" value="90">
         </div>
+        <div class="inrow">
+          <div class="inbox"><label><span class="vinc">A</span> (E<sub>x</sub>, 0–1)</label><input id="inA" type="number" step="any" min="0" max="1" inputmode="decimal"></div>
+          <div class="inbox"><label><span class="vinc">B</span> (E<sub>y</sub>, 0–1)</label><input id="inB" type="number" step="any" min="0" max="1" inputmode="decimal"></div>
+          <div class="inbox"><label><span class="vinc">δ</span> (grados)</label><input id="inD" type="number" step="any" inputmode="decimal"></div>
+        </div>
+        <p class="note" style="font-size:12.5px;margin-top:6px">También puedes teclear los valores exactos (p. ej. <var>δ</var> = 45): los deslizadores y la figura se actualizan.</p>
         <div class="row">
           <button class="btn" data-p="lin">Lineal</button>
           <button class="btn" data-p="cir">Circular</button>
@@ -123,6 +143,14 @@
     <p class="note" style="margin-top:12px">Con polarización lineal, girar la antena 90° apaga la señal (PLF = cos<sup>2</sup><var>&theta;</var>): un satélite que gira o una antena mal alineada pierde el enlace. Con polarización circular la señal se mantiene constante en &minus;3 dB sin importar la orientación; por eso el GPS, la telemetría satelital y muchos enlaces aeronáuticos la prefieren.</p>
   </section>
 
+  <details class="card">
+    <summary>Formulario</summary>
+    <div class="eq"><var>E</var><sub>x</sub>(<var>t</var>) <span class="op">=</span> <var>A</var> cos(<var>ω</var><var>t</var>)<span class="op">,</span>&emsp;<var>E</var><sub>y</sub>(<var>t</var>) <span class="op">=</span> <var>B</var> cos(<var>ω</var><var>t</var> + <var>δ</var>)</div>
+    <div class="eq">lineal: <var>δ</var> <span class="op">=</span> 0° o 180° (o <var>A</var>·<var>B</var> = 0)<span class="op">;</span>&emsp;circular: <var>A</var> <span class="op">=</span> <var>B</var> y <var>δ</var> <span class="op">=</span> ±90°<span class="op">;</span>&emsp;elíptica: cualquier otro caso</div>
+    <div class="eq">PLF <span class="op">=</span> |ê<sub>w</sub> · ê<sub>a</sub>|²<span class="op">;</span>&emsp;onda lineal y antena lineal: PLF <span class="op">=</span> cos²<var>θ</var> (ley de Malus)</div>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span>. En este explorador no interviene ninguna constante de la naturaleza: <var>A</var>, <var>B</var>, <var>δ</var> y <var>θ</var> describen la onda y la antena.</p>
+  </details>
+
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
     <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Polarización de ondas electromagnéticas — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
@@ -136,7 +164,7 @@
   function classify(){var s=Math.abs(Math.sin(dd));if(A<0.03||B<0.03||s<0.04)return{tipo:'Lineal',giro:'—'};var circ=Math.abs(A-B)<0.04&&Math.abs(s-1)<0.04;return{tipo:circ?'Circular':'Elíptica',giro:(Math.sin(dd)>0?'horario':'antihorario')+' (en pantalla)'};}
   function axialRatio(){var rmax=0,rmin=1e9;for(var k=0;k<180;k++){var th=k*Math.PI/90;var ex=A*Math.cos(th),ey=B*Math.cos(th+dd);var r=Math.hypot(ex,ey);if(r>rmax)rmax=r;if(r<rmin)rmin=r;}if(rmin<1e-4)return'∞ (lineal)';return(rmax/rmin).toFixed(2);}
   function plf(theta){var den=A*A+B*B;if(den<1e-9)return 0;var c=Math.cos(theta),s=Math.sin(theta);return (A*A*c*c+B*B*s*s+2*A*B*c*s*Math.cos(dd))/den;}
-  function labels(){
+  var labels=function(){
     document.getElementById('axv').textContent=A.toFixed(2);
     document.getElementById('ayv').textContent=B.toFixed(2);
     document.getElementById('dv').textContent=Math.round(dd*180/Math.PI)+'°';
@@ -145,7 +173,7 @@
     document.getElementById('giro').textContent=c.tipo==='Lineal'?'—':c.giro;
     document.getElementById('ar').textContent=c.tipo==='Lineal'?'∞ (recta)':axialRatio();
     updateLink();
-  }
+  };
   function drawFig(){
     var o=fit(document.getElementById('fig'),300),x=o.x,W=o.w,H=o.h,cx=W/2,cy=H/2,S=Math.min(W,H)/2-26;
     x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
@@ -233,6 +261,17 @@
   knob.addEventListener('pointercancel',function(){dragging=false;});
   document.getElementById('knobslider').addEventListener('input',function(e){thetaRx=(+e.target.value)*Math.PI/180;updateLink();});
   // main controls
+  var IN={A:document.getElementById('inA'),B:document.getElementById('inB'),D:document.getElementById('inD')};
+  function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+  function syncInputs(){ponSiLibre(IN.A,+A.toFixed(2));ponSiLibre(IN.B,+B.toFixed(2));
+    ponSiLibre(IN.D,Math.round(((dd*180/Math.PI)%360+360)%360));}
+  var labels0=labels; labels=function(){labels0();syncInputs();};
+  IN.A.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;A=Math.min(1,v);
+    document.getElementById('ax').value=A;labels();});
+  IN.B.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;B=Math.min(1,v);
+    document.getElementById('ay').value=B;labels();});
+  IN.D.addEventListener('input',function(){var v=parseFloat(this.value);if(isNaN(v))return;var g=((v%360)+360)%360;
+    dd=g*Math.PI/180;document.getElementById('d').value=Math.round(g);labels();});
   document.getElementById('ax').addEventListener('input',function(e){A=+e.target.value;labels();});
   document.getElementById('ay').addEventListener('input',function(e){B=+e.target.value;labels();});
   document.getElementById('d').addEventListener('input',function(e){dd=(+e.target.value)*Math.PI/180;labels();});

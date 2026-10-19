@@ -42,6 +42,23 @@
   .kv{font-size:13.5px;margin:5px 0} .kv b{font-family:var(--mono);color:var(--ink)}
   .credits{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.6}
   .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  /* convención de color: constantes de la naturaleza y variables */
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin-top:6px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .inbox .fila{display:flex;gap:6px}
+  .inbox input{flex:1;min-width:0;font-family:var(--mono);font-size:15px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+  .inbox select{font:inherit;font-size:13px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:0 6px}
+  #vis{background:var(--panel);touch-action:none;cursor:ew-resize}
+  .swatch-col{display:inline-block;width:15px;height:15px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid rgba(0,0,0,.25)}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
 </style>
 <div class="wrap">
   <header>
@@ -64,25 +81,49 @@
       <div class="tile"><div class="k">Energía (eV)</div><div class="v" id="oEeV">—</div></div>
       <div class="tile"><div class="k">Energía (J)</div><div class="v" id="oEJ">—</div></div>
       <div class="tile"><div class="k">Número de onda</div><div class="v" id="oWn">—</div></div>
+      <div class="tile"><div class="k">Color (si es visible)</div><div class="v" id="oCol">—</div></div>
     </div>
     <p class="note" style="margin-top:12px">Los límites entre bandas son convencionales y se traslapan; las etiquetas de tecnología marcan valores representativos.</p>
   </section>
 
   <section class="card">
+    <p class="sec-tag">Entrada directa · escribe un valor y el cursor se coloca en el espectro</p>
+    <div class="inrow">
+      <div class="inbox"><label>Longitud de onda <span class="vinc">λ</span></label>
+        <div class="fila"><input id="inL" type="number" step="any" min="0" placeholder="550" aria-label="Valor de longitud de onda">
+        <select id="unL"><option value="1e-9">nm</option><option value="1e-6">µm</option><option value="1e-3">mm</option><option value="1e-2">cm</option><option value="1">m</option><option value="1e3">km</option></select></div></div>
+      <div class="inbox"><label>Frecuencia <span class="vinc">f</span></label>
+        <div class="fila"><input id="inF" type="number" step="any" min="0" placeholder="545" aria-label="Valor de frecuencia">
+        <select id="unF"><option value="1e12">THz</option><option value="1e9">GHz</option><option value="1e6">MHz</option><option value="1e3">kHz</option><option value="1">Hz</option></select></div></div>
+      <div class="inbox"><label>Energía del fotón <span class="vinc">E</span></label>
+        <div class="fila"><input id="inE" type="number" step="any" min="0" placeholder="2.25" aria-label="Valor de energía">
+        <select id="unE"><option value="1">eV</option><option value="1e-3">meV</option><option value="1e3">keV</option><option value="1e6">MeV</option></select></div></div>
+    </div>
+    <p class="note" style="margin-top:8px">Basta llenar una de las tres: las otras dos y las casillas de lectura se actualizan con las conversiones <span class="vinc">λ</span> = <span class="cnat">c</span>/<span class="vinc">f</span> y <span class="vinc">E</span> = <span class="cnat">h</span><span class="vinc">f</span>.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Zoom · la ventana visible (380–750 nm) con el nombre de cada color</p>
+    <canvas id="vis" height="150"></canvas>
+    <p class="note" style="margin-top:8px">Arrastra dentro de la franja para mover el cursor principal. El ojo humano solo percibe esta rendija: menos de una octava de las ~60 que abarca el espectro completo.</p>
+  </section>
+
+  <section class="card">
     <p class="sec-tag">Fórmulas de conversión</p>
-    <div class="eq"><var>&lambda;</var> <span class="op">=</span> <var>c</var> / <var>f</var><span class="op">,</span>&nbsp; <var>f</var> <span class="op">=</span> <var>c</var> / <var>&lambda;</var></div>
-    <div class="eq"><var>E</var> <span class="op">=</span> <var>h</var><var>f</var> <span class="op">=</span> <var>h</var><var>c</var> / <var>&lambda;</var><span class="op">,</span>&nbsp; <var>E</var><sub>[eV]</sub> <span class="op">=</span> <var>E</var><sub>[J]</sub> / <var>e</var></div>
+    <div class="eq"><span class="vinc">&lambda;</span> <span class="op">=</span> <span class="cnat">c</span> / <span class="vinc">f</span><span class="op">,</span>&nbsp; <span class="vinc">f</span> <span class="op">=</span> <span class="cnat">c</span> / <span class="vinc">&lambda;</span></div>
+    <div class="eq"><span class="vinc">E</span> <span class="op">=</span> <span class="cnat">h</span><span class="vinc">f</span> <span class="op">=</span> <span class="cnat">h</span><span class="cnat">c</span> / <span class="vinc">&lambda;</span><span class="op">,</span>&nbsp; <span class="vinc">E</span><sub>[eV]</sub> <span class="op">=</span> <span class="vinc">E</span><sub>[J]</sub> / <span class="cnat">e</span></div>
     <div class="eq"><var>&nu;&#772;</var> (cm<sup>&minus;1</sup>) <span class="op">=</span> 1 / <var>&lambda;</var><sub>[cm]</sub> <span class="op">=</span> <var>f</var> / (100<span class="op">&middot;</span><var>c</var>)</div>
     <div class="eq">Atajos:&nbsp; <var>E</var><sub>[eV]</sub> <span class="op">=</span> 1240 / <var>&lambda;</var><sub>[nm]</sub> <span class="op">&middot;</span>&nbsp; 1 eV &harr; 8065.5 cm<sup>&minus;1</sup> &harr; 2.418×10<sup>14</sup> Hz</div>
   </section>
-  <section class="card">
-    <p class="sec-tag">Constantes de la naturaleza</p>
-    <p class="kv">Velocidad de la luz &nbsp; <b>c = 2.998×10⁸ m/s</b></p>
-    <p class="kv">Constante de Planck &nbsp; <b>h = 6.626×10⁻³⁴ J·s</b></p>
-    <p class="kv">Planck en eV &nbsp; <b>h = 4.136×10⁻¹⁵ eV·s</b></p>
-    <p class="kv">Carga elemental &nbsp; <b>e = 1.602×10⁻¹⁹ C</b></p>
-    <p class="kv">Producto útil &nbsp; <b>h·c = 1240 eV·nm</b></p>
-  </section>
+  <details class="card" open>
+    <summary>Constantes de la naturaleza</summary>
+    <p class="kv" style="margin-top:10px">Velocidad de la luz &nbsp; <b class="cnat">c = 2.998×10⁸ m/s</b></p>
+    <p class="kv">Constante de Planck &nbsp; <b class="cnat">h = 6.626×10⁻³⁴ J·s</b></p>
+    <p class="kv">Planck en eV &nbsp; <b class="cnat">h = 4.136×10⁻¹⁵ eV·s</b></p>
+    <p class="kv">Carga elemental &nbsp; <b class="cnat">e = 1.602×10⁻¹⁹ C</b></p>
+    <p class="kv">Producto útil &nbsp; <b class="cnat">h·c = 1240 eV·nm</b></p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
@@ -180,6 +221,82 @@
   cv.addEventListener('pointermove',function(e){if(drag)setFromE(e);});
   cv.addEventListener('pointerup',function(){drag=false;});
   cv.addEventListener('pointercancel',function(){drag=false;});
+  // ---------- entrada directa (λ, f, E) ----------
+  function g(id){return document.getElementById(id);}
+  function setLogf(v){logf=Math.max(LMIN,Math.min(LMAX,v));upd();}
+  function desde(tipo){
+    var val=parseFloat(g('in'+tipo).value); if(!(val>0)) return;
+    var u=parseFloat(g('un'+tipo).value);
+    if(tipo==='L') setLogf(Math.log10(c/(val*u)));
+    if(tipo==='F') setLogf(Math.log10(val*u));
+    if(tipo==='E') setLogf(Math.log10(val*u*eC/h));
+  }
+  ['L','F','E'].forEach(function(t){
+    g('in'+t).addEventListener('input',function(){desde(t);});
+    g('un'+t).addEventListener('change',function(){desde(t);});
+  });
+  function syncInputs(){
+    var f=Math.pow(10,logf),lam=c/f,EeV=h*f/eC,act=document.activeElement;
+    if(act!==g('inL')) g('inL').value=(lam/parseFloat(g('unL').value)).toPrecision(4);
+    if(act!==g('inF')) g('inF').value=(f/parseFloat(g('unF').value)).toPrecision(4);
+    if(act!==g('inE')) g('inE').value=(EeV/parseFloat(g('unE').value)).toPrecision(4);
+  }
+  // ---------- color del visible ----------
+  var NOMBRES=[[380,450,'violeta'],[450,485,'azul'],[485,500,'cian'],[500,565,'verde'],[565,590,'amarillo'],[590,625,'naranja'],[625,750,'rojo']];
+  function nombreColor(nm){for(var i=0;i<NOMBRES.length;i++)if(nm>=NOMBRES[i][0]&&nm<NOMBRES[i][1])return NOMBRES[i][2];return null;}
+  function nmRGB(nm){ // aproximación clásica (Bruton)
+    var r=0,gg=0,b=0,t;
+    if(nm<380||nm>750)return null;
+    if(nm<440){r=-(nm-440)/60;b=1;}else if(nm<490){gg=(nm-440)/50;b=1;}
+    else if(nm<510){gg=1;b=-(nm-510)/20;}else if(nm<580){r=(nm-510)/70;gg=1;}
+    else if(nm<645){r=1;gg=-(nm-645)/65;}else{r=1;}
+    t=nm>700?0.3+0.7*(750-nm)/50:(nm<420?0.3+0.7*(nm-380)/40:1);
+    function q(v){return Math.round(255*Math.pow(v*t,0.8));}
+    return 'rgb('+q(r)+','+q(gg)+','+q(b)+')';
+  }
+  var oldReadout=readout;
+  readout=function(){oldReadout();
+    var nm=c/Math.pow(10,logf)*1e9, el=g('oCol'), n=nombreColor(nm);
+    el.innerHTML = n ? '<span class="swatch-col" style="background:'+nmRGB(nm)+'"></span>'+n
+                     : (nm<380?'— (más allá del violeta)':'— (más acá del rojo)');
+    syncInputs(); drawVis();
+  };
+  // ---------- zoom del visible ----------
+  var NMA=380,NMB=750;
+  function drawVis(){
+    var o=fit(g('vis'),150),x=o.x,w=o.w;
+    x.fillStyle=CV('--panel');x.fillRect(0,0,w,150);
+    var x0=PADL,x1=w-PADR,bt=36,bh=54;
+    for(var px=x0;px<=x1;px++){var nm=NMA+(NMB-NMA)*(px-x0)/(x1-x0);x.fillStyle=nmRGB(nm);x.fillRect(px,bt,1.5,bh);}
+    x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=1;
+    x.font='10px '+CV('--mono')+',monospace';x.textAlign='center';
+    NOMBRES.forEach(function(N){
+      var pa=x0+(x1-x0)*(N[0]-NMA)/(NMB-NMA), pb=x0+(x1-x0)*(N[1]-NMA)/(NMB-NMA);
+      x.beginPath();x.moveTo(pa,bt);x.lineTo(pa,bt+bh+6);x.stroke();
+      x.fillStyle='rgba(255,255,255,.85)';x.fillText(N[2],(pa+pb)/2,bt+bh+18);
+    });
+    for(var nmt=400;nmt<=750;nmt+=50){var pt=x0+(x1-x0)*(nmt-NMA)/(NMB-NMA);
+      x.fillStyle='rgba(255,255,255,.6)';x.fillText(nmt+' nm',pt,24);}
+    x.textAlign='left';
+    var nmc=c/Math.pow(10,logf)*1e9;
+    if(nmc>=NMA&&nmc<=NMB){var pc=x0+(x1-x0)*(nmc-NMA)/(NMB-NMA);
+      x.strokeStyle=CV('--accent');x.lineWidth=2.5;x.beginPath();x.moveTo(pc,bt-8);x.lineTo(pc,bt+bh+8);x.stroke();
+      x.fillStyle=CV('--accent');x.beginPath();x.arc(pc,bt-12,6,0,6.2832);x.fill();
+      x.font='600 11px '+CV('--sans')+',sans-serif';
+      x.fillText(nmc.toFixed(0)+' nm · '+(nombreColor(nmc)||''),Math.min(pc+10,w-110),bt-16);
+    } else {
+      x.fillStyle='rgba(255,255,255,.55)';x.font='11px '+CV('--sans')+',sans-serif';
+      x.fillText('El cursor principal está fuera del visible ('+(nmc<NMA?'ultravioleta o más allá':'infrarrojo o más acá')+')',x0,140);
+    }
+  }
+  var vz=g('vis'),vdrag=false;
+  function setFromVis(e){var r=vz.getBoundingClientRect();var frac=(e.clientX-r.left-PADL)/(r.width-PADL-PADR);
+    var nm=Math.max(NMA,Math.min(NMB,NMA+(NMB-NMA)*frac));setLogf(Math.log10(c/(nm*1e-9)));}
+  vz.addEventListener('pointerdown',function(e){vdrag=true;vz.setPointerCapture(e.pointerId);setFromVis(e);});
+  vz.addEventListener('pointermove',function(e){if(vdrag)setFromVis(e);});
+  vz.addEventListener('pointerup',function(){vdrag=false;});
+  vz.addEventListener('pointercancel',function(){vdrag=false;});
+
   var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',upd);
   window.addEventListener('resize',upd);
   upd();
