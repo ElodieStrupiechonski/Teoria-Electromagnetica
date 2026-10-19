@@ -381,29 +381,46 @@
 <style>
   body{margin-top:50px!important}
   .nvbar{position:fixed;top:0;left:0;right:0;z-index:9999;height:44px;display:flex;align-items:center;
-    gap:14px;padding:0 16px;background:var(--card,#fff);border-bottom:1px solid var(--line,#e2dcc9);
+    gap:10px;padding:0 14px;background:var(--card,#fff);border-bottom:1px solid var(--line,#e2dcc9);
     font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
   .nvbar a{text-decoration:none;color:var(--navy,var(--ink,#1F3864))}
-  .nv-home{font-weight:700;letter-spacing:.01em}
+  .nv-home{font-weight:700;white-space:nowrap}
   .nv-home small{font-weight:400;color:var(--muted,#5a5a5a)}
-  .nvbar details{margin-left:auto;position:relative}
+  .nv-step{display:flex;align-items:center;justify-content:center;width:34px;height:30px;border:1px solid var(--line,#e2dcc9);
+    border-radius:8px;font-size:17px;line-height:1}
+  .nv-step:hover{background:var(--bg,#f4f1ea)}
+  .nv-step[aria-disabled="true"]{opacity:.25;pointer-events:none}
+  .nv-aquibar{flex:1;min-width:0;text-align:center;font-weight:700;color:var(--ink,#1a1a1a);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nv-aquibar small{font-weight:400;color:var(--muted,#8a8fa0)}
+  .nvbar details{position:relative}
   .nvbar summary{list-style:none;cursor:pointer;font-weight:700;color:var(--accent,#C1571B);
-    border:1px solid var(--line,#e2dcc9);border-radius:8px;padding:5px 12px;user-select:none}
+    border:1px solid var(--line,#e2dcc9);border-radius:8px;padding:5px 12px;user-select:none;white-space:nowrap}
   .nvbar summary::-webkit-details-marker{display:none}
-  .nv-menu{position:absolute;right:0;top:40px;min-width:300px;max-height:min(70vh,520px);overflow:auto;
+  .nv-menu{position:absolute;right:0;top:40px;width:min(640px,calc(100vw - 24px));max-height:calc(100vh - 70px);overflow:auto;
     background:var(--card,#fff);border:1px solid var(--line,#e2dcc9);border-radius:12px;
-    box-shadow:0 8px 30px rgba(0,0,0,.18);padding:8px}
+    box-shadow:0 8px 30px rgba(0,0,0,.18);padding:10px;column-count:2;column-gap:18px}
   .nv-grp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8a8fa0);
-    padding:9px 10px 4px;border-top:1px solid var(--line,#eee)}
-  .nv-grp:first-child{border-top:0}
-  .nv-menu a{display:block;padding:6px 10px;border-radius:7px;color:var(--ink,#1a1a1a)}
+    padding:10px 10px 5px;break-after:avoid;border-top:1px solid var(--line,#eee)}
+  .nv-menu .nv-grp:first-child{border-top:0;padding-top:4px}
+  .nv-menu a{display:block;padding:8px 10px;border-radius:7px;color:var(--ink,#1a1a1a);break-inside:avoid}
   .nv-menu a small{color:var(--muted,#8a8fa0);margin-left:4px}
   .nv-menu a:hover{background:var(--bg,#f4f1ea)}
   .nv-menu a.nv-aqui{background:var(--bg,#f4f1ea);font-weight:700;color:var(--accent,#C1571B)}
+  .nv-pie{column-span:all;margin-top:6px;padding:7px 10px 2px;border-top:1px solid var(--line,#eee);
+    font-size:11.5px;color:var(--muted,#8a8fa0)}
+  @media (max-width:720px){
+    .nv-home small{display:none}
+    .nv-aquibar{display:none}
+    .nv-menu{column-count:1;position:fixed;left:12px;right:12px;top:50px;width:auto}
+  }
   @media print{.nvbar{display:none} body{margin-top:0!important}}
 </style>
 <nav class="nvbar" aria-label="Navegación del sitio">
   <a class="nv-home" href="index.html">⌁ Exploradores EM <small>· ENES Juriquilla</small></a>
+  <a class="nv-step" id="nv-ant" href="#" title="Explorador anterior (tecla ←)" aria-label="Anterior">‹</a>
+  <span class="nv-aquibar" id="nv-aqui-bar"></span>
+  <a class="nv-step" id="nv-sig" href="#" title="Explorador siguiente (tecla →)" aria-label="Siguiente">›</a>
   <details id="nvdet"><summary>Temario ▾</summary>
     <div class="nv-menu">
 <div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
@@ -423,17 +440,47 @@
 <div class="nv-grp">Transversales</div>
 <a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético <small>todo el curso</small></a>
 <a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica <small>cómputo · P6</small></a>
+    <div class="nv-pie">Atajos: ← anterior · → siguiente · Esc cierra el menú</div>
     </div>
   </details>
 </nav>
 <script>
 (function(){
-  var aqui=(location.pathname.split('/').pop()||'index.html');
+  var orden=[], datos={};
   var l=document.querySelectorAll('.nv-menu a[data-nv]');
-  for(var i=0;i<l.length;i++) if(l[i].getAttribute('data-nv')===aqui) l[i].className='nv-aqui';
+  for(var i=0;i<l.length;i++){
+    var f=l[i].getAttribute('data-nv'); orden.push(f);
+    datos[f]={el:l[i], titulo:l[i].childNodes[0].textContent.trim(),
+               sub:(l[i].querySelector('small')||{textContent:''}).textContent};
+  }
+  var aqui=(location.pathname.split('/').pop()||'index.html');
+  var idx=orden.indexOf(aqui);
+  var ant=document.getElementById('nv-ant'), sig=document.getElementById('nv-sig'),
+      bar=document.getElementById('nv-aqui-bar');
+  if(idx>=0){
+    datos[aqui].el.className='nv-aqui';
+    bar.innerHTML=datos[aqui].titulo+' <small>'+datos[aqui].sub+'</small>';
+    if(idx>0) ant.href=orden[idx-1]; else ant.setAttribute('aria-disabled','true');
+    if(idx<orden.length-1) sig.href=orden[idx+1]; else sig.setAttribute('aria-disabled','true');
+    if(idx>0) ant.title='Anterior: '+datos[orden[idx-1]].titulo+'  (tecla ←)';
+    if(idx<orden.length-1) sig.title='Siguiente: '+datos[orden[idx+1]].titulo+'  (tecla →)';
+  } else {
+    // índice u otra página: sin anterior/siguiente
+    ant.setAttribute('aria-disabled','true'); sig.setAttribute('aria-disabled','true');
+    bar.textContent='';
+  }
   document.addEventListener('click',function(e){
     var d=document.getElementById('nvdet');
     if(d&&d.open&&!d.contains(e.target)) d.open=false;
+  });
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toUpperCase();
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
+    var d=document.getElementById('nvdet');
+    if(e.key==='Escape'&&d&&d.open){d.open=false;return;}
+    if(idx<0) return;
+    if(e.key==='ArrowLeft'&&idx>0) location.href=orden[idx-1];
+    if(e.key==='ArrowRight'&&idx<orden.length-1) location.href=orden[idx+1];
   });
 })();
 </script>
