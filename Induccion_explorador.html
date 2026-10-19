@@ -1,4 +1,21 @@
+<!doctype html>
+<html lang="es">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
 <title>Inducción de Faraday · explorador</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -56,7 +73,7 @@
 </style>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Teoría Electromagnética · Unidad 1 · temas 1.6–1.7</p>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 1 · tema 1.6</p>
     <h1>Inducción de Faraday: el flujo que cambia genera voltaje</h1>
     <p class="lede">Una espira de N vueltas encierra un flujo magnético Φ. Cuando el flujo <b>cambia en el tiempo</b> — porque acercas un imán o porque B(t) oscila — aparece una FEM proporcional a la rapidez del cambio, con el signo de Lenz. El osciloscopio muestra Φ y la FEM sincronizados: la FEM es grande donde Φ cambia rápido, y nula donde Φ es máximo. En el curso de la ENES Juriquilla este explorador acompaña la práctica P3.</p>
   </header>
@@ -65,11 +82,11 @@
     <p class="sec-tag">Explorador · espira + osciloscopio sincronizado</p>
     <div class="grid2">
       <div>
-        <canvas id="esc" class="panelcanvas" height="250"></canvas>
+        <canvas id="esc" role="img" aria-label="Escena de la espira con imán arrastrable o campo oscilante" class="panelcanvas" height="250"></canvas>
         <div class="legend"><span id="legEsc">arrastra el imán hacia la espira y aléjalo</span></div>
       </div>
       <div>
-        <canvas id="osc" class="panelcanvas" height="250"></canvas>
+        <canvas id="osc" role="img" aria-label="Osciloscopio con el flujo y la FEM" class="panelcanvas" height="250"></canvas>
         <div class="legend"><span><i style="background:var(--blueSoft)"></i>flujo Φ(t)</span><span><i style="background:var(--accent)"></i>FEM = −N dΦ/dt</span></div>
       </div>
     </div>
@@ -91,7 +108,7 @@
       <div class="tile key"><div class="k">FEM ahora</div><div class="v" id="oFem">—</div></div>
       <div class="tile" style="grid-column:span 2"><div class="k">Sentido de la corriente inducida (Lenz)</div><div class="v" id="oLenz" style="font-size:13.5px;font-family:var(--sans);font-weight:500">—</div></div>
     </div>
-    <p class="note" style="margin-top:12px">Prueba esto: acerca el imán <b>despacio</b> y luego <b>rápido</b> — el flujo final es el mismo, pero la FEM solo depende de la rapidez. Con B(t) senoidal, la FEM va 90° adelantada respecto de Φ (un coseno frente a un seno) y crece con la frecuencia: duplicar f duplica el pico de la FEM.</p>
+    <p class="note" style="margin-top:12px">Prueba esto: acerca el imán <b>despacio</b> y luego <b>rápido</b> — el flujo final es el mismo, pero la FEM solo depende de la rapidez. Con B(t) senoidal, la FEM va 90° <b>retrasada</b> respecto de Φ — la derivada adelanta 90° y el signo de Lenz aporta la media vuelta — y crece con la frecuencia: duplicar f duplica el pico de la FEM.</p>
   </section>
 
   <details class="card" open>
@@ -99,13 +116,14 @@
     <div class="eq">Φ <span class="op">=</span> &#8747; <span class="vec">B</span> · d<span class="vec">A</span> &nbsp;(espira plana, B uniforme: Φ <span class="op">=</span> <var>B</var>·<var>A</var>)</div>
     <div class="eq">FEM <span class="op">=</span> −<var>N</var> dΦ/d<var>t</var> &nbsp;(ley de Faraday, con el signo de Lenz)</div>
     <div class="eq"><var>B</var>(<var>t</var>) <span class="op">=</span> <var>B</var>₀ sen(2π<var>f</var><var>t</var>) &nbsp;→&nbsp; FEM <span class="op">=</span> −<var>N</var><var>A</var><var>B</var>₀·2π<var>f</var>·cos(2π<var>f</var><var>t</var>)</div>
+    <p class="note" style="margin-top:6px">Modelo del imán: dipolo sobre el eje con B ≈ 50 mT en la cara (valor típico de un imán de neodimio pequeño); Φ ∝ [1 + (x/R)²]^(−3/2). La FEM del arrastre se calcula numéricamente a partir de tu movimiento, con un suavizado ligero.</p>
     <p class="note" style="margin-top:6px">El signo de Lenz: la corriente inducida se opone al <b>cambio</b> del flujo — si Φ crece, la corriente genera un campo que lo contrarresta. Es la conservación de la energía en acción: frenar el imán cuesta trabajo, y ese trabajo es la energía eléctrica inducida.</p>
     <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span>. En este explorador no interviene ninguna constante de la naturaleza de forma explícita: N, R, B₀ y f son parámetros del experimento.</p>
   </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Inducción de Faraday — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Inducción de Faraday — Explorador interactivo</i> (Versión 1.2) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
   </div>
 </div>
 <script>
@@ -113,7 +131,7 @@
   var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
   var modo='iman', N=50, R=0.03, B0=20e-3, fB=1.0, playing=true;
   var xm=1.6;                 // posición del imán, en unidades de R (0 = centro de la espira)
-  var t=0, DT=1/60;
+  var t=0, DT=1/60, tsPrev=null;
   var BUF=600, bPhi=new Array(BUF).fill(0), bFem=new Array(BUF).fill(0), head=0;
   var phiPrev=null, dragging=false;
   var esc=document.getElementById('esc'), osc=document.getElementById('osc');
@@ -122,10 +140,10 @@
   function phiNow(){
     if(modo==='iman'){
       // modelo dipolar en el eje: Phi = Phi0 / (1 + (x/R)^2)^{3/2}, Phi0 = B_cara * A
-      var Bcara=50e-3;      // ~50 mT en la cara del imán de la P3
-      return N*Bcara*area()/Math.pow(1+xm*xm,1.5);
+      var Bcara=50e-3;      // ~50 mT en la cara del imán (modelo dipolar en el eje)
+      return Bcara*area()/Math.pow(1+xm*xm,1.5);
     }
-    return N*B0*area()*Math.sin(2*Math.PI*fB*t);
+    return B0*area()*Math.sin(2*Math.PI*fB*t);
   }
   function femNow(){
     if(modo==='B') return -N*B0*area()*2*Math.PI*fB*Math.cos(2*Math.PI*fB*t);
@@ -149,7 +167,7 @@
     var phi=phiNow(), fem;
     if(modo==='B'){fem=femNow();}
     else{
-      fem=(phiPrev===null)?0:-(phi-phiPrev)/DT;
+      fem=(phiPrev===null)?0:-N*(phi-phiPrev)/DT;
       femSuave=0.75*femSuave+0.25*fem; fem=femSuave;   // suavizado del arrastre
     }
     phiPrev=phi;
@@ -158,9 +176,10 @@
     document.getElementById('oFem').textContent=fmtV(fem);
     var lz=document.getElementById('oLenz');
     var ref=(modo==='B')?N*B0*area()*2*Math.PI*fB:0.002;
+    var vista=(modo==='iman')?' vista desde el imán':' vista de frente (⊙ hacia ti)';
     if(Math.abs(fem)<0.02*ref||Math.abs(fem)<1e-7) lz.textContent='sin cambio de flujo → sin corriente inducida';
-    else if(fem*1>0) lz.textContent='Φ decrece → la corriente mantiene el flujo (antihoraria vista desde el imán)';
-    else lz.textContent='Φ crece → la corriente se opone al aumento (horaria vista desde el imán)';
+    else if(fem>0) lz.textContent='Φ decrece → la corriente repone el flujo: '+(modo==='iman'?'horaria':'antihoraria')+vista;
+    else lz.textContent='Φ crece → la corriente se opone al aumento: '+(modo==='iman'?'antihoraria':'horaria')+vista;
   }
   function drawEsc(){
     var o=fit(esc,250),x=o.x,W=o.w,H=o.h,cy=H/2;
@@ -232,7 +251,7 @@
       x.fillText(rw.lab,pad+2,rw.y-rw.amp-5);
     });
     x.fillStyle='rgba(255,255,255,.4)';x.font='10px '+C('--mono')+',monospace';
-    x.textAlign='right';x.fillText('→ tiempo ('+(BUF*DT).toFixed(0)+' s en pantalla)',W-pad,H-6);x.textAlign='left';
+    x.textAlign='right';x.fillText('→ tiempo (≈10 s en pantalla)',W-pad,H-6);x.textAlign='left';
   }
   function syncInputs(){
     ponSiLibre(IN.N,N);ponSiLibre(IN.R,+(R*100).toFixed(1));
@@ -267,9 +286,47 @@
   esc.addEventListener('pointercancel',function(){dragging=false;});
   var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',function(){});
   syncInputs();
-  (function loop(){paso();drawEsc();drawOsc();syncInputs();requestAnimationFrame(loop);})();
+  (function loop(ts){
+    if(tsPrev!==null && ts!==undefined){var d=(ts-tsPrev)/1000;if(d>0&&d<0.1)DT=d;}
+    if(ts!==undefined)tsPrev=ts;
+    paso();drawEsc();drawOsc();syncInputs();requestAnimationFrame(loop);})();
 })();
 </script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
 <!-- navegacion:inicio -->
 <style>
   body{margin-top:50px!important}
@@ -320,7 +377,7 @@
 <a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
 <a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
 <a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
-<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6–1.7 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
 <div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
 <a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
 <a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
@@ -385,38 +442,3 @@
 })();
 </script>
 <!-- navegacion:fin -->
-<!-- contador:inicio -->
-<style>
-  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
-    color:var(--muted,#7A8699);display:none;font-family:inherit}
-  .visitas span{display:inline-block;background:var(--card,#fff);
-    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
-  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
-  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
-  .visitas a:hover{text-decoration:underline}
-</style>
-<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
-<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
-<script>
-(function(){
-  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
-  var sc=document.createElement('script'); sc.async=true;
-  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
-  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
-  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
-  function pide(path){
-    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
-      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
-  }
-  var p=location.pathname;
-  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
-  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
-    var a=res[0], b=res[1];
-    if(!a && !b) return;
-    document.getElementById('vis-pag').textContent = a ? a.count : '–';
-    document.getElementById('vis-tot').textContent = b ? b.count : '–';
-    document.getElementById('visitas').style.display='block';
-  });
-})();
-</script>
-<!-- contador:fin -->

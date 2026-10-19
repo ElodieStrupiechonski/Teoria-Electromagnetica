@@ -1,4 +1,21 @@
+<!doctype html>
+<html lang="es">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
 <title>Explorador de Polarización</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -80,11 +97,11 @@
     <p class="sec-tag">Explorador · vector de campo eléctrico</p>
     <div class="grid2">
       <div>
-        <canvas id="fig" class="panelcanvas" height="300"></canvas>
+        <canvas id="fig" role="img" aria-label="Trayectoria del vector de campo eléctrico" class="panelcanvas" height="300"></canvas>
         <div class="legend"><span><i style="background:var(--accent)"></i>vector E (ahora)</span><span><i style="background:var(--blueSoft)"></i>trayectoria en un periodo</span><span>⊙ = z sale hacia ti</span></div>
       </div>
       <div>
-        <canvas id="comp" class="panelcanvas" height="140"></canvas>
+        <canvas id="comp" role="img" aria-label="Componentes del campo contra el tiempo" class="panelcanvas" height="140"></canvas>
         <div class="legend"><span><i style="background:var(--blueSoft)"></i>E<sub>x</sub>(t)</span><span><i style="background:var(--redSoft)"></i>E<sub>y</sub>(t)</span><span>eje horizontal = tiempo t · la línea marca el instante actual</span></div>
         <div class="ctrl">
           <label><span>Amplitud E<sub>x</sub></span> <b id="axv">1.00</b></label><input id="ax" type="range" min="0" max="1" step="0.02" value="1">
@@ -120,14 +137,14 @@
     <div class="eq">PLF = |ê<sub>w</sub>&middot;ê<sub>a</sub>|<sup>2</sup> <span class="op">&nbsp;&nbsp;</span> (lineal) &nbsp; PLF = cos<sup>2</sup><var>&theta;</var></div>
     <div class="grid2">
       <div>
-        <canvas id="link" class="panelcanvas" height="260"></canvas>
+        <canvas id="link" role="img" aria-label="Onda incidente y antena receptora" class="panelcanvas" height="260"></canvas>
         <div class="legend"><span><i style="background:var(--blueSoft)"></i>onda incidente</span><span><i style="background:var(--greenSoft)"></i>antena receptora</span></div>
         <div style="font-size:13px;color:var(--muted);margin-top:12px">Señal recibida</div>
         <div class="meter"><div class="fill" id="mfill"></div></div>
       </div>
       <div class="knobwrap">
         <div style="font-size:13px;font-weight:600;color:var(--muted);align-self:flex-start">Perilla: orientación de la antena</div>
-        <canvas id="knob" width="150" height="150"></canvas>
+        <canvas id="knob" role="img" aria-label="Perilla de orientación de la antena" width="150" height="150"></canvas>
         <div style="font-family:var(--mono);font-size:15px;color:var(--accent)" id="angv">0°</div>
         <div style="width:100%">
           <label for="knobslider" style="display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px">Orientación de la antena</label>
@@ -153,7 +170,7 @@
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Polarización de ondas electromagnéticas — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Polarización de ondas electromagnéticas — Explorador interactivo</i> (Versión 1.2) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
   </div>
 </div>
 <script>
@@ -161,8 +178,13 @@
   var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
   function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(240,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
   var A=1,B=1,dd=90*Math.PI/180,t=0,thetaRx=0;
-  function classify(){var s=Math.abs(Math.sin(dd));if(A<0.03||B<0.03||s<0.04)return{tipo:'Lineal',giro:'—'};var circ=Math.abs(A-B)<0.04&&Math.abs(s-1)<0.04;return{tipo:circ?'Circular':'Elíptica',giro:(Math.sin(dd)>0?'horario':'antihorario')+' (en pantalla)'};}
-  function axialRatio(){var rmax=0,rmin=1e9;for(var k=0;k<180;k++){var th=k*Math.PI/90;var ex=A*Math.cos(th),ey=B*Math.cos(th+dd);var r=Math.hypot(ex,ey);if(r>rmax)rmax=r;if(r<rmin)rmin=r;}if(rmin<1e-4)return'∞ (lineal)';return(rmax/rmin).toFixed(2);}
+  function arNum(){var rmax=0,rmin=1e9;for(var k=0;k<360;k++){var th=k*Math.PI/180;var ex=A*Math.cos(th),ey=B*Math.cos(th+dd);var r=Math.hypot(ex,ey);if(r>rmax)rmax=r;if(r<rmin)rmin=r;}return rmin<1e-4?Infinity:rmax/rmin;}
+  function classify(){ // por relación axial: lineal AR→∞, circular AR≈1
+    if(A<0.02&&B<0.02)return{tipo:'Lineal',giro:'—'};
+    var ar=arNum();
+    if(!isFinite(ar)||ar>40)return{tipo:'Lineal',giro:'—'};
+    return{tipo:ar<1.05?'Circular':'Elíptica',giro:(Math.sin(dd)>0?'horario':'antihorario')+' (en pantalla)'};}
+  function axialRatio(){var ar=arNum();return isFinite(ar)?ar.toFixed(2):'∞ (lineal)';}
   function plf(theta){var den=A*A+B*B;if(den<1e-9)return 0;var c=Math.cos(theta),s=Math.sin(theta);return (A*A*c*c+B*B*s*s+2*A*B*c*s*Math.cos(dd))/den;}
   var labels=function(){
     document.getElementById('axv').textContent=A.toFixed(2);
@@ -285,6 +307,41 @@
   (function loop(){t+=0.05;drawFig();drawComp();drawLink();requestAnimationFrame(loop);})();
 })();
 </script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
 <!-- navegacion:inicio -->
 <style>
   body{margin-top:50px!important}
@@ -335,7 +392,7 @@
 <a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
 <a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
 <a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
-<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6–1.7 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
 <div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
 <a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
 <a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
@@ -400,38 +457,3 @@
 })();
 </script>
 <!-- navegacion:fin -->
-<!-- contador:inicio -->
-<style>
-  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
-    color:var(--muted,#7A8699);display:none;font-family:inherit}
-  .visitas span{display:inline-block;background:var(--card,#fff);
-    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
-  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
-  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
-  .visitas a:hover{text-decoration:underline}
-</style>
-<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
-<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
-<script>
-(function(){
-  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
-  var sc=document.createElement('script'); sc.async=true;
-  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
-  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
-  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
-  function pide(path){
-    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
-      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
-  }
-  var p=location.pathname;
-  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
-  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
-    var a=res[0], b=res[1];
-    if(!a && !b) return;
-    document.getElementById('vis-pag').textContent = a ? a.count : '–';
-    document.getElementById('vis-tot').textContent = b ? b.count : '–';
-    document.getElementById('visitas').style.display='block';
-  });
-})();
-</script>
-<!-- contador:fin -->

@@ -1,4 +1,21 @@
+<!doctype html>
+<html lang="es">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
 <title>Guía de onda rectangular · explorador</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -65,16 +82,16 @@
     <p class="sec-tag">Explorador · mapa de modos y patrón del TE₁₀</p>
     <div class="grid2">
       <div>
-        <canvas id="map" class="panelcanvas" height="190"></canvas>
+        <canvas id="map" role="img" aria-label="Mapa de frecuencias de corte de los modos" class="panelcanvas" height="190"></canvas>
         <div class="legend"><span><i style="background:var(--greenSoft)"></i>banda monomodo (solo TE₁₀)</span><span><i style="background:var(--accent)"></i>frecuencia de operación f</span><span><i style="background:var(--redSoft)"></i>cortes de los modos</span></div>
-        <canvas id="pat" class="panelcanvas" height="230" style="margin-top:14px"></canvas>
+        <canvas id="pat" role="img" aria-label="Patrón del modo TE10 en la sección transversal" class="panelcanvas" height="230" style="margin-top:14px"></canvas>
         <div class="legend"><span>sección transversal a×b · intensidad de <b>E_y</b> del TE₁₀ (máxima en x = a/2, nula en las paredes)</span></div>
       </div>
       <div class="ctrl">
         <div class="row">
-          <button class="btn on" data-g="22.86,10.16">WR-90 (banda X)</button>
-          <button class="btn" data-g="72.14,34.04">WR-284 (banda S)</button>
-          <button class="btn" data-g="10.668,4.318">WR-42 (banda K)</button>
+          <button class="btn on" data-g="22.86,10.16,10.3">WR-90 (banda X)</button>
+          <button class="btn" data-g="72.14,34.04,3.3">WR-284 (banda S)</button>
+          <button class="btn" data-g="10.668,4.318,22.2">WR-42 (banda K)</button>
         </div>
         <label><span>Frecuencia f</span> <b id="fv">10.0 GHz</b></label>
         <input id="f" type="range" min="1" max="40" step="0.05" value="10">
@@ -103,13 +120,14 @@
     <div class="eq">β <span class="op">=</span> (2π<var>f</var>/<span class="cnat">c</span>) √(1 − (<var>f</var><sub>c</sub>/<var>f</var>)²)<span class="op">,</span>&emsp;λ<sub>g</sub> <span class="op">=</span> λ / √(1 − (<var>f</var><sub>c</sub>/<var>f</var>)²)</div>
     <div class="eq"><var>v</var><sub>p</sub> <span class="op">=</span> <span class="cnat">c</span> / √(1 − (<var>f</var><sub>c</sub>/<var>f</var>)²)<span class="op">,</span>&emsp;<var>v</var><sub>g</sub> <span class="op">=</span> <span class="cnat">c</span> √(1 − (<var>f</var><sub>c</sub>/<var>f</var>)²)<span class="op">,</span>&emsp;<var>v</var><sub>p</sub><var>v</var><sub>g</sub> <span class="op">=</span> <span class="cnat">c</span>²</div>
     <div class="eq">TE₁₀: <var>E</var><sub>y</sub>(<var>x</var>) <span class="op">=</span> <var>E</var>₀ sen(π<var>x</var>/<var>a</var>) &nbsp;(nula en las paredes <var>x</var> = 0, <var>a</var>)</div>
+    <p class="note" style="margin-top:6px">La «banda monomodo» mostrada es la teórica (f<sub>c,TE₁₀</sub> a f<sub>c</sub> del siguiente modo). La banda de <b>operación recomendada</b> (EIA) es más angosta — WR-90: 8.2–12.4 GHz — para alejarse del corte (dispersión) y del segundo modo. Los pares TE<sub>mn</sub> con m,n ≥ 1 comparten corte con su TM<sub>mn</sub>.</p>
     <p class="kv" style="margin-top:10px">Velocidad de la luz &nbsp; <b class="cnat">c = 299 792 458 m/s ≈ 2.998×10⁸ m/s</b> &nbsp;<span style="color:var(--muted)">(guía con aire; con dieléctrico, sustituir c → c/√ε<sub>r</sub>)</span></p>
     <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
   </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Guía de onda rectangular — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Guía de onda rectangular — Explorador interactivo</i> (Versión 1.2) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
   </div>
 </div>
 <script>
@@ -119,14 +137,22 @@
   var a=22.86e-3, b=10.16e-3, f=10e9, t=0;
   function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(260,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
   function fc(m,n){return c0/2*Math.sqrt(Math.pow(m/a,2)+Math.pow(n/b,2));}
-  function modos(){
+  function modos(){ // lista completa de cortes TE (los TM se cuentan aparte)
     var lista=[];
-    for(var m=0;m<=3;m++)for(var n=0;n<=3;n++){
+    for(var m=0;m<=12;m++)for(var n=0;n<=12;n++){
       if(m===0&&n===0)continue;
       lista.push({m:m,n:n,fc:fc(m,n)});
     }
     lista.sort(function(p,q){return p.fc-q.fc;});
-    return lista.slice(0,6);
+    return lista;
+  }
+  function cuenta(f){ // modos que se propagan a la frecuencia f
+    var nTE=0,nTM=0;
+    for(var m=0;m<=12;m++)for(var n=0;n<=12;n++){
+      if(m===0&&n===0)continue;
+      if(f>fc(m,n)){nTE++; if(m>=1&&n>=1)nTM++;}
+    }
+    return {TE:nTE,TM:nTM};
   }
   function fmtF(h){if(h>=1e9)return (h/1e9).toFixed(2)+' GHz';return (h/1e6).toFixed(0)+' MHz';}
   function fmtL(m){if(m>=1)return m.toFixed(2)+' m';if(m>=1e-2)return (m*100).toFixed(2)+' cm';return (m*1e3).toFixed(2)+' mm';}
@@ -134,19 +160,20 @@
   function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
   function labels(){
     var f10=fc(1,0), ms=modos(), f2=ms[1].fc;
+    var degen=(f2-f10)/f10<1e-9;
     var prop=f>f10, u=prop?Math.sqrt(1-Math.pow(f10/f,2)):0;
     document.getElementById('fv').textContent=(f/1e9).toFixed(2)+' GHz';
     document.getElementById('ofc').textContent=fmtF(f10);
-    document.getElementById('obm').textContent=fmtF(f10)+' – '+fmtF(f2);
+    document.getElementById('obm').textContent=degen?'— (TE₁₀/TE₀₁ degenerados)':fmtF(f10)+' – '+fmtF(f2);
     document.getElementById('olam').textContent=fmtL(c0/f);
     document.getElementById('olg').textContent=prop?fmtL(c0/f/u):'— (evanescente)';
     document.getElementById('ovp').textContent=prop?(1/u).toFixed(3):'—';
     document.getElementById('ovg').textContent=prop?u.toFixed(3):'—';
     var est=document.getElementById('estado'), txt=document.getElementById('oest');
-    var nprop=ms.filter(function(mm){return f>mm.fc;}).length;
+    var ct=cuenta(f);
     if(!prop){est.className='tile bad';txt.textContent='por debajo del corte · evanescente';}
-    else if(nprop===1){est.className='tile key';txt.textContent='banda monomodo · solo TE₁₀';}
-    else {est.className='tile';txt.textContent=nprop+' modos se propagan (multimodo)';}
+    else if(ct.TE===1&&ct.TM===0){est.className='tile key';txt.textContent='banda monomodo · solo TE₁₀';}
+    else {est.className='tile';txt.textContent=ct.TE+' TE + '+ct.TM+' TM se propagan (multimodo)';}
     ponSiLibre(IN.A,+(a*1e3).toFixed(3));ponSiLibre(IN.B,+(b*1e3).toFixed(3));
     ponSiLibre(IN.F,+(f/1e9).toFixed(2));
     var sl=document.getElementById('f');sl.value=Math.min(+sl.max,Math.max(+sl.min,f/1e9));
@@ -154,7 +181,7 @@
   function drawMap(){
     var o=fit(document.getElementById('map'),190),x=o.x,W=o.w,H=o.h,padL=14,padR=14,axY=H-44;
     x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
-    var ms=modos(), f10=ms[0].fc, fmax=Math.max(f*1.15,ms[ms.length-1].fc*1.1);
+    var ms=modos(), f10=ms[0].fc, fmax=Math.max(f*1.15,ms[Math.min(5,ms.length-1)].fc*1.1);
     function X(ff){return padL+(W-padL-padR)*ff/fmax;}
     // banda monomodo
     x.fillStyle='rgba(90,168,113,.22)';x.fillRect(X(ms[0].fc),20,X(ms[1].fc)-X(ms[0].fc),axY-20);
@@ -168,12 +195,13 @@
     for(var g=0;g*1e9<=fmax;g+=step){x.fillStyle='rgba(255,255,255,.5)';
       x.fillRect(X(g*1e9),axY,1,5);x.fillText(g,X(g*1e9),axY+17);}
     // cortes
-    ms.forEach(function(mm,i){
+    var vis=ms.filter(function(mm){return mm.fc<=fmax;});
+    vis.forEach(function(mm,i){
       var xx=X(mm.fc);
       x.strokeStyle=C('--redSoft');x.setLineDash([3,3]);x.lineWidth=1.4;
       x.beginPath();x.moveTo(xx,20);x.lineTo(xx,axY);x.stroke();x.setLineDash([]);
       x.fillStyle='rgba(255,255,255,.85)';x.font='11px '+C('--mono')+',monospace';
-      var lab='TE'+mm.m+mm.n, yy=28+(i%3)*14;
+      var lab=(mm.m>=1&&mm.n>=1?'TE/TM':'TE')+mm.m+mm.n, yy=28+(i%3)*14;
       x.fillText(lab,xx,yy);
     });
     // f de operación
@@ -226,6 +254,7 @@
   document.getElementById('f').addEventListener('input',function(e){f=(+e.target.value)*1e9;upd();});
   document.querySelectorAll('[data-g]').forEach(function(btn){btn.addEventListener('click',function(){
     var p=btn.getAttribute('data-g').split(',');a=parseFloat(p[0])*1e-3;b=parseFloat(p[1])*1e-3;
+    if(p[2])f=parseFloat(p[2])*1e9;   // centro de la banda de operación EIA
     document.querySelectorAll('[data-g]').forEach(function(bb){bb.classList.toggle('on',bb===btn);});upd();});});
   function aCustom(){document.querySelectorAll('[data-g]').forEach(function(bb){bb.classList.remove('on');});}
   IN.A.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;a=v*1e-3;aCustom();upd();});
@@ -237,6 +266,41 @@
   (function loop(){t+=0.07;drawPat();requestAnimationFrame(loop);})();
 })();
 </script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
 <!-- navegacion:inicio -->
 <style>
   body{margin-top:50px!important}
@@ -287,7 +351,7 @@
 <a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
 <a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
 <a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
-<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6–1.7 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
 <div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
 <a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
 <a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
@@ -352,38 +416,3 @@
 })();
 </script>
 <!-- navegacion:fin -->
-<!-- contador:inicio -->
-<style>
-  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
-    color:var(--muted,#7A8699);display:none;font-family:inherit}
-  .visitas span{display:inline-block;background:var(--card,#fff);
-    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
-  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
-  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
-  .visitas a:hover{text-decoration:underline}
-</style>
-<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
-<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
-<script>
-(function(){
-  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
-  var sc=document.createElement('script'); sc.async=true;
-  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
-  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
-  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
-  function pide(path){
-    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
-      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
-  }
-  var p=location.pathname;
-  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
-  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
-    var a=res[0], b=res[1];
-    if(!a && !b) return;
-    document.getElementById('vis-pag').textContent = a ? a.count : '–';
-    document.getElementById('vis-tot').textContent = b ? b.count : '–';
-    document.getElementById('visitas').style.display='block';
-  });
-})();
-</script>
-<!-- contador:fin -->

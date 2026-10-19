@@ -1,4 +1,21 @@
+<!doctype html>
+<html lang="es">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
 <title>Capa dieléctrica · 3 medios, 2 interfaces</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,7 +83,7 @@
   <div class="sub">La onda llega del medio 1, atraviesa la capa (medio 2) y sale al medio 3. La interfaz capa–medio 3 está fija en z = 0; <b>arrastra la interfaz 2→1 (z = −d)</b> para cambiar el espesor y ver variar la impedancia efectiva η(d) y la reflexión. Comprueba los casos d = λ₂/2 (capa transparente: radomo) y d = λ₂/4 con η₂ = √(η₁η₃) (antirreflejante).</div>
 
   <div class="card">
-    <canvas id="cv" height="360"></canvas>
+    <canvas id="cv" role="img" aria-label="Campos en los tres medios con interfaz arrastrable" height="360"></canvas>
     <div class="legend">
       <span><i style="background:var(--inc)"></i>Medio 1 (incidente + reflejada)</span>
       <span><i style="background:var(--lay)"></i>Campo en la capa</span>
@@ -116,12 +133,13 @@
     <div class="eq"><var>&Gamma;</var> <span class="op">=</span> [<var>&eta;</var>(<var>d</var>) <span class="op">&minus;</span> <var>&eta;</var><sub>1</sub>] / [<var>&eta;</var>(<var>d</var>) <span class="op">+</span> <var>&eta;</var><sub>1</sub>] <span style="display:inline-block;width:1.6em"></span> <var>d</var> <span class="op">=</span> &lambda;<sub>2</sub>/2 &rarr; <var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>3</sub> <span style="display:inline-block;width:1.6em"></span> <var>d</var> <span class="op">=</span> &lambda;<sub>2</sub>/4 &rarr; <var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>2</sub><sup>2</sup>/<var>&eta;</var><sub>3</sub></div>
     <p style="margin:.6em 0 .2em;color:var(--muted);font-size:14px">Sugerencias: <b>Antirreflejante</b> — aire | MgF₂ | vidrio con d = λ₂/4 (compara |Γ|² con el 4 % del vidrio sin capa). <b>Radomo</b> — aire | teflón | aire con d = λ₂/2: la capa desaparece sin importar su material. Con n₂ ideal = √(n₁n₃) el mínimo en λ₂/4 baja a cero exacto.</p>
     <p class="kv" style="margin-top:10px">Impedancia intrínseca del vacío &nbsp; <b class="cnat">η₀ = √(μ₀/ε₀) ≈ 376.73 Ω ≈ 377 Ω</b> &nbsp;<span style="color:var(--muted)">(en cada medio no magnético, η<sub>i</sub> = η₀/n<sub>i</sub>)</span></p>
-    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+    <p class="kv" style="color:var(--muted);font-family:inherit">Hipótesis del modelo: medios sin pérdidas, μ<sub>r</sub> = 1, incidencia normal; los índices de la lista son valores ópticos (en microondas difieren: p. ej. teflón n ≈ 1.44 vale en microondas, agua n ≈ 9).</p>
+<p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
   </details>
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Capa dieléctrica: 3 medios, 2 interfaces — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Capa dieléctrica: 3 medios, 2 interfaces — Explorador interactivo</i> (Versión 1.2) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
   </div>
 </div>
 <script>
@@ -304,6 +322,41 @@
   labels();frame();
 })();
 </script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
 <!-- navegacion:inicio -->
 <style>
   body{margin-top:50px!important}
@@ -354,7 +407,7 @@
 <a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
 <a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
 <a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
-<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6–1.7 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
 <div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
 <a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
 <a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
@@ -419,38 +472,3 @@
 })();
 </script>
 <!-- navegacion:fin -->
-<!-- contador:inicio -->
-<style>
-  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
-    color:var(--muted,#7A8699);display:none;font-family:inherit}
-  .visitas span{display:inline-block;background:var(--card,#fff);
-    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
-  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
-  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
-  .visitas a:hover{text-decoration:underline}
-</style>
-<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
-<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
-<script>
-(function(){
-  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
-  var sc=document.createElement('script'); sc.async=true;
-  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
-  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
-  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
-  function pide(path){
-    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
-      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
-  }
-  var p=location.pathname;
-  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
-  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
-    var a=res[0], b=res[1];
-    if(!a && !b) return;
-    document.getElementById('vis-pag').textContent = a ? a.count : '–';
-    document.getElementById('vis-tot').textContent = b ? b.count : '–';
-    document.getElementById('visitas').style.display='block';
-  });
-})();
-</script>
-<!-- contador:fin -->

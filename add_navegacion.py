@@ -25,7 +25,7 @@ NAV = [
    ("CampoGauss_explorador.html",     "Ley de Gauss",                "1.1 · P1"),
    ("Capacitor_explorador.html",      "Capacitor con dieléctrico",   "1.2 · P1"),
    ("Solenoide_explorador.html",      "Solenoide finito",            "1.4 · P3"),
-   ("Induccion_explorador.html",      "Inducción de Faraday",        "1.6–1.7 · P3"),
+   ("Induccion_explorador.html",      "Inducción de Faraday",        "1.6 · P3"),
  ]),
  ("Unidad 2 · Ondas planas electromagnéticas", [
    ("RC_interactivo.html",            "Circuito RC y fasores",       "fasores · P4"),

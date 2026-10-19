@@ -1,4 +1,21 @@
+<!doctype html>
+<html lang="es">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
 <title>Reflexión · incidencia normal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,7 +83,7 @@
   <div class="sub">La onda llega del medio 1 a la frontera (z = 0). Parte se refleja (formando una onda estacionaria) y parte se transmite al medio 2. Arrastra el <b>plano amarillo</b> (z = −d) para medir la impedancia de onda η(d) que “se ve” desde ahí. En el curso de la ENES Juriquilla este explorador acompaña la práctica P8 (ondas estacionarias).</div>
 
   <div class="card">
-    <canvas id="cv" height="360"></canvas>
+    <canvas id="cv" role="img" aria-label="Onda estacionaria con plano de medición arrastrable" height="360"></canvas>
     <div class="legend">
       <span><i style="background:var(--inc)"></i>Campo total en el medio 1 (incidente + reflejada)</span>
       <span><i style="background:var(--tr)"></i>Onda transmitida (medio 2)</span>
@@ -114,11 +131,12 @@
     <p style="margin:.9em 0 .4em;color:var(--muted);font-size:14px">Impedancia de onda vista en el plano <var>z</var> = &minus;<var>d</var> (cociente del campo eléctrico total entre el magnético total). En <var>d</var> = λ₁/2 se repite η(<var>d</var>) = η₂; en <var>d</var> = λ₁/4 se invierte: η(<var>d</var>) = η₁²/η₂. Con conductor perfecto, η(<var>d</var>) = j<var>&eta;</var><sub>1</sub> tan(β₁<var>d</var>): reactancia pura.</p>
     <div class="eq"><var>&eta;</var>(<var>d</var>) <span class="op">=</span> <var>&eta;</var><sub>1</sub> &middot; [<var>&eta;</var><sub>2</sub> <span class="op">+</span> j<var>&eta;</var><sub>1</sub> tan(β₁<var>d</var>)] / [<var>&eta;</var><sub>1</sub> <span class="op">+</span> j<var>&eta;</var><sub>2</sub> tan(β₁<var>d</var>)]</div>
     <p class="kv" style="margin-top:10px">Impedancia intrínseca del vacío &nbsp; <b class="cnat">η₀ = √(μ₀/ε₀) ≈ 376.73 Ω ≈ 377 Ω</b> &nbsp;<span style="color:var(--muted)">(el medio 1 es aire/vacío: η₁ = η₀; en un dieléctrico, η = η₀/√ε<sub>r</sub>)</span></p>
-    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+    <p class="kv" style="color:var(--muted);font-family:inherit">Hipótesis del modelo: medios sin pérdidas, μ<sub>r</sub> = 1, el medio 1 es aire (η₁ = η₀); por eso aquí Γ ≤ 0 — para Γ &gt; 0 habría que invertir los medios.</p>
+<p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
   </details>
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Reflexión con incidencia normal — Explorador interactivo</i> (Versión 1.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Reflexión con incidencia normal — Explorador interactivo</i> (Versión 1.2) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
   </div>
 </div>
 <script>
@@ -255,6 +273,41 @@
   labels();frame();
 })();
 </script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
 <!-- navegacion:inicio -->
 <style>
   body{margin-top:50px!important}
@@ -305,7 +358,7 @@
 <a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
 <a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
 <a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
-<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6–1.7 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
 <div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
 <a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
 <a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
@@ -370,38 +423,3 @@
 })();
 </script>
 <!-- navegacion:fin -->
-<!-- contador:inicio -->
-<style>
-  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
-    color:var(--muted,#7A8699);display:none;font-family:inherit}
-  .visitas span{display:inline-block;background:var(--card,#fff);
-    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
-  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
-  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
-  .visitas a:hover{text-decoration:underline}
-</style>
-<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
-<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
-<script>
-(function(){
-  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
-  var sc=document.createElement('script'); sc.async=true;
-  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
-  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
-  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
-  function pide(path){
-    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
-      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
-  }
-  var p=location.pathname;
-  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
-  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
-    var a=res[0], b=res[1];
-    if(!a && !b) return;
-    document.getElementById('vis-pag').textContent = a ? a.count : '–';
-    document.getElementById('vis-tot').textContent = b ? b.count : '–';
-    document.getElementById('visitas').style.display='block';
-  });
-})();
-</script>
-<!-- contador:fin -->

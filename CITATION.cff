@@ -11,8 +11,8 @@ authors:
     given-names: "Andrés"
     orcid: "https://orcid.org/0000-0002-7591-5235"
     affiliation: "Centro de Física Aplicada y Tecnología Avanzada (CFATA), UNAM"
-version: "1.1"
-date-released: "2026-09-29"
+version: "1.2"
+date-released: "2026-10-19"
 license: CC-BY-4.0
 keywords:
   - electromagnetismo
@@ -25,4 +25,4 @@ keywords:
 identifiers:
   - type: doi
     value: "10.5281/zenodo.23423157"
-    description: "DOI de concepto (todas las versiones); se completa al publicar en Zenodo."
+    description: "DOI de concepto (apunta a todas las versiones en Zenodo)."

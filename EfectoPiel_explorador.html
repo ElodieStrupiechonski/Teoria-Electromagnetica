@@ -1,4 +1,21 @@
+<!doctype html>
+<html lang="es">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
 <title>Explorador de Efecto Piel</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -76,9 +93,9 @@
     <p class="sec-tag">Explorador · onda penetrando en el conductor</p>
     <div class="grid2">
       <div>
-        <canvas id="skin" class="panelcanvas" height="250"></canvas>
+        <canvas id="skin" role="img" aria-label="Onda penetrando en el conductor" class="panelcanvas" height="250"></canvas>
         <div class="legend"><span><i style="background:var(--blueSoft)"></i>campo E</span><span><i style="background:var(--greenSoft)"></i>campo H (retrasado)</span><span><i style="background:var(--accent)"></i>envolvente e^(−z/δ)</span></div>
-        <canvas id="df" class="panelcanvas" height="170" style="margin-top:14px"></canvas>
+        <canvas id="df" role="img" aria-label="Profundidad de penetración contra frecuencia" class="panelcanvas" height="170" style="margin-top:14px"></canvas>
         <div class="legend"><span><i style="background:var(--accent)"></i>δ contra frecuencia (escala fija, log–log)</span></div>
       </div>
       <div class="ctrl">
@@ -99,7 +116,7 @@
         <p class="note" style="font-size:12.5px;margin-top:6px">Teclea los valores de tu propio material (acepta notación científica, p. ej. <code>5.8e7</code>); al editarlos el material pasa a «personalizado».</p>
         <div class="tiles">
           <div class="tile"><div class="k">Conductividad σ</div><div class="v" id="sig">—</div></div>
-          <div class="tile"><div class="k">Profundidad δ = 1/√(πfμσ)</div><div class="v" id="dl">—</div></div>
+          <div class="tile"><div class="k">Profundidad δ = 1/α</div><div class="v" id="dl">—</div></div>
           <div class="tile"><div class="k">Atenuación α = 1/δ</div><div class="v" id="al">—</div></div>
           <div class="tile"><div class="k">Resistencia superficial Rs</div><div class="v" id="rs">—</div></div>
           <div class="tile"><div class="k">Desfase de H respecto de E</div><div class="v" id="ph">—</div></div>
@@ -112,11 +129,13 @@
 
   <details class="card" open>
     <summary>Formulario y constantes</summary>
-    <div class="eq"><var>&delta;</var> <span class="op">=</span> 1 <span class="op">/</span> &radic;(&pi; <var>f</var> &middot; <var>&mu;</var> &middot; <var>&sigma;</var>)</div>
+
     <div class="eq"><span class="vec">E</span>(<var>z</var>) <span class="op">=</span> <span class="vec">E</span><sub>0</sub> <var>e</var><sup>&minus;<var>z</var>/<var>&delta;</var></sup></div>
-    <div class="eq"><var>&alpha;</var> <span class="op">=</span> <var>&beta;</var> <span class="op">=</span> 1 <span class="op">/</span> <var>&delta;</var></div>
+    <div class="eq">general: <var>&alpha;</var>,<var>&beta;</var> <span class="op">=</span> <var>&omega;</var>&radic;(<var>&mu;</var><var>&epsilon;</var>/2) · [&radic;(1 + tan²<var>&delta;</var><sub>p</sub>) &#8723; 1]<sup>1/2</sup><span class="op">,</span>&emsp;tan <var>&delta;</var><sub>p</sub> <span class="op">=</span> <var>&sigma;</var>/(<var>&omega;</var><var>&epsilon;</var>)<span class="op">,</span>&emsp;<var>&delta;</var> <span class="op">=</span> 1/<var>&alpha;</var></div>
+    <div class="eq">buen conductor (tan <var>&delta;</var><sub>p</sub> &#8811; 1): <var>&alpha;</var> <span class="op">=</span> <var>&beta;</var> <span class="op">=</span> 1/<var>&delta;</var> <span class="op">=</span> &radic;(&pi;<var>f</var><var>&mu;</var><var>&sigma;</var>)</div>
+    <div class="eq">atenuación de un espesor <var>t</var>: 8.686 · <var>t</var>/<var>&delta;</var> dB &nbsp;(útil para el blindaje de la práctica P6)</div>
     <div class="eq"><var>&theta;</var><sub><var>&eta;</var></sub> <span class="op">=</span> &frac12; arctan(<var>&sigma;</var> <span class="op">/</span> <var>&omega;</var><var>&epsilon;</var>) <span class="op">&rarr;</span> 45&deg; = &pi;/4</div>
-    <p class="note" style="margin-top:6px">En un buen conductor el ángulo de la impedancia intrínseca es de 45&deg;: la <span class="vec">H</span> se retrasa &pi;/4 respecto de la <span class="vec">E</span>. La amplitud decae como exp(&minus;<var>z</var>/<var>&delta;</var>) y cae al 37 % en una <var>&delta;</var>.</p>
+    <p class="note" style="margin-top:6px">Este explorador usa las expresiones generales de α y β, válidas en cualquier régimen (el rótulo de régimen usa los umbrales tan δ<sub>p</sub> &gt; 100 y &lt; 0.01). Nota de validez: ε<sub>r</sub> = 81 del agua de mar vale hasta ~1 GHz (relajación de Debye) y σ del cobre deja de ser constante desde ~1 THz. En un buen conductor el ángulo de la impedancia intrínseca es de 45&deg;: la <span class="vec">H</span> se retrasa &pi;/4 respecto de la <span class="vec">E</span>. La amplitud decae como exp(&minus;<var>z</var>/<var>&delta;</var>) y cae al 37 % en una <var>&delta;</var>.</p>
     <p class="note" style="margin-top:6px">Nota: por arriba del infrarrojo (banda visible marcada en la gráfica) este modelo de buen conductor es solo orientativo; a esas frecuencias la conductividad deja de ser constante y aparecen efectos de plasma.</p>
     <p class="kv" style="margin-top:10px">Permeabilidad del vacío &nbsp; <b class="cnat">μ₀ = 4π×10⁻⁷ T·m/A</b> &nbsp;(para los materiales no magnéticos de aquí, <var>μ</var> ≈ <span class="cnat">μ₀</span>)</p>
     <p class="kv">Permitividad del vacío &nbsp; <b class="cnat">ε₀ = 8.854×10⁻¹² F/m</b> &nbsp;(<var>ε</var> = <var>ε</var><sub>r</sub><span class="cnat">ε₀</span>)</p>
@@ -125,7 +144,7 @@
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Efecto piel en conductores — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Efecto piel en conductores — Explorador interactivo</i> (Versión 1.2) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
   </div>
 </div>
 <script>
@@ -137,7 +156,11 @@
   var mat='cobre', fexp=6, t=0;
   function sigma(){return MAT[mat].s;} function er(){return MAT[mat].er;}
   function fval(){return Math.pow(10,fexp);}
-  function delta(f){return 1/Math.sqrt(Math.PI*f*MU0*sigma());}
+  function ab(f){ // α y β generales (medio con pérdidas): Ulaby ecs. 7.66
+    var w=2*Math.PI*f, eps=er()*E0P, q=sigma()/(w*eps), k=w*Math.sqrt(MU0*eps/2);
+    return {a:k*Math.sqrt(Math.sqrt(1+q*q)-1), b:k*Math.sqrt(Math.sqrt(1+q*q)+1)};
+  }
+  function delta(f){return 1/ab(f).a;}
   function lossTan(f){return sigma()/(2*Math.PI*f*er()*E0P);}       // σ/(ωε)
   function etaAngle(f){return 0.5*Math.atan(lossTan(f));}            // H lags E by this
   function fmtLen(m){if(m>=1)return m.toFixed(2)+' m';if(m>=1e-3)return (m*1e3).toFixed(3)+' mm';if(m>=1e-6)return (m*1e6).toFixed(2)+' µm';return (m*1e9).toFixed(1)+' nm';}
@@ -148,9 +171,9 @@
     document.getElementById('sig').textContent=(sigma()>=1e6?(sigma()/1e6).toFixed(1)+'×10⁶':sigma())+' S/m';
     document.getElementById('dl').textContent=fmtLen(dl);
     document.getElementById('al').textContent=(1/dl).toExponential(2)+' Np/m';
-    document.getElementById('rs').textContent=(1/(sigma()*dl)).toExponential(2)+' Ω';
+    document.getElementById('rs').textContent=tanD>100?(1/(sigma()*dl)).toExponential(2)+' Ω':'— (solo buen conductor)';
     document.getElementById('ph').textContent=ang.toFixed(1)+'°';
-    document.getElementById('reg').textContent=tanD>10?'buen conductor':(tanD<0.1?'cuasi-dieléctrico':'intermedio');
+    document.getElementById('reg').textContent=(tanD>100?'buen conductor':(tanD<0.01?'cuasi-dieléctrico':'intermedio'))+' · tan δ = '+(tanD>=100?tanD.toExponential(1):tanD.toPrecision(2));
   }
   function drawSkin(){
     var o=fit(document.getElementById('skin'),250),x=o.x,W=o.w,H=o.h,pad=10,mid=H/2,amp=H*0.32,Nsh=6;
@@ -161,6 +184,7 @@
     x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=2;x.beginPath();x.moveTo(pad,pad);x.lineTo(pad,H-pad);x.stroke();
     x.fillStyle='rgba(255,255,255,.6)';x.font='11px '+C('--mono')+',monospace';x.fillText('superficie',pad+4,pad+12);x.fillText('profundidad z →',W-118,H-8);
     var span=W-2*pad, lag=etaAngle(fval());
+    var AB=ab(fval()), rba=AB.b/AB.a;          // β/α: 1 en buen conductor
     function ex(u){return Math.exp(-u);}
     // envelope
     x.strokeStyle=C('--accent');x.lineWidth=1.5;x.setLineDash([5,4]);
@@ -168,10 +192,10 @@
     x.beginPath();for(var q=0;q<=span;q++){x.lineTo(pad+q,mid+ex(Nsh*q/span)*amp);}x.stroke();x.setLineDash([]);
     // H (retrasado) drawn behind E
     x.strokeStyle=C('--greenSoft');x.lineWidth=2.2;x.globalAlpha=.9;x.beginPath();
-    for(var ph=0;ph<=span;ph++){var uh=Nsh*ph/span;var yh=mid-ex(uh)*Math.cos(uh-t-lag)*amp;if(ph===0)x.moveTo(pad+ph,yh);else x.lineTo(pad+ph,yh);}x.stroke();x.globalAlpha=1;
+    for(var ph=0;ph<=span;ph++){var uh=Nsh*ph/span;var yh=mid-ex(uh)*Math.cos(rba*uh-t+lag)*amp;if(ph===0)x.moveTo(pad+ph,yh);else x.lineTo(pad+ph,yh);}x.stroke();x.globalAlpha=1;
     // E
     x.strokeStyle=C('--blueSoft');x.lineWidth=2.8;x.beginPath();
-    for(var px=0;px<=span;px++){var u=Nsh*px/span;var y=mid-ex(u)*Math.cos(u-t)*amp;if(px===0)x.moveTo(pad+px,y);else x.lineTo(pad+px,y);}x.stroke();
+    for(var px=0;px<=span;px++){var u=Nsh*px/span;var y=mid-ex(u)*Math.cos(rba*u-t)*amp;if(px===0)x.moveTo(pad+px,y);else x.lineTo(pad+px,y);}x.stroke();
     // delta markers
     var dl=delta(fval());
     x.strokeStyle='rgba(255,255,255,.35)';x.fillStyle='rgba(255,255,255,.7)';x.font='11px '+C('--mono')+',monospace';
@@ -233,6 +257,41 @@
   (function loop(){t+=0.08;drawSkin();requestAnimationFrame(loop);})();
 })();
 </script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
 <!-- navegacion:inicio -->
 <style>
   body{margin-top:50px!important}
@@ -283,7 +342,7 @@
 <a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
 <a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
 <a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
-<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6–1.7 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
 <div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
 <a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
 <a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
@@ -348,38 +407,3 @@
 })();
 </script>
 <!-- navegacion:fin -->
-<!-- contador:inicio -->
-<style>
-  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
-    color:var(--muted,#7A8699);display:none;font-family:inherit}
-  .visitas span{display:inline-block;background:var(--card,#fff);
-    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
-  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
-  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
-  .visitas a:hover{text-decoration:underline}
-</style>
-<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
-<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
-<script>
-(function(){
-  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
-  var sc=document.createElement('script'); sc.async=true;
-  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
-  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
-  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
-  function pide(path){
-    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
-      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
-  }
-  var p=location.pathname;
-  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
-  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
-    var a=res[0], b=res[1];
-    if(!a && !b) return;
-    document.getElementById('vis-pag').textContent = a ? a.count : '–';
-    document.getElementById('vis-tot').textContent = b ? b.count : '–';
-    document.getElementById('visitas').style.display='block';
-  });
-})();
-</script>
-<!-- contador:fin -->

@@ -1,4 +1,21 @@
+<!doctype html>
+<html lang="es">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
 <title>Explorador Doppler</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -106,7 +123,7 @@
     <p class="note">La fuente avanza y emite frentes de onda a intervalos iguales. Adelante (hacia donde va) los frentes se juntan: longitud de onda menor, frecuencia mayor. Atrás ocurre lo contrario.</p>
     <div class="grid2">
       <div>
-        <canvas id="waves" class="panelcanvas" height="250"></canvas>
+        <canvas id="waves" role="img" aria-label="Frentes de onda de la fuente en movimiento" class="panelcanvas" height="250"></canvas>
         <div class="legend"><span><i style="background:var(--blueSoft)"></i>frentes de onda</span><span><i style="background:var(--accent)"></i>fuente y velocidad v</span></div>
       </div>
       <div class="ctrl">
@@ -119,9 +136,9 @@
           <div class="tile"><div class="k"><var>f</var> adelante  (se acerca)</div><div class="v up" id="fup">—</div></div>
           <div class="tile"><div class="k"><var>f</var> atrás  (se aleja)</div><div class="v dn" id="fdn">—</div></div>
         </div>
-        <div class="eq"><var>f</var>&prime; = <var>f</var> / (1 &#8723; <var>v</var>/<span class="cnat">c</span>)</div>
+        <div class="eq"><var>f</var>&prime; = <var>f</var> &radic;[(1 &plusmn; <var>v</var>/<span class="cnat">c</span>) / (1 &#8723; <var>v</var>/<span class="cnat">c</span>)]</div>
         <div class="eq">&Delta;<var>f</var> / <var>f</var> &asymp; <var>v</var>/<span class="cnat">c</span></div>
-        <p class="note" style="margin-top:12px">Para <var>v</var> &#8810; <span class="cnat">c</span>: &Delta;<var>f</var>/<var>f</var> &asymp; <var>v</var>/<span class="cnat">c</span>. Aquí se usa la fuente en movimiento, <var>f</var>&prime; = <var>f</var>/(1&#8723;<var>v</var>/<span class="cnat">c</span>), para que el efecto se vea con claridad. El signo &minus; corresponde a la fuente que se acerca y el + a la que se aleja.</p>
+        <p class="note" style="margin-top:12px">Para ondas electromagnéticas la fórmula correcta es la <b>relativista</b> (curvas sólidas); la aproximación clásica <var>f</var>&prime; = <var>f</var>/(1&#8723;<var>v</var>/<span class="cnat">c</span>) (punteada en la gráfica de abajo) solo vale para <var>v</var> &#8810; <span class="cnat">c</span>: a <var>v</var>/<span class="cnat">c</span> = 0.5 ya se equivoca un 15 %. El signo superior corresponde a la fuente que se acerca.</p>
       </div>
     </div>
   </section>
@@ -133,11 +150,11 @@
     <p class="note">Acoplado al control de arriba: el observador de adelante recibe la onda comprimida (más ciclos en el mismo tiempo) y el de atrás la recibe estirada. La curva de la derecha resume cómo cambia la frecuencia recibida con la velocidad.</p>
     <div class="grid2">
       <div>
-        <canvas id="signals" class="panelcanvas" height="250"></canvas>
+        <canvas id="signals" role="img" aria-label="Señales recibidas adelante y atrás" class="panelcanvas" height="250"></canvas>
         <div class="legend"><span><i style="background:var(--faint)"></i>emitida</span><span><i style="background:var(--blueSoft)"></i>adelante (f sube)</span><span><i style="background:var(--redSoft)"></i>atrás (f baja)</span></div>
       </div>
       <div>
-        <canvas id="curve" class="panelcanvas" height="250"></canvas>
+        <canvas id="curve" role="img" aria-label="Cociente de frecuencias contra velocidad" class="panelcanvas" height="250"></canvas>
         <p class="note" style="margin-top:10px">Cociente <var>f</var>&prime;/<var>f</var> contra la velocidad. El punto marca la velocidad elegida arriba.</p>
       </div>
     </div>
@@ -148,7 +165,7 @@
     <p class="sec-tag">Explorador 3 · corrimiento al rojo cosmológico</p>
     <h2>Las galaxias que se alejan se ven más rojas</h2>
     <p class="note">Las galaxias lejanas se alejan de nosotros (expansión del universo). Su luz llega con la longitud de onda estirada: las líneas del espectro se corren hacia el rojo. Modifica la velocidad de alejamiento y observa cómo se desplazan las líneas conocidas del hidrógeno.</p>
-    <canvas id="spectrum" height="200" style="margin-top:8px"></canvas>
+    <canvas id="spectrum" role="img" aria-label="Espectros en reposo y corrido al rojo" height="200" style="margin-top:8px"></canvas>
     <div class="ctrl">
       <label>Velocidad de alejamiento&nbsp; v/c <b id="zbval">0.10</b></label>
       <input id="zbeta" type="range" min="0" max="0.30" step="0.005" value="0.10">
@@ -160,10 +177,10 @@
       <div class="tile"><div class="k">Hα: 656.3 nm  →</div><div class="v dn" id="haobs">—</div></div>
       <div class="tile"><div class="k">Velocidad de recesión</div><div class="v" id="vkm">—</div></div>
     </div>
-    <div class="eq"><var>z</var> = &Delta;<var>&lambda;</var>/<var>&lambda;</var> = (<var>&lambda;</var><sub>obs</sub> &minus; <var>&lambda;</var>)/<var>&lambda;</var> &asymp; <var>v</var>/<span class="cnat">c</span></div>
+    <div class="eq"><var>z</var> = &Delta;<var>&lambda;</var>/<var>&lambda;</var> = &radic;[(1 + <var>v</var>/<span class="cnat">c</span>) / (1 &minus; <var>v</var>/<span class="cnat">c</span>)] &minus; 1 &asymp; <var>v</var>/<span class="cnat">c</span> &nbsp;(<var>v</var> &#8810; <span class="cnat">c</span>)</div>
     <div class="eq"><var>&lambda;</var><sub>obs</sub> = <var>&lambda;</var>(1 + <var>z</var>)</div>
     <div class="eq"><var>v</var> = <var>H</var><sub>0</sub> <span class="op">&middot;</span> <var>d</var></div>
-    <p class="note" style="margin-top:12px">Aproximación clásica <var>z</var> &asymp; <var>v</var>/<span class="cnat">c</span> (válida para <var>v</var> &#8810; <span class="cnat">c</span>). Por la ley de Hubble, <var>v</var> = <var>H</var><sub>0</sub> <var>d</var>: cuanto más lejos está la galaxia, más rápido se aleja y mayor es su corrimiento al rojo. Así se descubrió que el universo se expande.</p>
+    <p class="note" style="margin-top:12px">Aquí usamos la expresión relativista exacta; la aproximación <var>z</var> &asymp; <var>v</var>/<span class="cnat">c</span> solo vale para <var>v</var> &#8810; <span class="cnat">c</span>. Por la ley de Hubble, <var>v</var> = <var>H</var><sub>0</sub> <var>d</var>: cuanto más lejos está la galaxia, más rápido se aleja y mayor es su corrimiento al rojo. Así se descubrió que el universo se expande.</p>
   </section>
 
   <!-- ============ SECCIÓN 4 ============ -->
@@ -183,7 +200,7 @@
 
   <details class="card">
     <summary>Formulario y constantes</summary>
-    <div class="eq"><var>f</var>&prime; <span class="op">=</span> <var>f</var> / (1 &#8723; <var>v</var>/<span class="cnat">c</span>)<span class="op">,</span>&emsp;&Delta;<var>f</var>/<var>f</var> &asymp; <var>v</var>/<span class="cnat">c</span> &nbsp;(<var>v</var> &#8810; <span class="cnat">c</span>)</div>
+    <div class="eq"><var>f</var>&prime; <span class="op">=</span> <var>f</var> &radic;[(1 &plusmn; <var>v</var>/<span class="cnat">c</span>) / (1 &#8723; <var>v</var>/<span class="cnat">c</span>)] &nbsp;(relativista)<span class="op">;</span>&emsp;para <var>v</var> &#8810; <span class="cnat">c</span>: <var>f</var>&prime; &asymp; <var>f</var> / (1 &#8723; <var>v</var>/<span class="cnat">c</span>)<span class="op">,</span>&emsp;&Delta;<var>f</var>/<var>f</var> &asymp; <var>v</var>/<span class="cnat">c</span></div>
     <div class="eq"><var>z</var> <span class="op">=</span> &Delta;<var>&lambda;</var>/<var>&lambda;</var> &asymp; <var>v</var>/<span class="cnat">c</span><span class="op">,</span>&emsp;<var>&lambda;</var><sub>obs</sub> <span class="op">=</span> <var>&lambda;</var>(1 + <var>z</var>)<span class="op">,</span>&emsp;<var>v</var> <span class="op">=</span> <var>H</var><sub>0</sub> <span class="op">&middot;</span> <var>d</var></div>
     <div class="eq">&Delta;<var>f</var> <span class="op">=</span> <var>k</var> <span class="op">&middot;</span> <var>f</var> <span class="op">&middot;</span> (<var>v</var>/<span class="cnat">c</span>)<span class="op">,</span>&emsp;<var>k</var> = 2 (radar, ida y vuelta)<span class="op">,</span> <var>k</var> = 1 (un trayecto)</div>
     <p class="kv" style="margin-top:10px">Velocidad de la luz &nbsp; <b class="cnat">c = 299 792 458 m/s ≈ 2.998×10⁸ m/s</b></p>
@@ -193,7 +210,7 @@
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Efecto Doppler electromagnético — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Efecto Doppler electromagnético — Explorador interactivo</i> (Versión 1.2) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
     <p>Fundamentos: Ulaby, F. T. <i>Fundamentals of Applied Electromagnetics</i>, Pearson. Sadiku, M. N. O. <i>Elements of Electromagnetics</i>, Oxford University Press.</p>
   </div>
 </div>
@@ -204,11 +221,12 @@
   function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(260,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
   var beta=0.30, playing=true, fc=0, xs=0, waves=[], SPD=1.5, EMIT=26, tt=0;
 
+  function fRel(b){return Math.sqrt((1+b)/(1-b));}   // Doppler relativista (EM)
   // ---- Section 1: wavefronts ----
   function sec1labels(){
     document.getElementById('bval').textContent=beta.toFixed(2);
-    document.getElementById('fup').textContent=(1/(1-beta)).toFixed(2)+' f';
-    document.getElementById('fdn').textContent=(1/(1+beta)).toFixed(2)+' f';
+    document.getElementById('fup').textContent=fRel(beta).toFixed(2)+' f';
+    document.getElementById('fdn').textContent=fRel(-beta).toFixed(2)+' f';
   }
   function drawWaves(){
     var o=fit(document.getElementById('waves'),250),x=o.x,W=o.w,H=o.h,mid=H/2;
@@ -227,7 +245,7 @@
   function drawSignals(){
     var o=fit(document.getElementById('signals'),250),x=o.x,W=o.w,H=o.h,pad=10;
     x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
-    var rows=[{y:H*0.22,f:1,col:C('--faint'),lab:'emitida'},{y:H*0.53,f:1/(1-beta),col:C('--blueSoft'),lab:'adelante'},{y:H*0.84,f:1/(1+beta),col:C('--redSoft'),lab:'atrás'}];
+    var rows=[{y:H*0.22,f:1,col:C('--faint'),lab:'emitida'},{y:H*0.53,f:fRel(beta),col:C('--blueSoft'),lab:'adelante'},{y:H*0.84,f:fRel(-beta),col:C('--redSoft'),lab:'atrás'}];
     var base=2*Math.PI/70;
     for(var r=0;r<rows.length;r++){var row=rows[r],amp=H*0.12;
       x.strokeStyle='rgba(255,255,255,.14)';x.lineWidth=1;x.beginPath();x.moveTo(pad,row.y);x.lineTo(W-pad,row.y);x.stroke();
@@ -251,11 +269,16 @@
     x.fillText('1',x0-16,Y(1)+4);x.fillText('3',x0-16,Y(3)+4);
     // curves
     function plot(fn,col){x.strokeStyle=col;x.lineWidth=2.6;x.beginPath();for(var b=0;b<=bmax+1e-9;b+=0.01){var yy=Y(Math.min(ymax,fn(b)));if(b===0)x.moveTo(X(b),yy);else x.lineTo(X(b),yy);}x.stroke();}
+    // aproximación clásica (punteada), para ver dónde diverge
+    x.setLineDash([5,5]);x.globalAlpha=.5;
     plot(function(b){return 1/(1-b);},C('--blueSoft'));
     plot(function(b){return 1/(1+b);},C('--redSoft'));
+    x.setLineDash([]);x.globalAlpha=1;
+    plot(function(b){return fRel(b);},C('--blueSoft'));
+    plot(function(b){return fRel(-b);},C('--redSoft'));
     // dots at current beta
     function dot(v,col){x.fillStyle=col;x.beginPath();x.arc(X(beta),Y(Math.min(ymax,v)),5,0,6.2832);x.fill();}
-    dot(1/(1-beta),C('--blueSoft'));dot(1/(1+beta),C('--redSoft'));
+    dot(fRel(beta),C('--blueSoft'));dot(fRel(-beta),C('--redSoft'));
   }
   // ---- Section 3: spectrum / redshift ----
   var LINES=[{l:434.0,n:'Hγ'},{l:486.1,n:'Hβ'},{l:589.0,n:'Na'},{l:656.3,n:'Hα'}];
@@ -267,7 +290,8 @@
   }
   var LMIN=380,LMAX=780;
   function drawSpectrum(){
-    var zb=parseFloat(document.getElementById('zbeta').value), z=zb;
+    var zb=parseFloat(document.getElementById('zbeta').value);
+    var z=Math.sqrt((1+zb)/(1-zb))-1;      // corrimiento relativista exacto
     var o=fit(document.getElementById('spectrum'),200),x=o.x,W=o.w,H=o.h,pad=14;
     var x0=pad,x1=W-pad, topY=40, barH=54, obsY=118, obsH=54;
     function X(l){return x0+(x1-x0)*(l-LMIN)/(LMAX-LMIN);}
@@ -317,15 +341,17 @@
           ZB:document.getElementById('inZB'),Z:document.getElementById('inZ')};
   function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
   function syncB(){ponSiLibre(IN.B,+beta.toFixed(3));ponSiLibre(IN.V,Math.round(beta*CKM));}
+  function zDe(zb){return Math.sqrt((1+zb)/(1-zb))-1;}
   function syncZ(){var zb=parseFloat(document.getElementById('zbeta').value);
-    ponSiLibre(IN.ZB,+zb.toFixed(3));ponSiLibre(IN.Z,+zb.toFixed(3));}
+    ponSiLibre(IN.ZB,+zb.toFixed(3));ponSiLibre(IN.Z,+zDe(zb).toFixed(3));}
   function setBeta(v){beta=Math.max(0,Math.min(0.7,v));document.getElementById('beta').value=beta;
     sec1labels();syncB();drawCurve();}
   function setZB(v){v=Math.max(0,Math.min(0.30,v));document.getElementById('zbeta').value=v;drawSpectrum();syncZ();}
   IN.B.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;setBeta(v);});
   IN.V.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;setBeta(v/CKM);});
   IN.ZB.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;setZB(v);});
-  IN.Z.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;setZB(v);});
+  IN.Z.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;
+    var g=(1+v)*(1+v); setZB((g-1)/(g+1));});   // z relativista → v/c
   document.getElementById('beta').addEventListener('input',function(e){beta=+e.target.value;sec1labels();syncB();drawCurve();});
   document.getElementById('wplay').addEventListener('click',function(){playing=!playing;this.textContent=playing?'Pausar':'Reanudar';this.classList.toggle('on',playing);});
   document.getElementById('zbeta').addEventListener('input',function(){drawSpectrum();syncZ();});
@@ -335,6 +361,41 @@
   sec1labels();syncB();drawCurve();drawSpectrum();syncZ();calc();loop();
 })();
 </script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
 <!-- navegacion:inicio -->
 <style>
   body{margin-top:50px!important}
@@ -385,7 +446,7 @@
 <a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
 <a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
 <a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
-<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6–1.7 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
 <div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
 <a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
 <a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
@@ -450,38 +511,3 @@
 })();
 </script>
 <!-- navegacion:fin -->
-<!-- contador:inicio -->
-<style>
-  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
-    color:var(--muted,#7A8699);display:none;font-family:inherit}
-  .visitas span{display:inline-block;background:var(--card,#fff);
-    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
-  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
-  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
-  .visitas a:hover{text-decoration:underline}
-</style>
-<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
-<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
-<script>
-(function(){
-  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
-  var sc=document.createElement('script'); sc.async=true;
-  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
-  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
-  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
-  function pide(path){
-    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
-      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
-  }
-  var p=location.pathname;
-  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
-  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
-    var a=res[0], b=res[1];
-    if(!a && !b) return;
-    document.getElementById('vis-pag').textContent = a ? a.count : '–';
-    document.getElementById('vis-tot').textContent = b ? b.count : '–';
-    document.getElementById('visitas').style.display='block';
-  });
-})();
-</script>
-<!-- contador:fin -->
