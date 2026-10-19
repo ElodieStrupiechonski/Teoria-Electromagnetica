@@ -1,0 +1,389 @@
+<meta charset="utf-8">
+<title>Guía de onda rectangular · explorador</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
+    --blue:#2456a6;--blueSoft:#4a7fd0;--red:#c0392b;--redSoft:#d9635a;--accent:#c96a1e;--green:#2f7d46;--greenSoft:#5aa871;--panel:#10141d;
+    --serif:"Spectral",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}}
+  :root[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:940px;margin:0 auto;padding-block:32px 40px;padding-left:16px;padding-right:16px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.6vw,40px);line-height:1.08;margin:.04em 0 .18em;text-wrap:balance}
+  .lede{font-size:17px;color:var(--muted);max-width:64ch;margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:22px;box-shadow:0 1px 3px rgba(20,20,40,.05)}
+  .sec-tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+  .note{font-size:14.5px;color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px}
+  .panelcanvas{background:var(--panel)}
+  .grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:22px;align-items:start}
+  @media (max-width:680px){.grid2{grid-template-columns:1fr}}
+  .ctrl label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin:12px 0 6px}
+  .ctrl label b{font-family:var(--mono);color:var(--accent);font-weight:500}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:7px 12px;cursor:pointer}
+  .btn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .tile .k{font-size:12px;color:var(--muted)} .tile .v{font-family:var(--mono);font-size:16.5px;font-weight:500;color:var(--ink)}
+  .tile.key{border-color:var(--accent)} .tile.key .v{color:var(--accent)}
+  .tile.bad{border-color:var(--red)} .tile.bad .v{color:var(--red)}
+  .legend{display:flex;gap:16px;font-size:13px;flex-wrap:wrap;margin-top:10px;color:var(--muted)}
+  .legend i{display:inline-block;width:15px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic;color:var(--accent)}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .kv{font-size:13.5px;margin:5px 0} .kv b{font-family:var(--mono);color:var(--ink)}
+  .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:var(--mono);font-size:15px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
+  @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}h1{font-size:26px}.card{padding:18px 16px}}
+</style>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 4 · temas 4.10–4.12</p>
+    <h1>Guía de onda rectangular: modos y frecuencia de corte</h1>
+    <p class="lede">En un tubo metálico hueco de sección <var style="color:var(--accent)">a</var> × <var style="color:var(--accent)">b</var> solo se propagan las ondas cuya frecuencia supera la frecuencia de corte del modo. Elige una guía estándar o teclea tus dimensiones, mueve la frecuencia y observa qué modos viajan, cuál es la banda monomodo y cómo se estira λ<sub>g</sub> cerca del corte.</p>
+  </header>
+
+  <section class="card">
+    <p class="sec-tag">Explorador · mapa de modos y patrón del TE₁₀</p>
+    <div class="grid2">
+      <div>
+        <canvas id="map" class="panelcanvas" height="190"></canvas>
+        <div class="legend"><span><i style="background:var(--greenSoft)"></i>banda monomodo (solo TE₁₀)</span><span><i style="background:var(--accent)"></i>frecuencia de operación f</span><span><i style="background:var(--redSoft)"></i>cortes de los modos</span></div>
+        <canvas id="pat" class="panelcanvas" height="230" style="margin-top:14px"></canvas>
+        <div class="legend"><span>sección transversal a×b · intensidad de <b>E_y</b> del TE₁₀ (máxima en x = a/2, nula en las paredes)</span></div>
+      </div>
+      <div class="ctrl">
+        <div class="row">
+          <button class="btn on" data-g="22.86,10.16">WR-90 (banda X)</button>
+          <button class="btn" data-g="72.14,34.04">WR-284 (banda S)</button>
+          <button class="btn" data-g="10.668,4.318">WR-42 (banda K)</button>
+        </div>
+        <label><span>Frecuencia f</span> <b id="fv">10.0 GHz</b></label>
+        <input id="f" type="range" min="1" max="40" step="0.05" value="10">
+        <div class="inrow">
+          <div class="inbox"><label><span class="vinc">a</span> (mm, lado ancho)</label><input id="inA" type="number" step="any" min="0" inputmode="decimal"></div>
+          <div class="inbox"><label><span class="vinc">b</span> (mm)</label><input id="inB" type="number" step="any" min="0" inputmode="decimal"></div>
+          <div class="inbox"><label><span class="vinc">f</span> (GHz)</label><input id="inF" type="number" step="any" min="0" inputmode="decimal"></div>
+        </div>
+        <div class="tiles">
+          <div class="tile key"><div class="k">f_c del TE₁₀ = c/(2a)</div><div class="v" id="ofc">—</div></div>
+          <div class="tile"><div class="k">Banda monomodo</div><div class="v" id="obm">—</div></div>
+          <div class="tile"><div class="k">λ en espacio libre</div><div class="v" id="olam">—</div></div>
+          <div class="tile"><div class="k">λ_g en la guía</div><div class="v" id="olg">—</div></div>
+          <div class="tile"><div class="k">v_p / c</div><div class="v" id="ovp">—</div></div>
+          <div class="tile"><div class="k">v_g / c</div><div class="v" id="ovg">—</div></div>
+        </div>
+        <div class="tile" id="estado" style="margin-top:10px"><div class="k">Estado</div><div class="v" id="oest">—</div></div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px">Nótese que v<sub>p</sub> &gt; c y v<sub>g</sub> &lt; c, con v<sub>p</sub>·v<sub>g</sub> = c²: la información viaja a v<sub>g</sub>, de modo que no se viola la relatividad. Por debajo de f<sub>c</sub> el modo es evanescente: no transporta potencia (así funciona la rejilla de la puerta del horno de microondas, una "guía" demasiado pequeña para 2.45 GHz).</p>
+  </section>
+
+  <details class="card" open>
+    <summary>Formulario y constantes</summary>
+    <div class="eq"><var>f</var><sub>c,mn</sub> <span class="op">=</span> (<span class="cnat">c</span>/2) √[(<var>m</var>/<var>a</var>)² + (<var>n</var>/<var>b</var>)²]<span class="op">,</span>&emsp;TE₁₀: <var>f</var><sub>c</sub> <span class="op">=</span> <span class="cnat">c</span>/(2<var>a</var>)</div>
+    <div class="eq">β <span class="op">=</span> (2π<var>f</var>/<span class="cnat">c</span>) √(1 − (<var>f</var><sub>c</sub>/<var>f</var>)²)<span class="op">,</span>&emsp;λ<sub>g</sub> <span class="op">=</span> λ / √(1 − (<var>f</var><sub>c</sub>/<var>f</var>)²)</div>
+    <div class="eq"><var>v</var><sub>p</sub> <span class="op">=</span> <span class="cnat">c</span> / √(1 − (<var>f</var><sub>c</sub>/<var>f</var>)²)<span class="op">,</span>&emsp;<var>v</var><sub>g</sub> <span class="op">=</span> <span class="cnat">c</span> √(1 − (<var>f</var><sub>c</sub>/<var>f</var>)²)<span class="op">,</span>&emsp;<var>v</var><sub>p</sub><var>v</var><sub>g</sub> <span class="op">=</span> <span class="cnat">c</span>²</div>
+    <div class="eq">TE₁₀: <var>E</var><sub>y</sub>(<var>x</var>) <span class="op">=</span> <var>E</var>₀ sen(π<var>x</var>/<var>a</var>) &nbsp;(nula en las paredes <var>x</var> = 0, <var>a</var>)</div>
+    <p class="kv" style="margin-top:10px">Velocidad de la luz &nbsp; <b class="cnat">c = 299 792 458 m/s ≈ 2.998×10⁸ m/s</b> &nbsp;<span style="color:var(--muted)">(guía con aire; con dieléctrico, sustituir c → c/√ε<sub>r</sub>)</span></p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Guía de onda rectangular — Explorador interactivo</i> (Versión 1.0) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423157" target="_blank" rel="noopener">10.5281/zenodo.23423157</a></p>
+  </div>
+</div>
+<script>
+(function(){
+  var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  var c0=299792458;
+  var a=22.86e-3, b=10.16e-3, f=10e9, t=0;
+  function fit(cv,h){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=Math.max(260,r.width);cv.width=w*dpr;cv.height=h*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};}
+  function fc(m,n){return c0/2*Math.sqrt(Math.pow(m/a,2)+Math.pow(n/b,2));}
+  function modos(){
+    var lista=[];
+    for(var m=0;m<=3;m++)for(var n=0;n<=3;n++){
+      if(m===0&&n===0)continue;
+      lista.push({m:m,n:n,fc:fc(m,n)});
+    }
+    lista.sort(function(p,q){return p.fc-q.fc;});
+    return lista.slice(0,6);
+  }
+  function fmtF(h){if(h>=1e9)return (h/1e9).toFixed(2)+' GHz';return (h/1e6).toFixed(0)+' MHz';}
+  function fmtL(m){if(m>=1)return m.toFixed(2)+' m';if(m>=1e-2)return (m*100).toFixed(2)+' cm';return (m*1e3).toFixed(2)+' mm';}
+  var IN={A:document.getElementById('inA'),B:document.getElementById('inB'),F:document.getElementById('inF')};
+  function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+  function labels(){
+    var f10=fc(1,0), ms=modos(), f2=ms[1].fc;
+    var prop=f>f10, u=prop?Math.sqrt(1-Math.pow(f10/f,2)):0;
+    document.getElementById('fv').textContent=(f/1e9).toFixed(2)+' GHz';
+    document.getElementById('ofc').textContent=fmtF(f10);
+    document.getElementById('obm').textContent=fmtF(f10)+' – '+fmtF(f2);
+    document.getElementById('olam').textContent=fmtL(c0/f);
+    document.getElementById('olg').textContent=prop?fmtL(c0/f/u):'— (evanescente)';
+    document.getElementById('ovp').textContent=prop?(1/u).toFixed(3):'—';
+    document.getElementById('ovg').textContent=prop?u.toFixed(3):'—';
+    var est=document.getElementById('estado'), txt=document.getElementById('oest');
+    var nprop=ms.filter(function(mm){return f>mm.fc;}).length;
+    if(!prop){est.className='tile bad';txt.textContent='por debajo del corte · evanescente';}
+    else if(nprop===1){est.className='tile key';txt.textContent='banda monomodo · solo TE₁₀';}
+    else {est.className='tile';txt.textContent=nprop+' modos se propagan (multimodo)';}
+    ponSiLibre(IN.A,+(a*1e3).toFixed(3));ponSiLibre(IN.B,+(b*1e3).toFixed(3));
+    ponSiLibre(IN.F,+(f/1e9).toFixed(2));
+    var sl=document.getElementById('f');sl.value=Math.min(+sl.max,Math.max(+sl.min,f/1e9));
+  }
+  function drawMap(){
+    var o=fit(document.getElementById('map'),190),x=o.x,W=o.w,H=o.h,padL=14,padR=14,axY=H-44;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    var ms=modos(), f10=ms[0].fc, fmax=Math.max(f*1.15,ms[ms.length-1].fc*1.1);
+    function X(ff){return padL+(W-padL-padR)*ff/fmax;}
+    // banda monomodo
+    x.fillStyle='rgba(90,168,113,.22)';x.fillRect(X(ms[0].fc),20,X(ms[1].fc)-X(ms[0].fc),axY-20);
+    // eje
+    x.strokeStyle='rgba(255,255,255,.4)';x.lineWidth=1;x.beginPath();x.moveTo(padL,axY);x.lineTo(W-padR,axY);x.stroke();
+    x.fillStyle='rgba(255,255,255,.6)';x.font='11px '+C('--mono')+',monospace';
+    x.textAlign='right';x.fillText('f (GHz)',W-padR,axY+30);x.textAlign='left';
+    // ticks
+    var step=fmax>3e10?10:(fmax>1.2e10?5:(fmax>4e9?2:1));
+    x.textAlign='center';
+    for(var g=0;g*1e9<=fmax;g+=step){x.fillStyle='rgba(255,255,255,.5)';
+      x.fillRect(X(g*1e9),axY,1,5);x.fillText(g,X(g*1e9),axY+17);}
+    // cortes
+    ms.forEach(function(mm,i){
+      var xx=X(mm.fc);
+      x.strokeStyle=C('--redSoft');x.setLineDash([3,3]);x.lineWidth=1.4;
+      x.beginPath();x.moveTo(xx,20);x.lineTo(xx,axY);x.stroke();x.setLineDash([]);
+      x.fillStyle='rgba(255,255,255,.85)';x.font='11px '+C('--mono')+',monospace';
+      var lab='TE'+mm.m+mm.n, yy=28+(i%3)*14;
+      x.fillText(lab,xx,yy);
+    });
+    // f de operación
+    var xf=X(f);
+    x.strokeStyle=C('--accent');x.lineWidth=2.5;x.beginPath();x.moveTo(xf,16);x.lineTo(xf,axY);x.stroke();
+    x.fillStyle=C('--accent');x.beginPath();x.arc(xf,16,5,0,6.2832);x.fill();
+    x.textAlign='left';x.font='600 12px '+C('--sans')+',sans-serif';
+    x.fillText('f = '+(f/1e9).toFixed(2)+' GHz',Math.min(xf+8,W-110),14);
+    x.textAlign='left';
+  }
+  function drawPat(){
+    var o=fit(document.getElementById('pat'),230),x=o.x,W=o.w,H=o.h;
+    x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
+    // sección a×b a escala
+    var marg=34, s=Math.min((W-2*marg)/a,(H-2*marg)/b);
+    var gw=a*s, gh=b*s, x0=(W-gw)/2, y0=(H-gh)/2;
+    var f10=fc(1,0), prop=f>f10;
+    var fase=prop?Math.cos(t):Math.exp(-1)*Math.cos(t); // evanescente: amplitud reducida
+    // mapa de intensidad Ey = sin(pi x/a), uniforme en y
+    var cols=120;
+    for(var i=0;i<cols;i++){
+      var xx=i/(cols-1);
+      var amp=Math.sin(Math.PI*xx)*Math.abs(prop?1:0.35);
+      var inst=Math.abs(fase);
+      var al=amp*(0.25+0.75*inst);
+      x.fillStyle='rgba(111,155,232,'+al.toFixed(3)+')';
+      x.fillRect(x0+xx*gw,y0,gw/cols+1,gh);
+    }
+    // flechas de E (verticales, amplitud sin(pi x/a))
+    x.strokeStyle='rgba(255,255,255,.85)';x.fillStyle='rgba(255,255,255,.85)';x.lineWidth=1.6;
+    var nA=9;
+    for(var k2=1;k2<nA;k2++){
+      var xr=k2/nA, ex=x0+xr*gw;
+      var A2=Math.sin(Math.PI*xr)*fase*gh*0.33;
+      if(Math.abs(A2)<1.5)continue;
+      var cy=y0+gh/2;
+      x.beginPath();x.moveTo(ex,cy+A2);x.lineTo(ex,cy-A2);x.stroke();
+      var dir=A2>0?-1:1, tip=cy-A2;
+      x.beginPath();x.moveTo(ex,tip);x.lineTo(ex-3.5,tip-5*dir*(-1));x.lineTo(ex+3.5,tip-5*dir*(-1));x.closePath();x.fill();
+    }
+    // paredes
+    x.strokeStyle='rgba(255,255,255,.7)';x.lineWidth=2.5;x.strokeRect(x0,y0,gw,gh);
+    x.fillStyle='rgba(255,255,255,.65)';x.font='11px '+C('--mono')+',monospace';x.textAlign='center';
+    x.fillText('a = '+(a*1e3).toFixed(2)+' mm',x0+gw/2,y0+gh+18);
+    x.save();x.translate(x0-10,y0+gh/2);x.rotate(-Math.PI/2);x.fillText('b = '+(b*1e3).toFixed(2)+' mm',0,0);x.restore();
+    x.textAlign='left';
+    x.fillText(prop?'TE₁₀ propagándose':'TE₁₀ evanescente (f < f_c)',12,18);
+  }
+  function upd(){labels();drawMap();drawPat();}
+  document.getElementById('f').addEventListener('input',function(e){f=(+e.target.value)*1e9;upd();});
+  document.querySelectorAll('[data-g]').forEach(function(btn){btn.addEventListener('click',function(){
+    var p=btn.getAttribute('data-g').split(',');a=parseFloat(p[0])*1e-3;b=parseFloat(p[1])*1e-3;
+    document.querySelectorAll('[data-g]').forEach(function(bb){bb.classList.toggle('on',bb===btn);});upd();});});
+  function aCustom(){document.querySelectorAll('[data-g]').forEach(function(bb){bb.classList.remove('on');});}
+  IN.A.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;a=v*1e-3;aCustom();upd();});
+  IN.B.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;b=v*1e-3;aCustom();upd();});
+  IN.F.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;f=v*1e9;upd();});
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',upd);
+  window.addEventListener('resize',upd);
+  upd();
+  (function loop(){t+=0.07;drawPat();requestAnimationFrame(loop);})();
+})();
+</script>
+<!-- navegacion:inicio -->
+<style>
+  body{margin-top:50px!important}
+  .nvbar{position:fixed;top:0;left:0;right:0;z-index:9999;height:44px;display:flex;align-items:center;
+    gap:10px;padding:0 14px;background:var(--card,#fff);border-bottom:1px solid var(--line,#e2dcc9);
+    font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+  .nvbar a{text-decoration:none;color:var(--navy,var(--ink,#1F3864))}
+  .nv-home{font-weight:700;white-space:nowrap}
+  .nv-home small{font-weight:400;color:var(--muted,#5a5a5a)}
+  .nv-step{display:flex;align-items:center;justify-content:center;width:34px;height:30px;border:1px solid var(--line,#e2dcc9);
+    border-radius:8px;font-size:17px;line-height:1}
+  .nv-step:hover{background:var(--bg,#f4f1ea)}
+  .nv-step[aria-disabled="true"]{opacity:.25;pointer-events:none}
+  .nv-aquibar{flex:1;min-width:0;text-align:center;font-weight:700;color:var(--ink,#1a1a1a);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nv-aquibar small{font-weight:400;color:var(--muted,#8a8fa0)}
+  .nvbar details{position:relative}
+  .nvbar summary{list-style:none;cursor:pointer;font-weight:700;color:var(--accent,#C1571B);
+    border:1px solid var(--line,#e2dcc9);border-radius:8px;padding:5px 12px;user-select:none;white-space:nowrap}
+  .nvbar summary::-webkit-details-marker{display:none}
+  .nv-menu{position:absolute;right:0;top:40px;width:min(640px,calc(100vw - 24px));max-height:calc(100vh - 70px);overflow:auto;
+    background:var(--card,#fff);border:1px solid var(--line,#e2dcc9);border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.18);padding:10px;column-count:2;column-gap:18px}
+  .nv-grp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8a8fa0);
+    padding:10px 10px 5px;break-after:avoid;border-top:1px solid var(--line,#eee)}
+  .nv-menu .nv-grp:first-child{border-top:0;padding-top:4px}
+  .nv-menu a{display:block;padding:8px 10px;border-radius:7px;color:var(--ink,#1a1a1a);break-inside:avoid}
+  .nv-menu a small{color:var(--muted,#8a8fa0);margin-left:4px}
+  .nv-menu a:hover{background:var(--bg,#f4f1ea)}
+  .nv-menu a.nv-aqui{background:var(--bg,#f4f1ea);font-weight:700;color:var(--accent,#C1571B)}
+  .nv-pie{column-span:all;margin-top:6px;padding:7px 10px 2px;border-top:1px solid var(--line,#eee);
+    font-size:11.5px;color:var(--muted,#8a8fa0)}
+  @media (max-width:720px){
+    .nv-home small{display:none}
+    .nv-aquibar{display:none}
+    .nv-menu{column-count:1;position:fixed;left:12px;right:12px;top:50px;width:auto}
+  }
+  @media print{.nvbar{display:none} body{margin-top:0!important}}
+</style>
+<nav class="nvbar" aria-label="Navegación del sitio">
+  <a class="nv-home" href="index.html">⌁ Exploradores EM <small>· ENES Juriquilla</small></a>
+  <a class="nv-step" id="nv-ant" href="#" title="Explorador anterior (tecla ←)" aria-label="Anterior">‹</a>
+  <span class="nv-aquibar" id="nv-aqui-bar"></span>
+  <a class="nv-step" id="nv-sig" href="#" title="Explorador siguiente (tecla →)" aria-label="Siguiente">›</a>
+  <details id="nvdet"><summary>Temario ▾</summary>
+    <div class="nv-menu">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
+<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6–1.7 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel <small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización <small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler <small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal <small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios) <small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d) <small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell <small>3.5 · P10, P11</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel <small>3.6–3.8</small></a>
+<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
+<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR <small>4.3–4.4</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith <small>4.7–4.8</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular <small>4.10–4.12</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético <small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica <small>cómputo · P6</small></a>
+    <div class="nv-pie">Atajos: ← anterior · → siguiente · Esc cierra el menú</div>
+    </div>
+  </details>
+</nav>
+<script>
+(function(){
+  var orden=[], datos={};
+  var l=document.querySelectorAll('.nv-menu a[data-nv]');
+  for(var i=0;i<l.length;i++){
+    var f=l[i].getAttribute('data-nv'); orden.push(f);
+    datos[f]={el:l[i], titulo:l[i].childNodes[0].textContent.trim(),
+               sub:(l[i].querySelector('small')||{textContent:''}).textContent};
+  }
+  var aqui=(location.pathname.split('/').pop()||'index.html');
+  var idx=orden.indexOf(aqui);
+  var ant=document.getElementById('nv-ant'), sig=document.getElementById('nv-sig'),
+      bar=document.getElementById('nv-aqui-bar');
+  if(idx>=0){
+    datos[aqui].el.className='nv-aqui';
+    bar.innerHTML=datos[aqui].titulo+' <small>'+datos[aqui].sub+'</small>';
+    if(idx>0) ant.href=orden[idx-1]; else ant.setAttribute('aria-disabled','true');
+    if(idx<orden.length-1) sig.href=orden[idx+1]; else sig.setAttribute('aria-disabled','true');
+    if(idx>0) ant.title='Anterior: '+datos[orden[idx-1]].titulo+'  (tecla ←)';
+    if(idx<orden.length-1) sig.title='Siguiente: '+datos[orden[idx+1]].titulo+'  (tecla →)';
+  } else {
+    // índice u otra página: sin anterior/siguiente
+    ant.setAttribute('aria-disabled','true'); sig.setAttribute('aria-disabled','true');
+    bar.textContent='';
+  }
+  document.addEventListener('click',function(e){
+    var d=document.getElementById('nvdet');
+    if(d&&d.open&&!d.contains(e.target)) d.open=false;
+  });
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toUpperCase();
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
+    var d=document.getElementById('nvdet');
+    if(e.key==='Escape'&&d&&d.open){d.open=false;return;}
+    if(idx<0) return;
+    if(e.key==='ArrowLeft'&&idx>0) location.href=orden[idx-1];
+    if(e.key==='ArrowRight'&&idx<orden.length-1) location.href=orden[idx+1];
+  });
+})();
+</script>
+<!-- navegacion:fin -->
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->

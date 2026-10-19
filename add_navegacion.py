@@ -22,7 +22,10 @@ INI, FIN = "<!-- navegacion:inicio -->", "<!-- navegacion:fin -->"
 # (archivo, etiqueta corta, subtema)  — agrupados por unidad del temario ENES
 NAV = [
  ("Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell", [
+   ("CampoGauss_explorador.html",     "Ley de Gauss",                "1.1 · P1"),
+   ("Capacitor_explorador.html",      "Capacitor con dieléctrico",   "1.2 · P1"),
    ("Solenoide_explorador.html",      "Solenoide finito",            "1.4 · P3"),
+   ("Induccion_explorador.html",      "Inducción de Faraday",        "1.6–1.7 · P3"),
  ]),
  ("Unidad 2 · Ondas planas electromagnéticas", [
    ("RC_interactivo.html",            "Circuito RC y fasores",       "fasores · P4"),
@@ -37,6 +40,11 @@ NAV = [
    ("CapaDielectrica_explorador.html","Impedancia efectiva η(d)",    "3.3"),
    ("Snell_explorador.html",          "Ley de Snell",                "3.5 · P10, P11"),
    ("Fresnel_explorador.html",        "Coeficientes de Fresnel",     "3.6–3.8"),
+ ]),
+ ("Unidad 4 · Líneas de transmisión y guías de onda", [
+   ("LineaTransmision_interactivo.html","Línea de transmisión · Γ y VSWR","4.3–4.4"),
+   ("Smith_explorador.html",          "Carta de Smith",              "4.7–4.8"),
+   ("GuiaOnda_explorador.html",       "Guía de onda rectangular",    "4.10–4.12"),
  ]),
  ("Transversales", [
    ("Espectro_explorador.html",       "Espectro electromagnético",   "todo el curso"),
