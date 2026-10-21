@@ -1,5 +1,7 @@
+
+Zenodo con sitio · JSON
 {
-  "title": "Teoría Electromagnética — Exploradores interactivos",
+  "title": "Teoría Electromagnética - Exploradores interactivos",
   "upload_type": "lesson",
   "language": "spa",
   "access_right": "open",
@@ -36,5 +38,12 @@
     "enseñanza de la física",
     "UNAM"
   ],
-  "notes": "Material didáctico para el curso de Teoría Electromagnética, Ingeniería Aeroespacial, ENES Juriquilla, UNAM. Abrir index.html para navegar la colección."
+  "notes": "Material didáctico para el curso de Teoría Electromagnética, Ingeniería Aeroespacial, ENES Juriquilla, UNAM. Abrir index.html para navegar la colección.",
+  "related_identifiers": [
+    {
+      "identifier": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    }
+  ]
 }
