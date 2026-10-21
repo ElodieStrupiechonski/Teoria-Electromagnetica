@@ -1,0 +1,40 @@
+{
+  "title": "Teoría Electromagnética — Exploradores interactivos",
+  "upload_type": "lesson",
+  "language": "spa",
+  "access_right": "open",
+  "license": "cc-by-4.0",
+  "creators": [
+    {
+      "name": "Strupiechonski, Elodie",
+      "affiliation": "Escuela Nacional de Estudios Superiores (ENES) Unidad Juriquilla, Universidad Nacional Autónoma de México",
+      "orcid": "0000-0001-8991-8499"
+    },
+    {
+      "name": "de Luna Bugallo, Andrés",
+      "affiliation": "Centro de Física Aplicada y Tecnología Avanzada (CFATA), Universidad Nacional Autónoma de México",
+      "orcid": "0000-0002-7591-5235"
+    }
+  ],
+  "description": "Colección de recursos educativos abiertos e interactivos para el curso de Teoría Electromagnética de la licenciatura en Ingeniería Aeroespacial (ENES Juriquilla, UNAM). Cada explorador es una página HTML autónoma en la que el estudiante manipula controles y observa en tiempo real el fenómeno físico. La colección incluye diecinueve exploradores organizados según las cuatro unidades del programa. Unidad 1 (campos y ecuaciones de Maxwell): ley de Gauss con superficie gaussiana arrastrable; capacitor de placas paralelas con dieléctrico deslizable; campo de un solenoide finito; inducción de Faraday con imán móvil y osciloscopio de flujo y FEM. Unidad 2 (ondas planas): circuito RC y fasores; medición de la velocidad de la luz con microondas; efecto piel con atenuación general; polarización lineal, circular y elíptica con un caso satelital; efecto Doppler relativista y corrimiento al rojo. Unidad 3 (reflexión y refracción): incidencia normal con onda estacionaria e impedancia de onda; capa dieléctrica de tres medios (radomo y antirreflejante); curva de diseño de la impedancia efectiva; ley de Snell y reflexión total; coeficientes de Fresnel y ángulo de Brewster. Unidad 4 (ondas guiadas): línea de transmisión con Γ, VSWR y Z_in(d); carta de Smith interactiva; guía de onda rectangular con cortes TE/TM y banda monomodo. Se añaden dos herramientas transversales: el mapa del espectro electromagnético con cuatro ejes convertibles y un miniproyecto de anatomía de una gráfica científica con su código matplotlib. Los recursos son autocontenidos (no requieren internet), se adaptan al tema claro u oscuro, funcionan en pantalla de teléfono y están redactados en español. Entrada por el archivo index.html.",
+  "keywords": [
+    "electromagnetismo",
+    "recurso educativo abierto",
+    "física",
+    "ondas electromagnéticas",
+    "polarización",
+    "efecto Doppler",
+    "espectro electromagnético",
+    "efecto piel",
+    "ley de Gauss",
+    "carta de Smith",
+    "guía de onda",
+    "inducción electromagnética",
+    "líneas de transmisión",
+    "ingeniería aeroespacial",
+    "simulación interactiva",
+    "enseñanza de la física",
+    "UNAM"
+  ],
+  "notes": "Material didáctico para el curso de Teoría Electromagnética, Ingeniería Aeroespacial, ENES Juriquilla, UNAM. Abrir index.html para navegar la colección."
+}
