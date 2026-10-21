@@ -2,7 +2,7 @@
 
 La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones archivadas en Zenodo. Cada versión archivada tiene su propio DOI de versión; el DOI de concepto [10.5281/zenodo.23423156](https://doi.org/10.5281/zenodo.23423156) (citar «todas las versiones») resuelve siempre a la más reciente.
 
-## [1.3.1] — 2026-10-20
+## [1.3.1] — 2026-10-21 · DOI de versión [10.5281/zenodo.23538848](https://doi.org/10.5281/zenodo.23538848)
 
 Atiende el informe de verificación de la v1.3 (detalle en [`auditoria/RESPUESTA_AUDITORIA.md`](auditoria/RESPUESTA_AUDITORIA.md), sección 6).
 
@@ -13,6 +13,10 @@ Atiende el informe de verificación de la v1.3 (detalle en [`auditoria/RESPUESTA
 - CapaDielectrica: bloque «Cómo citar»; nombre accesible en los lienzos que faltaban (CapaDielectrica, Anatomía, Espectro).
 - Metadatos: `.zenodo.json` presente en la raíz (tipo «lección»), sin número de versión fijo; páginas con «Versión 1.3.1» y el DOI de concepto.
 - Matriz de respuesta: la auditoría se hizo sobre el commit `92f6190`, no sobre la v1.2.
+
+### Añadido
+- Datos para buscadores en las 20 páginas (título descriptivo, descripción, URL canónica, Open Graph, schema.org *LearningResource*), `sitemap.xml` y verificación de Google Search Console; script `add_seo_em.py`.
+- Carpeta `auditoria/` con los informes de los auditores (auditoría de la v1.2+ y verificación de la v1.3, con sus anexos), publicados con su autorización, y la matriz de respuesta.
 
 ## [1.3] — 2026-10-19 · DOI de versión [10.5281/zenodo.23482923](https://doi.org/10.5281/zenodo.23482923)
 

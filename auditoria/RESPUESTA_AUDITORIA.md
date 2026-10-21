@@ -3,7 +3,8 @@
 **Recurso:** Teoría Electromagnética — Exploradores interactivos (ENES Juriquilla, UNAM) · DOI de concepto (todas las versiones) [10.5281/zenodo.23423156](https://doi.org/10.5281/zenodo.23423156)
 **Auditoría recibida:** 19 de octubre de 2026, sobre el commit `92f6190` del repositorio (19 de octubre de 2026, 11:52; 20 páginas), posterior a la v1.2 archivada en Zenodo el 16 de octubre y no depositado. *(Corregido en 1.3.1: la redacción anterior atribuía la auditoría a la v1.2, que solo tenía 15 páginas.)*
 **Respuesta:** versión 1.3, 19 de octubre de 2026 · DOI de versión [10.5281/zenodo.23482923](https://doi.org/10.5281/zenodo.23482923).  
-**Seguimiento:** versión 1.3.1, que atiende el informe de verificación de la v1.3 (sección 6).
+**Seguimiento:** versión 1.3.1, 21 de octubre de 2026 · DOI de versión [10.5281/zenodo.23538848](https://doi.org/10.5281/zenodo.23538848), que atiende el informe de verificación de la v1.3 (sección 6).  
+**Documentos de los auditores:** en esta misma carpeta (ver [`README.md`](README.md)).
 
 ## Método de atención
 
@@ -72,8 +73,8 @@ Los auditores verificaron la v1.3 (etiqueta y rama principal) contra la matriz a
 | # | Hallazgo de la verificación | Decisión | Cambio en 1.3.1 | Verificación |
 |---|---|---|---|---|
 | R1 | Efecto piel: cancelación numérica en α para q = σ/ωε < 1.5×10⁻⁸ («δ = Infinity») | Adoptado | Forma estable α = k·q/√(√(1+q²)+1); casillas σ y εᵣ restauran el valor vigente si se deja un valor inválido; longitudes en km | Agua de mar a 1 THz, σ = 10⁻⁶ S/m: δ = 47.78 km (referencia 47.78 km); casos de E3 sin cambio |
-| R2 | Falta `.zenodo.json`; Zenodo archivó la v1.3 como «software» | Adoptado | `.zenodo.json` en la raíz, sin campo `version` (Zenodo toma el nombre de la etiqueta); tipo y descripción de la v1.3 corregidos a mano en Zenodo | Registro de la v1.3.1 con tipo «Lesson» |
-| R3 | La copia archivada de v1.3 rotula «1.2» y cita el DOI de v1.2 | Adoptado | Release v1.3.1 desde la rama principal, con «Versión 1.3.1» y el DOI de concepto | Copia archivada coherente |
+| R2 | Falta `.zenodo.json`; Zenodo archivó la v1.3 como «software» | Adoptado | `.zenodo.json` en la raíz, sin campo `version` (Zenodo toma el nombre de la etiqueta); tipo y descripción de la v1.3 corregidos a mano en Zenodo | Registro de la v1.3.1 ([10.5281/zenodo.23538848](https://doi.org/10.5281/zenodo.23538848)): tipo de recurso «Lesson», palabras clave y descripción de `.zenodo.json` |
+| R3 | La copia archivada de v1.3 rotula «1.2» y cita el DOI de v1.2 | Adoptado | Release v1.3.1 desde la rama principal, con «Versión 1.3.1» y el DOI de concepto | Copia archivada en [10.5281/zenodo.23538848](https://doi.org/10.5281/zenodo.23538848), rotulada «Versión 1.3.1» |
 | R4 | La matriz atribuía la auditoría a la v1.2 de Zenodo | Adoptado | Encabezado corregido: commit `92f6190`, no depositado | — |
 | m1 | Espectro: 750.0 nm exactos se rotulaba «Infrarrojo» | Adoptado | Fronteras calculadas exactamente: log₁₀(c/750 nm) y log₁₀(c/380 nm) | Visible = [380, 750] nm con ambos extremos incluidos: 750 nm → «Visible · rojo»; 760 nm → «Infrarrojo»; 380 nm → «Visible · violeta»; 379 nm → «Ultravioleta» |
 | m2 | Fresnel: teflón 1.44 (microondas) en una lista declarada óptica | Adoptado | Teflón (PTFE) n = 1.35 | — |
