@@ -17,7 +17,58 @@
   }
 </style>
 <!-- movil:fin -->
-<title>Capa dieléctrica — impedancia efectiva</title>
+<title>Impedancia efectiva de una capa dieléctrica: curva de diseño</title>
+<!-- seo:inicio -->
+<meta name="description" content="Potencia reflejada contra el espesor de la capa, con los ceros en λ/2 y λ/4 y la condición η₂ = √(η₁η₃).">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/CapaDielectrica_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Impedancia efectiva de una capa dieléctrica: curva de diseño">
+<meta property="og:description" content="Potencia reflejada contra el espesor de la capa, con los ceros en λ/2 y λ/4 y la condición η₂ = √(η₁η₃).">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/CapaDielectrica_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Impedancia efectiva de una capa dieléctrica: curva de diseño",
+ "description": "Potencia reflejada contra el espesor de la capa, con los ceros en λ/2 y λ/4 y la condición η₂ = √(η₁η₃).",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/CapaDielectrica_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "impedancia de onda",
+  "capa dieléctrica",
+  "adaptación de impedancias"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética — Exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México — ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
 <style>
 :root{
   --bg:#f7f5f0; --card:#ffffff; --ink:#1a1a1a; --mut:#6b6b6b;
@@ -78,7 +129,7 @@ details.card summary::after{content:" ▸";color:var(--acc)} details.card[open] 
 <div class="sub">Incidencia normal con <b>dos interfaces</b>: medio 1 → capa (espesor <var>d</var>) → medio 3. Comprueba los casos λ₂/2 (la capa “desaparece”: radomo) y λ₂/4 (adaptador antirreflejante).</div>
 
 <div class="card">
-  <canvas id="cv" width="960" height="560"></canvas>
+  <canvas id="cv" role="img" aria-label="Esquema de tres medios y curva de potencia reflejada contra el espesor" width="960" height="560"></canvas>
   <div class="ctrl">
     <div><label>ε<sub>r1</sub> (medio 1): <output id="o1">1.0</output></label>
       <input id="e1" type="range" min="1" max="10" step="0.1" value="1"></div>
@@ -125,7 +176,10 @@ details.card summary::after{content:" ▸";color:var(--acc)} details.card[open] 
   <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--acc)"></i><span class="vinc">variables y cantidades por determinar</span></p>
 </details>
 
-<footer>Exploradores de Teoría Electromagnética · ENES Juriquilla, UNAM · CC BY 4.0 · DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></footer>
+<div class="card" style="font-size:.8rem;color:var(--mut);line-height:1.6">
+  <p style="margin:0 0 6px"><b style="color:var(--ink)">Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+  <p style="margin:0"><b style="color:var(--ink)">Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Impedancia efectiva de una capa dieléctrica — Explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+</div>
 </div>
 
 <script>

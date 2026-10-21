@@ -5,7 +5,7 @@
 
 Colección de recursos educativos abiertos (REA) para el curso de **Teoría Electromagnética** de la licenciatura en **Ingeniería Aeroespacial**, ENES Juriquilla, UNAM. Cada explorador es una página HTML autónoma e interactiva: se mueve un control y se observa cómo responde el fenómeno físico, en vivo.
 
-**Versión 1.3 (2026)**
+**Versión 1.3.1 (2026)**
 
 ## Cómo usar
 
@@ -53,5 +53,5 @@ Navegador con HTML5 y `<canvas>`. Sin dependencias externas ni servidor. Las tip
 
 ## Cómo citar
 
-> Strupiechonski, E., & de Luna Bugallo, A. (2026). *Teoría Electromagnética — Exploradores interactivos* (Versión 1.3) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.23423156
+> Strupiechonski, E., & de Luna Bugallo, A. (2026). *Teoría Electromagnética — Exploradores interactivos* (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.23423156
 

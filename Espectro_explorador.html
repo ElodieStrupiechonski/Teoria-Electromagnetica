@@ -16,7 +16,58 @@
   }
 </style>
 <!-- movil:fin -->
-<title>Espectro EM</title>
+<title>Espectro electromagnético interactivo: λ, f, energía y color</title>
+<!-- seo:inicio -->
+<meta name="description" content="Convierte entre longitud de onda, frecuencia, energía del fotón y número de onda; bandas, tecnologías y zoom del visible con nombres de colores.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Espectro_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Espectro electromagnético interactivo: λ, f, energía y color">
+<meta property="og:description" content="Convierte entre longitud de onda, frecuencia, energía del fotón y número de onda; bandas, tecnologías y zoom del visible con nombres de colores.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Espectro_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Espectro electromagnético interactivo: λ, f, energía y color",
+ "description": "Convierte entre longitud de onda, frecuencia, energía del fotón y número de onda; bandas, tecnologías y zoom del visible con nombres de colores.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Espectro_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "espectro electromagnético",
+  "longitud de onda",
+  "energía del fotón"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética — Exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México — ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
@@ -86,7 +137,7 @@
 
   <section class="card">
     <p class="sec-tag">Explorador · mueve el cursor sobre el espectro</p>
-    <canvas id="spec" height="430"></canvas>
+    <canvas id="spec" role="img" aria-label="Espectro electromagnético completo con cuatro ejes y cursor arrastrable" height="430"></canvas>
     <input id="pos" class="slider" type="range" min="3" max="24" step="0.01" value="14.74" aria-label="Posición en el espectro">
     <div class="hint">Usa el deslizador o toca la gráfica para mover el cursor</div>
     <div class="bandleg" id="bandleg"></div>
@@ -144,7 +195,7 @@
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Espectro electromagnético — Explorador interactivo</i> (Versión 1.3) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Espectro electromagnético — Explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
   </div>
 </div>
 <script>
@@ -156,10 +207,11 @@
   var PADL=14,PADR=14;
   function X(lf,w){return PADL+(w-PADL-PADR)*(lf-LMIN)/(LMAX-LMIN);}
   function invX(px,w){return LMIN+(LMAX-LMIN)*(px-PADL)/(w-PADL-PADR);}
+  var LIR=Math.log10(c/750e-9)-1e-9, LUV=Math.log10(c/380e-9)+1e-9;  // misma c que las conversiones de la página;  // visible = [380, 750] nm, extremos incluidos
   var BANDS=[
     {a:3,b:8.5,c:'#3b5a8c',n:'Radiofrecuencia'},{a:8.5,b:11.48,c:'#2f7d7a',n:'Microondas'},
-    {a:11.48,b:13,c:'#6a4ea8',n:'Terahertz'},{a:13,b:14.602,c:'#a0522d',n:'Infrarrojo'},
-    {a:14.602,b:14.897,c:'rainbow',n:'Visible'},{a:14.897,b:16.5,c:'#7a3fb0',n:'Ultravioleta'},
+    {a:11.48,b:13,c:'#6a4ea8',n:'Terahertz'},{a:13,b:LIR,c:'#a0522d',n:'Infrarrojo'},
+    {a:LIR,b:LUV,c:'rainbow',n:'Visible'},{a:LUV,b:16.5,c:'#7a3fb0',n:'Ultravioleta'},
     {a:16.5,b:19.7,c:'#35608b',n:'Rayos X'},{a:19.7,b:24,c:'#8b2f6b',n:'Rayos gamma'}
   ];
   var FLAGS=[{lf:8,t:'FM'},{lf:9.26,t:'4G'},{lf:9.54,t:'5G sub-6'},{lf:10.45,t:'5G mmW'},{lf:12,t:'1 THz'}];
@@ -259,7 +311,7 @@
     if(act!==g('inE')) g('inE').value=(EeV/parseFloat(g('unE').value)).toPrecision(4);
   }
   // ---------- color del visible ----------
-  var NOMBRES=[[380,450,'violeta'],[450,485,'azul'],[485,500,'cian'],[500,565,'verde'],[565,590,'amarillo'],[590,625,'naranja'],[625,750,'rojo']];
+  var NOMBRES=[[380,450,'violeta'],[450,485,'azul'],[485,500,'cian'],[500,565,'verde'],[565,590,'amarillo'],[590,625,'naranja'],[625,750.0001,'rojo']];
   function nombreColor(nm){for(var i=0;i<NOMBRES.length;i++)if(nm>=NOMBRES[i][0]&&nm<NOMBRES[i][1])return NOMBRES[i][2];return null;}
   function nmRGB(nm){ // aproximación clásica (Bruton)
     var r=0,gg=0,b=0,t;

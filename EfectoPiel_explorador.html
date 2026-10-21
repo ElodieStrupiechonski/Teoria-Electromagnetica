@@ -16,7 +16,58 @@
   }
 </style>
 <!-- movil:fin -->
-<title>Explorador de Efecto Piel</title>
+<title>Efecto piel y profundidad de penetración: simulador</title>
+<!-- seo:inicio -->
+<meta name="description" content="Cómo se atenúa una onda dentro de un conductor: profundidad de penetración δ contra frecuencia y material, con la expresión general de α y β.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/EfectoPiel_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Efecto piel y profundidad de penetración: simulador">
+<meta property="og:description" content="Cómo se atenúa una onda dentro de un conductor: profundidad de penetración δ contra frecuencia y material, con la expresión general de α y β.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/EfectoPiel_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Efecto piel y profundidad de penetración: simulador",
+ "description": "Cómo se atenúa una onda dentro de un conductor: profundidad de penetración δ contra frecuencia y material, con la expresión general de α y β.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/EfectoPiel_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "efecto piel",
+  "profundidad de penetración",
+  "blindaje electromagnético"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética — Exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México — ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
   :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
@@ -144,7 +195,7 @@
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Efecto piel en conductores — Explorador interactivo</i> (Versión 1.3) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Efecto piel en conductores — Explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
   </div>
 </div>
 <script>
@@ -158,12 +209,14 @@
   function fval(){return Math.pow(10,fexp);}
   function ab(f){ // α y β generales (medio con pérdidas): Ulaby ecs. 7.66
     var w=2*Math.PI*f, eps=er()*E0P, q=sigma()/(w*eps), k=w*Math.sqrt(MU0*eps/2);
-    return {a:k*Math.sqrt(Math.sqrt(1+q*q)-1), b:k*Math.sqrt(Math.sqrt(1+q*q)+1)};
+    var r=Math.sqrt(1+q*q);
+    // forma estable: √(r−1) = q/√(r+1) evita la cancelación cuando q ≪ 1
+    return {a:k*q/Math.sqrt(r+1), b:k*Math.sqrt(r+1)};
   }
   function delta(f){return 1/ab(f).a;}
   function lossTan(f){return sigma()/(2*Math.PI*f*er()*E0P);}       // σ/(ωε)
   function etaAngle(f){return 0.5*Math.atan(lossTan(f));}            // H lags E by this
-  function fmtLen(m){if(m>=1)return m.toFixed(2)+' m';if(m>=1e-3)return (m*1e3).toFixed(3)+' mm';if(m>=1e-6)return (m*1e6).toFixed(2)+' µm';return (m*1e9).toFixed(1)+' nm';}
+  function fmtLen(m){if(!isFinite(m))return '∞';if(m>=1e3)return (m/1e3).toFixed(2)+' km';if(m>=1)return m.toFixed(2)+' m';if(m>=1e-3)return (m*1e3).toFixed(3)+' mm';if(m>=1e-6)return (m*1e6).toFixed(2)+' µm';return (m*1e9).toFixed(1)+' nm';}
   function fmtF(f){if(f>=1e12)return (f/1e12).toFixed(2)+' THz';if(f>=1e9)return (f/1e9).toFixed(2)+' GHz';if(f>=1e6)return (f/1e6).toFixed(2)+' MHz';if(f>=1e3)return (f/1e3).toFixed(1)+' kHz';return f.toFixed(0)+' Hz';}
   function labels(){
     var f=fval(),dl=delta(f),tanD=lossTan(f),ang=etaAngle(f)*180/Math.PI;
@@ -246,6 +299,8 @@
     document.getElementById('f').value=fexp;labels();drawDF();});
   IN.S.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;
     aCustom();MAT.custom.s=v;MAT.custom.er=parseFloat(IN.Er.value)||1;labels();drawDF();});
+  IN.Er.addEventListener('change',function(){var v=parseFloat(this.value);if(!(v>=1))this.value=er();});
+  IN.S.addEventListener('change',function(){var v=parseFloat(this.value);if(!(v>0))this.value=sigma();});
   IN.Er.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;
     aCustom();MAT.custom.er=v;MAT.custom.s=parseFloat(IN.S.value)||MAT.custom.s;labels();drawDF();});
   document.getElementById('f').addEventListener('input',function(e){fexp=+e.target.value;statLabels();});

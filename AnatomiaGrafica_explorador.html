@@ -16,7 +16,58 @@
   }
 </style>
 <!-- movil:fin -->
-<title>Anatomía de una gráfica — Miniproyecto</title>
+<title>Anatomía de una gráfica científica con Python y matplotlib</title>
+<!-- seo:inicio -->
+<meta name="description" content="Miniproyecto guiado: construye paso a paso una figura científica (profundidad de penetración) con ejes, escalas, leyenda y el código matplotlib.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/AnatomiaGrafica_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Anatomía de una gráfica científica con Python y matplotlib">
+<meta property="og:description" content="Miniproyecto guiado: construye paso a paso una figura científica (profundidad de penetración) con ejes, escalas, leyenda y el código matplotlib.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/AnatomiaGrafica_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Anatomía de una gráfica científica con Python y matplotlib",
+ "description": "Miniproyecto guiado: construye paso a paso una figura científica (profundidad de penetración) con ejes, escalas, leyenda y el código matplotlib.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/AnatomiaGrafica_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "matplotlib",
+  "gráficas científicas",
+  "Python"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética — Exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México — ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
@@ -81,7 +132,7 @@
   <h1>Anatomía de una gráfica científica — Miniproyecto</h1>
   <div class="sub">Construimos paso a paso una figura científica completa — la profundidad de penetración δ(<i>f</i>) del <a href="EfectoPiel_explorador.html">efecto piel</a> —: escribimos la función, elegimos el barrido de frecuencias, agregamos materiales y cuidamos ejes, leyenda y estilo. Cada pestaña modifica la gráfica en vivo y muestra el código de matplotlib correspondiente; la última entrega el script completo. En el curso de la ENES Juriquilla este miniproyecto acompaña la práctica P6.</div>
 
-  <div class="card"><canvas id="cv" width="1000" height="520"></canvas>
+  <div class="card"><canvas id="cv" role="img" aria-label="Vista previa de la gráfica que produce el código matplotlib" width="1000" height="520"></canvas>
     <div class="check" id="checklist"></div>
   </div>
 
@@ -236,7 +287,7 @@
   <div class="credits">
     <p><b>Referencias.</b> J. D. Jackson, <i>Classical Electrodynamics</i>, 3.ª ed., Wiley (1999), §5.18 y §8.1 · J. D. Hunter, «Matplotlib: A 2D graphics environment», <i>Comput. Sci. Eng.</i> 9, 90–95 (2007), DOI <a href="https://doi.org/10.1109/MCSE.2007.55" target="_blank" rel="noopener">10.1109/MCSE.2007.55</a> · C. R. Harris <i>et al.</i>, «Array programming with NumPy», <i>Nature</i> 585, 357–362 (2020), DOI <a href="https://doi.org/10.1038/s41586-020-2649-2" target="_blank" rel="noopener">10.1038/s41586-020-2649-2</a> · N. P. Rougier, M. Droettboom, P. E. Bourne, «Ten Simple Rules for Better Figures», <i>PLoS Comput. Biol.</i> 10, e1003833 (2014), DOI <a href="https://doi.org/10.1371/journal.pcbi.1003833" target="_blank" rel="noopener">10.1371/journal.pcbi.1003833</a>.</p>
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Anatomía de una gráfica — Explorador interactivo</i> (Versión 1.3) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Anatomía de una gráfica — Explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
   </div>
 </div>
 <script>
