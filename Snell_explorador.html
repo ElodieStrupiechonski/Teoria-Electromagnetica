@@ -16,22 +16,22 @@
   }
 </style>
 <!-- movil:fin -->
-<title>Ley de Snell, reflexión total interna y ángulo de Brewster</title>
+<title>Ley de Snell, reflexión total interna y fibra óptica</title>
 <!-- seo:inicio -->
-<meta name="description" content="Trazado de rayos interactivo: refracción, ángulo crítico, reflexión total interna (fibra óptica) y ángulo de Brewster.">
+<meta name="description" content="Trazado de rayos interactivo: refracción, ángulo crítico y reflexión total interna; fibra óptica con sus rebotes, apertura numérica y acoplamiento a una fibra vecina por efecto túnel.">
 <link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Snell_explorador.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
-<meta property="og:title" content="Ley de Snell, reflexión total interna y ángulo de Brewster">
-<meta property="og:description" content="Trazado de rayos interactivo: refracción, ángulo crítico, reflexión total interna (fibra óptica) y ángulo de Brewster.">
+<meta property="og:title" content="Ley de Snell, reflexión total interna y fibra óptica">
+<meta property="og:description" content="Trazado de rayos interactivo: refracción, ángulo crítico y reflexión total interna; fibra óptica con sus rebotes, apertura numérica y acoplamiento a una fibra vecina por efecto túnel.">
 <meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Snell_explorador.html">
 <meta property="og:locale" content="es_MX">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
  "@type": "LearningResource",
- "name": "Ley de Snell, reflexión total interna y ángulo de Brewster",
- "description": "Trazado de rayos interactivo: refracción, ángulo crítico, reflexión total interna (fibra óptica) y ángulo de Brewster.",
+ "name": "Ley de Snell, reflexión total interna y fibra óptica",
+ "description": "Trazado de rayos interactivo: refracción, ángulo crítico y reflexión total interna; fibra óptica con sus rebotes, apertura numérica y acoplamiento a una fibra vecina por efecto túnel.",
  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Snell_explorador.html",
  "inLanguage": "es",
  "isAccessibleForFree": true,
@@ -40,7 +40,9 @@
  "about": [
   "ley de Snell",
   "reflexión total interna",
-  "fibra óptica"
+  "fibra óptica",
+  "apertura numérica",
+  "reflexión total frustrada"
  ],
  "license": "https://creativecommons.org/licenses/by/4.0/",
  "identifier": "https://doi.org/10.5281/zenodo.23423156",
@@ -132,8 +134,8 @@
 <div class="wrap">
   <header>
     <p class="eyebrow">Teoría Electromagnética · Unidad 3 · tema 3.5</p>
-    <h1>Ley de Snell, reflexión total y ángulo de Brewster</h1>
-    <p class="lede">Cuando una onda cruza la frontera entre dos medios, se refracta según n₁ sen θ₁ = n₂ sen θ₂. Modifica el ángulo de incidencia y los medios — o teclea tus propios índices — y observa aparecer el ángulo crítico (reflexión total interna) y el ángulo de Brewster. En el curso de la ENES Juriquilla este explorador acompaña las prácticas P10 y P11.</p>
+    <h1>Ley de Snell, reflexión total y fibra óptica</h1>
+    <p class="lede">Cuando una onda cruza la frontera entre dos medios, se refracta según n₁ sen θ₁ = n₂ sen θ₂. Modifica el ángulo de incidencia y los medios — o teclea tus propios índices — y observa aparecer el ángulo crítico (reflexión total interna); abajo, la misma reflexión total guía la luz en una fibra óptica y una fibra vecina puede robarle señal por efecto túnel. Lo que pasa con la amplitud y la polarización en cada reflexión (coeficientes de Fresnel, ángulo de Brewster, campo evanescente) está en el <a href="Fresnel_explorador.html">explorador de Fresnel</a>. En el curso de la ENES Juriquilla este explorador acompaña las prácticas P10 y P11.</p>
   </header>
 
   <section class="card">
@@ -149,7 +151,7 @@
           <button class="btn" data-n="1,1.5">aire → vidrio</button>
           <button class="btn" data-n="1.5,1">vidrio → aire</button>
           <button class="btn" data-n="1.33,1">agua → aire</button>
-          <button class="btn" data-n="1.50,1.48">fibra óptica</button>
+          <button class="btn" data-n="1.48,1.46">fibra óptica</button>
           <button class="btn" id="btc">Ir al ángulo crítico</button>
         </div>
         <div class="inrow">
@@ -166,14 +168,35 @@
         <div class="status" id="status">—</div>
       </div>
     </div>
-    <p class="note" style="margin-top:12px">El ángulo crítico solo existe al pasar a un medio menos denso (<var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>); más allá de él hay reflexión total interna, el principio de la fibra óptica. En el ángulo de Brewster la luz reflejada queda linealmente polarizada.</p>
+    <p class="note" style="margin-top:12px">El ángulo crítico solo existe al pasar a un medio menos denso (<var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>); más allá de él hay reflexión total interna, el principio de la fibra óptica (panel siguiente). Qué fracción de la potencia se refleja antes de llegar ahí, y por qué en el ángulo de Brewster el reflejo sale polarizado, es tema del <a href="Fresnel_explorador.html">explorador de Fresnel</a>.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Explorador · fibra óptica y acoplamiento por efecto túnel</p>
+    <p class="note" style="margin:0 0 10px">El mismo θ₁ de arriba, ahora como ángulo con la pared de un núcleo <var class="vinc">n</var><sub>1</sub> rodeado de revestimiento <var class="vinc">n</var><sub>2</sub> (pulsa «fibra óptica» arriba). Si θ₁ &gt; θc la luz queda atrapada; si no, se fuga un poco en cada rebote. Una segunda fibra idéntica a distancia <var class="vinc">g</var> recibe, por reflexión total frustrada, una fracción T(<var class="vinc">g</var>) en cada rebote de la cara vecina; como entra con el mismo ángulo, también queda guiada en ella. Colores: <span style="color:#1f5fbf;font-weight:600">azul = ∥</span>, <span style="color:#c62828;font-weight:600">rojo = ⊥</span>.</p>
+    <canvas id="cvf" role="img" aria-label="Rayo que rebota dentro de una fibra óptica y una segunda fibra cercana que recibe potencia por efecto túnel" height="270" style="background:var(--bg)"></canvas>
+    <div class="grid2" style="margin-top:6px">
+      <div class="ctrl"><label>Separación entre fibras g <b id="gv">0.50 λ₀</b></label><input id="gap" type="range" min="0" max="2" step="0.01" value="0.5" aria-label="Separación entre las dos fibras, en longitudes de onda"></div>
+      <div class="ctrl"><label>Rebotes dibujados N <b id="nv">8</b></label><input id="nreb" type="range" min="1" max="20" step="1" value="8" aria-label="Número de rebotes"></div>
+    </div>
+    <div class="tiles" style="grid-template-columns:repeat(4,1fr)">
+      <div class="tile"><div class="k">Apertura numérica · θ de aceptación</div><div class="v" id="ftNA">—</div></div>
+      <div class="tile"><div class="k">Fuga por rebote T(g) · ∥ · ⊥</div><div class="v" id="ftT">—</div></div>
+      <div class="tile"><div class="k">Queda en la fibra 1 tras N rebotes · ∥ · ⊥</div><div class="v" id="ftN">—</div></div>
+      <div class="tile"><div class="k">Rebotes por metro (núcleo de 9 µm)</div><div class="v" id="ftM">—</div></div>
+    </div>
+    <p class="note" style="margin-top:12px"><b style="color:var(--ink)">Acoplador y «escucha» de una fibra.</b> Como la luz que pasa a la fibra 2 también queda guiada, puede volver a pasar a la 1: en un acoplador de fibra fundida la potencia oscila entre las dos a lo largo del tramo acoplado, y la longitud del tramo decide el reparto (50/50, 90/10…). El mismo efecto permite intervenir un cable sin cortarlo: doblar la fibra o desnudarla y arrimar un detector basta para desviar una fracción de la señal. Una fibra con pérdidas inexplicables puede estar siendo «escuchada»; de ahí los sistemas que vigilan el presupuesto de potencia. En aeroespacial el acoplamiento se usa a propósito en sensores de fibra distribuidos y en las redes ópticas de a bordo. La distancia g se mide en λ₀ = 2π/k₀; con λ₀ = 1550 nm (telecomunicaciones), 0.5 λ₀ son 775 nm.</p>
   </section>
 
   <details class="card" open>
     <summary>Formulario</summary>
     <div class="eq"><var>n</var><sub>1</sub> sen <var>&theta;</var><sub>1</sub> <span class="op">=</span> <var>n</var><sub>2</sub> sen <var>&theta;</var><sub>2</sub></div>
     <div class="eq"><var>&theta;</var><sub>c</sub> <span class="op">=</span> arcsen(<var>n</var><sub>2</sub><span class="op">/</span><var>n</var><sub>1</sub>) &nbsp;(solo si <var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>)</div>
-    <div class="eq"><var>&theta;</var><sub>B</sub> <span class="op">=</span> arctan(<var>n</var><sub>2</sub><span class="op">/</span><var>n</var><sub>1</sub>)</div>
+    <div class="eq">NA <span class="op">=</span> sen <var>&theta;</var><sub>acept</sub> <span class="op">=</span> √(<var>n</var><sub>1</sub><sup>2</sup> &minus; <var>n</var><sub>2</sub><sup>2</sup>) &nbsp;(fibra: n&uacute;cleo <var>n</var><sub>1</sub>, revestimiento <var>n</var><sub>2</sub>, entrada desde el aire)</div>
+    <div class="eq">M&aacute;s all&aacute; de <var>&theta;</var><sub>c</sub> el campo en el medio 2 decae como e<sup>&minus;<var>&alpha;z</var></sup>, &nbsp;<var>&alpha;</var> <span class="op">=</span> <var>k</var><sub>0</sub>&thinsp;&radic;(<var>n</var><sub>1</sub><sup>2</sup> sen&sup2;<var>&theta;</var><sub>1</sub> &minus; <var>n</var><sub>2</sub><sup>2</sup>).&nbsp; Dos medios <var>n</var><sub>1</sub> separados por una capa <var>n</var><sub>2</sub> de grosor <var>g</var> se pasan la fracci&oacute;n
+    T(<var>g</var>) <span class="op">=</span> 1 / [1 + <var>F</var> senh&sup2;(<var>&alpha;g</var>)],&nbsp;
+    <var>F</var><sub>&#8869;</sub> <span class="op">=</span> (<var>n</var><sub>1</sub><sup>2</sup> &minus; <var>n</var><sub>2</sub><sup>2</sup>)<sup>2</sup> / [4 <var>n</var><sub>1</sub><sup>2</sup> cos&sup2;<var>&theta;</var><sub>1</sub> (<var>n</var><sub>1</sub><sup>2</sup> sen&sup2;<var>&theta;</var><sub>1</sub> &minus; <var>n</var><sub>2</sub><sup>2</sup>)],&nbsp;
+    <var>F</var><sub>&#8741;</sub> <span class="op">=</span> (<var>n</var><sub>2</sub><sup>4</sup> <var>k</var><sub>1z</sub><sup>2</sup> + <var>n</var><sub>1</sub><sup>4</sup> <var>&alpha;</var><sup>2</sup>)<sup>2</sup> / (4 <var>n</var><sub>1</sub><sup>4</sup> <var>n</var><sub>2</sub><sup>4</sup> <var>k</var><sub>1z</sub><sup>2</sup> <var>&alpha;</var><sup>2</sup>),&nbsp; <var>k</var><sub>1z</sub> <span class="op">=</span> <var>k</var><sub>0</sub> <var>n</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>1</sub>&nbsp; (Zhu <i>et al.</i>, <a href="https://doi.org/10.1119/1.14514" target="_blank" rel="noopener">Am. J. Phys. 54, 601, 1986</a>)</div>
     <div class="eq"><var>n</var> <span class="op">=</span> <span class="cnat">c</span>/<var>v</var> <span class="op">=</span> √<var>ε</var><sub>r</sub> &nbsp;(medio no magnético)</div>
     <p class="kv" style="margin-top:10px;font-size:13.5px">Velocidad de la luz &nbsp; <b class="cnat" style="font-family:var(--mono)">c = 2.998×10⁸ m/s</b></p>
     <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
@@ -220,21 +243,77 @@
     x.fillStyle=C('--blueSoft');x.fillText('reflejado',rx-64,ry+14);
     // critical & brewster
     var tc = n1>n2 ? Math.asin(n2/n1)*180/Math.PI : null;
-    var tb = Math.atan(n2/n1)*180/Math.PI;
     document.getElementById('tcv').textContent = tc!==null ? tc.toFixed(1)+'°' : 'no aplica';
     var st=document.getElementById('status'), d1=t1*180/Math.PI;
     if(tir){st.className='status tir';st.innerHTML='<b>Reflexión total interna:</b> θ₁ supera el ángulo crítico ('+tc.toFixed(1)+'°). No hay rayo transmitido; toda la energía se refleja. Es el principio de la fibra óptica.';}
-    else if(Math.abs(d1-tb)<1.2){st.className='status br';st.innerHTML='<b>Ángulo de Brewster ('+tb.toFixed(1)+'°):</b> el rayo reflejado queda linealmente polarizado.';}
-    else {st.className='status';st.innerHTML='Refracción normal. <var>&theta;</var><sub>B</sub> = '+tb.toFixed(1)+'°'+(tc!==null?' · <var>&theta;</var><sub>c</sub> = '+tc.toFixed(1)+'°':'')+'.';}
+    else {st.className='status';st.innerHTML='Refracción: parte de la onda se refleja y parte se transmite.'+(tc!==null?' Ángulo crítico: '+tc.toFixed(1)+'°.':' Sin ángulo crítico (n₁ &lt; n₂).');}
     document.getElementById('t1v').textContent=Math.round(d1)+'°';
     document.getElementById('n1v').textContent=n1.toFixed(2);
     document.getElementById('n2v').textContent=n2.toFixed(2);
   };
+
+  // ---- fibra óptica y reflexión total frustrada ----
+  var cvf=document.getElementById('cvf'), gap=0.5, nreb=8, D=180/Math.PI;
+  function fres(){ // R⊥, R∥ para el escape (Fresnel, μr = 1)
+    var si=Math.sin(t1),ci=Math.cos(t1),st=n1/n2*si; if(st>1)return {Rs:1,Rp:1,tir:true,tt:NaN};
+    var ct=Math.sqrt(1-st*st),e1=1/n1,e2=1/n2,gs=(e2*ci-e1*ct)/(e2*ci+e1*ct),gp=(e2*ct-e1*ci)/(e2*ct+e1*ci);
+    return {Rs:gs*gs,Rp:gp*gp,tir:false,tt:Math.asin(st)};}
+  function ftir(){ var si=Math.sin(t1),ci=Math.cos(t1),q=n1*n1*si*si-n2*n2; if(!(q>0))return null;
+    var a=2*Math.PI*Math.sqrt(q),k1z=2*Math.PI*n1*ci;
+    var Fs=Math.pow(n1*n1-n2*n2,2)/(4*n1*n1*ci*ci*q);
+    var Fp=Math.pow(Math.pow(n2,4)*k1z*k1z+Math.pow(n1,4)*a*a,2)/(4*Math.pow(n1,4)*Math.pow(n2,4)*k1z*k1z*a*a);
+    var sh=Math.sinh(a*gap);sh=sh*sh; return {Ts:1/(1+Fs*sh),Tp:1/(1+Fp*sh),a:a};}
+  function seg(x,ax,ay,bx,by,p,col,off){var dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1,nx=-dy/L*off,ny=dx/L*off,amp=Math.max(0.12,Math.sqrt(p));
+    x.save();x.globalAlpha=0.25+0.75*amp;x.lineWidth=1+3*amp;x.strokeStyle=col;x.beginPath();x.moveTo(ax+nx,ay+ny);x.lineTo(bx+nx,by+ny);x.stroke();x.restore();}
+  function zig(x,px,py,dir,yTop,yBot,xe,t,Ps,Pp,loss){ // rayo guiado en zigzag; devuelve potencias restantes
+    var dx=(yBot-yTop)*Math.tan(t);
+    while(px<xe-0.5){var nx=Math.min(xe,px+dx),ny=dir<0?yTop:yBot; if(nx===xe)ny=py+dir*(xe-px)/Math.tan(t);
+      seg(x,px,py-1.5,nx,ny-1.5,Pp,'#1f5fbf',0);seg(x,px,py+1.5,nx,ny+1.5,Ps,'#c62828',0);
+      if(nx===xe)break; var r=loss(nx,ny,dir,Ps,Pp); Ps=r[0];Pp=r[1]; px=nx;py=ny;dir=-dir;}
+    return [Ps,Pp];}
+  function drawFiber(){
+    var o=fit(cvf,270),x=o.x,W=o.w,H=o.h,ink=C('--ink'),mut=C('--muted'),crit='#8e1b5b',blue=C('--blueSoft');
+    x.fillStyle=C('--bg');x.fillRect(0,0,W,H);
+    var f=ftir(),c0=fres(),tc=n1>n2?Math.asin(n2/n1):NaN,th=t1*D;
+    var core=58,gapPx=Math.max(4,gap*40),y1=56,y2=y1+core,y3=y2+gapPx,y4=y3+core,x0=20,xe=W-20;
+    x.fillStyle=blue;x.globalAlpha=Math.min(.18,.02+.08*(n2-1));x.fillRect(x0,y1-24,xe-x0,core*2+48+gapPx);x.globalAlpha=1;
+    x.fillStyle=blue;x.globalAlpha=Math.min(.35,.05+.16*(n1-1));x.fillRect(x0,y1,xe-x0,core);x.fillRect(x0,y3,xe-x0,core);x.globalAlpha=1;
+    x.strokeStyle=ink;x.lineWidth=1.2;[y1,y2,y3,y4].forEach(function(y){x.beginPath();x.moveTo(x0,y);x.lineTo(xe,y);x.stroke();});
+    x.font='12px '+C('--sans')+',sans-serif';x.fillStyle=mut;x.textAlign='left';
+    x.fillText('fibra 1 · núcleo n₁ = '+n1.toFixed(2)+' · revestimiento n₂ = '+n2.toFixed(2),x0+4,y1-9);
+    x.fillText('fibra 2 (idéntica) · separación g = '+gap.toFixed(2)+' λ₀',x0+4,y4+16);
+    var $=function(i){return document.getElementById(i);};
+    var NA=n1>n2?Math.sqrt(n1*n1-n2*n2):NaN;
+    $('ftNA').textContent=isNaN(NA)?'—':(NA<1?NA.toFixed(3)+' · '+(Math.asin(NA)*D).toFixed(1)+'°':NA.toFixed(2)+' · 90° (acepta todo)');
+    if(isNaN(tc)){x.fillStyle=ink;x.font='600 14px '+C('--sans')+',sans-serif';x.textAlign='center';x.fillText('Con n₁ < n₂ la luz no queda guiada: no hay reflexión total',W/2,H-22);
+      ['ftT','ftN','ftM'].forEach(function(i){$(i).textContent='—';});return;}
+    var escapes=t1<=tc+1e-9,dx=core*Math.tan(t1),N=nreb,leaks=0,P2=[0,0],first=null;
+    var res=zig(x,x0+10,y2,-1,y1,y2,Math.min(xe,x0+10+dx*N),t1,1,1,function(nx,ny,dir,Ps,Pp){
+      if(escapes){var ey=ny+(dir<0?-1:1)*30*Math.cos(c0.tt),ex=nx+30*Math.sin(c0.tt);
+        x.save();x.globalAlpha=.6;x.lineWidth=1;x.strokeStyle=mut;x.setLineDash([3,3]);x.beginPath();x.moveTo(nx,ny);x.lineTo(ex,ey);x.stroke();x.restore();
+        return [Ps*c0.Rs,Pp*c0.Rp];}
+      if(dir>0&&f){var Ls=Ps*f.Ts,Lp=Pp*f.Tp;leaks++;
+        x.fillStyle='rgba(142,27,91,'+(0.1+0.3*Math.max(0.12,Math.sqrt((Ls+Lp)/2)))+')';x.fillRect(nx-8,y2,16,gapPx);
+        if(!first)first=nx;
+        // la luz que pasa entra con el mismo ángulo: queda guiada en la fibra 2
+        zig(x,nx,y3,1,y3,y4,xe,t1,Ls,Lp,function(){return [Ls,Lp];});
+        return [Ps-Ls,Pp-Lp];}
+      return [Ps,Pp];});
+    x.strokeStyle=ink;x.lineWidth=1;x.setLineDash([3,3]);x.beginPath();x.moveTo(Math.min(x0+10+dx,xe),y1);x.lineTo(Math.min(x0+10+dx,xe),y1+34);x.stroke();x.setLineDash([]);
+    x.fillStyle=ink;x.font='600 12px '+C('--sans')+',sans-serif';x.textAlign='left';
+    var lx=Math.min(x0+10+dx,xe),lr=lx>W*0.55;x.textAlign=lr?'right':'left';x.fillText('θ₁ = '+th.toFixed(1)+'°'+(escapes?'  ≤ θc = '+(tc*D).toFixed(1)+'°: se escapa':'  > θc = '+(tc*D).toFixed(1)+'°: guiada'),lx+(lr?-6:6),y1+30);x.textAlign='left';
+    if(first&&f){x.fillStyle=crit;x.textAlign='right';x.fillText('fuga T(g) ≈ '+(100*(f.Tp+f.Ts)/2).toFixed(f.Ts<0.01?2:1)+' % por rebote; en la fibra 2 también queda guiada',xe-4,y4+16);x.textAlign='left';}
+    if(escapes){$('ftT').textContent='— (no hay reflexión total)';$('ftN').textContent=(100*Math.pow(c0.Rp,N)).toFixed(1)+' % · '+(100*Math.pow(c0.Rs,N)).toFixed(1)+' % (fuga por refracción)';}
+    else{var nb=Math.floor(N/2);$('ftT').textContent=(100*f.Tp).toFixed(2)+' % · '+(100*f.Ts).toFixed(2)+' %';$('ftN').textContent=(100*Math.pow(1-f.Tp,nb)).toFixed(1)+' % · '+(100*Math.pow(1-f.Ts,nb)).toFixed(1)+' % ('+nb+' rebotes en la cara vecina)';}
+    var per=1/(9e-6*Math.tan(t1));$('ftM').textContent=per>=1e6?(per/1e6).toFixed(2)+' millones':(per>=1e3?(per/1e3).toFixed(0)+' mil':per.toFixed(0));
+  }
+  document.getElementById('gap').addEventListener('input',function(e){gap=+e.target.value;document.getElementById('gv').textContent=gap.toFixed(2)+' λ₀';drawFiber();});
+  document.getElementById('nreb').addEventListener('input',function(e){nreb=+e.target.value;document.getElementById('nv').textContent=nreb;drawFiber();});
   var IN={N1:document.getElementById('inN1'),N2:document.getElementById('inN2'),T1:document.getElementById('inT1')};
   function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
   function syncInputs(){ponSiLibre(IN.N1,+n1.toFixed(2));ponSiLibre(IN.N2,+n2.toFixed(2));
     ponSiLibre(IN.T1,Math.round(t1*180/Math.PI));}
-  var draw0=draw; draw=function(){draw0();syncInputs();};
+  var draw0=draw; draw=function(){draw0();syncInputs();drawFiber();};
   IN.N1.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n1=v;draw();});
   IN.N2.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n2=v;draw();});
   IN.T1.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;
