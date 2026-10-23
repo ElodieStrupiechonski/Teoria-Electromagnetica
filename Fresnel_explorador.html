@@ -116,10 +116,31 @@
   details.card summary::-webkit-details-marker{display:none}
   details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}input[type=range]{height:26px}h1{font-size:26px}}
+  /* v1.4: diagrama de rayos, estado, comparación Brewster/crítico y práctica */
+  .rayhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14.5px;color:var(--navy);margin-bottom:8px}
+  .muted{color:var(--muted);font-size:12.5px}
+  .estado{margin-top:10px;padding:10px 13px;border-radius:9px;border-left:5px solid var(--line);background:var(--bg);font-size:14.5px;line-height:1.5}
+  .estado.eB{border-left-color:var(--green)} .estado.eC{border-left-color:var(--red)}
+  .btnx{border-color:var(--accent);color:var(--accent)}
+  .tile.tb{border-color:var(--green)} .tile.tb .v{color:var(--green)}
+  .tile.tc{border-color:var(--red)} .tile.tc .v{color:var(--red)}
+  .tile.tb .k b{color:var(--green)} .tile.tc .k b{color:var(--red)}
+  .gB{color:var(--green)} .gC{color:var(--red)}
+  .regla{font-size:15px;margin:10px 0}
+  .cmpwrap{overflow-x:auto}
+  table.cmp{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
+  table.cmp th,table.cmp td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+  table.cmp th{background:var(--bg)} table.cmp td:first-child{color:var(--muted);white-space:nowrap}
+  .reto{font-size:15px;background:var(--bg);border:1px dashed var(--accent);border-radius:9px;padding:9px 12px;margin-top:6px}
+  .inbox .nx{display:flex;gap:6px;align-items:center;margin:6px 0 0;font-size:13px;color:var(--ink)}
+  .inbox .nx input{width:auto}
+  .fb{margin-top:10px;font-size:14.5px;line-height:1.5;padding:0 2px}
+  .fb.fok{color:var(--green)} .fb.fno{color:var(--red)}
+  @media (max-width:560px){.tile .v{font-size:15px}}
 </style>
 <div class="wrap">
   <h1>Coeficientes de Fresnel: incidencia oblicua</h1>
-  <div class="sub">Potencia reflejada de cada polarización contra el ángulo de incidencia. Arrastra la línea amarilla (o usa el deslizador) para mover θᵢ; cambia los medios y observa el <b>ángulo de Brewster</b> (R∥ = 0) y, cuando n₁ &gt; n₂, el <b>ángulo crítico</b> con reflexión total. En el curso de la ENES Juriquilla este explorador acompaña los temas 3.6 a 3.8.</div>
+  <div class="sub">Potencia reflejada de cada polarización contra el ángulo de incidencia. Arrastra la línea amarilla (o usa el deslizador) para mover θᵢ; cambia los medios y observa el <b>ángulo de Brewster</b> (R∥ = 0) y, cuando n₁ &gt; n₂, el <b>ángulo crítico</b> con reflexión total; el diagrama de rayos muestra dónde está «el 90°» de cada uno y el botón ⇄ invierte el sentido de la luz. En el curso de la ENES Juriquilla este explorador acompaña los temas 3.6 a 3.8.</div>
 
   <div class="card">
     <canvas id="cv" role="img" aria-label="Curvas de potencia reflejada contra el ángulo de incidencia" height="430"></canvas>
@@ -127,32 +148,77 @@
       <span><i style="background:var(--sperp)"></i>R⊥ (E fuera del plano de incidencia, s/TE)</span>
       <span><i style="background:var(--spar)"></i>R∥ (E en el plano, p/TM)</span>
       <span><i style="background:var(--plane)"></i>θᵢ (arrástralo)</span>
+      <span><i style="background:var(--green)"></i>θB: se borra R∥</span>
+      <span><i style="background:var(--red)"></i>θc: se corta la transmisión</span>
     </div>
+  </div>
+
+  <div class="card">
+    <div class="rayhead"><b>Lo que hace la luz en la frontera</b><span class="muted">grosor e intensidad de cada rayo ∝ potencia; azul ⊥, naranja ∥</span></div>
+    <canvas id="cvr" role="img" aria-label="Diagrama de rayos incidente, reflejado y transmitido en la frontera, con los ángulos marcados" height="320"></canvas>
+    <div class="estado" id="estado" aria-live="polite">—</div>
   </div>
 
   <div class="card">
     <div class="controls">
       <div class="ctl"><label>Medio 1 (de donde llega)</label><select id="m1"></select></div>
       <div class="ctl"><label>Medio 2 (al que entra)</label><select id="m2"></select></div>
-      <div class="ctl"><label><span>Ángulo de incidencia θᵢ</span> <span id="av">30.0°</span></label><input id="ang" type="range" min="0" max="89.9" step="0.1" value="30"></div>
+      <div class="ctl"><label><span>Ángulo de incidencia θᵢ</span> <span id="av">30.0°</span></label><input id="ang" type="range" min="0" max="89.9" step="0.1" value="30" aria-label="Ángulo de incidencia en grados"></div>
     </div>
     <div class="btns">
       <button class="btn" id="bB">Ir a Brewster</button>
       <button class="btn" id="bC">Ir al ángulo crítico</button>
       <button class="btn" id="b0">θᵢ = 0 (normal)</button>
+      <button class="btn btnx" id="bS" title="Intercambia los medios: la luz viaja en sentido contrario">⇄ Invertir el sentido (n₁ ↔ n₂)</button>
     </div>
     <div class="inrow">
-      <div class="inbox"><label><span class="vinc">n</span><sub>1</sub> (personalizado)</label><input id="inN1" type="number" step="any" min="1" inputmode="decimal"></div>
-      <div class="inbox"><label><span class="vinc">n</span><sub>2</sub> (personalizado)</label><input id="inN2" type="number" step="any" min="1" inputmode="decimal"></div>
-      <div class="inbox"><label><span class="vinc">θ</span><sub>i</sub> (grados)</label><input id="inT" type="number" step="any" min="0" max="89.9" inputmode="decimal"></div>
+      <div class="inbox"><label for="inN1"><span class="vinc">n</span><sub>1</sub> (personalizado)</label><input id="inN1" type="number" step="any" min="1" inputmode="decimal"></div>
+      <div class="inbox"><label for="inN2"><span class="vinc">n</span><sub>2</sub> (personalizado)</label><input id="inN2" type="number" step="any" min="1" inputmode="decimal"></div>
+      <div class="inbox"><label for="inT"><span class="vinc">θ</span><sub>i</sub> (grados)</label><input id="inT" type="number" step="any" min="0" max="89.9" inputmode="decimal"></div>
     </div>
     <div class="tiles">
       <div class="tile"><div class="k">θₜ (Snell)</div><div class="v" id="tt">—</div></div>
+      <div class="tile"><div class="k">Ángulo reflejado–transmitido</div><div class="v" id="rt">—</div></div>
       <div class="tile"><div class="k">Γ⊥ · R⊥</div><div class="v" id="gs">—</div></div>
       <div class="tile"><div class="k">Γ∥ · R∥</div><div class="v" id="gp">—</div></div>
-      <div class="tile"><div class="k">θ Brewster · θ crítico</div><div class="v" id="bb">—</div></div>
+      <div class="tile"><div class="k">Transmitida T⊥ · T∥</div><div class="v" id="tr">—</div></div>
+      <div class="tile"><div class="k">Penetración evanescente 1/α</div><div class="v" id="ev">—</div></div>
+      <div class="tile tb"><div class="k">θB · tan θB = n₂/n₁ · <b>borra R∥</b></div><div class="v" id="bb">—</div></div>
+      <div class="tile tc"><div class="k">θc · sen θc = n₂/n₁ · <b>corta T</b></div><div class="v" id="cc">—</div></div>
     </div>
   </div>
+
+  <details class="card" open>
+    <summary>Brewster o crítico: cómo no confundirlos</summary>
+    <p class="regla"><b class="gB">Brewster borra</b> un reflejo; <b class="gC">el crítico corta</b> la transmisión. Ambos usan el cociente <span class="vinc">n</span><sub>2</sub>/<span class="vinc">n</span><sub>1</sub> y ambos tienen «un 90°», pero son cosas distintas:</p>
+    <div class="cmpwrap"><table class="cmp">
+      <tr><th></th><th class="gB">Ángulo de Brewster θ<sub>B</sub></th><th class="gC">Ángulo crítico θ<sub>c</sub></th></tr>
+      <tr><td>Qué pasa</td><td>R<sub>∥</sub> = 0: el reflejo paralelo se borra</td><td>θ<sub>t</sub> = 90°: el rayo transmitido sale rasante; más allá, R = 1</td></tr>
+      <tr><td>Dónde está el 90°</td><td><b>entre</b> el reflejado y el transmitido: θ<sub>B</sub> + θ<sub>t</sub> = 90°</td><td><b>es</b> el propio θ<sub>t</sub></td></tr>
+      <tr><td>Fórmula</td><td><b>tan</b> θ<sub>B</sub> = <span class="vinc">n</span><sub>2</sub>/<span class="vinc">n</span><sub>1</sub></td><td><b>sen</b> θ<sub>c</sub> = <span class="vinc">n</span><sub>2</sub>/<span class="vinc">n</span><sub>1</sub></td></tr>
+      <tr><td>Existe</td><td>siempre, en los dos sentidos</td><td>solo si <span class="vinc">n</span><sub>1</sub> &gt; <span class="vinc">n</span><sub>2</sub> (de denso a menos denso)</td></tr>
+      <tr><td>Polarización</td><td>solo la paralela (μ<sub>r</sub> = 1)</td><td>las dos por igual</td></tr>
+      <tr><td>Con un polarizador</td><td>el reflejo restante (⊥) se puede apagar</td><td>el reflejo total NO se puede apagar</td></tr>
+    </table></div>
+    <p class="kv" style="font-family:inherit">Si existen los dos, siempre θ<sub>B</sub> &lt; θ<sub>c</sub>, porque tan <var class="vinc">x</var> &gt; sen <var class="vinc">x</var> para 0 &lt; <var class="vinc">x</var> &lt; 90°. Y θ<sub>B</sub>(1→2) + θ<sub>B</sub>(2→1) = 90°: compruébalo con el botón ⇄.</p>
+  </details>
+
+  <details class="card">
+    <summary>Practica: ¿Brewster o crítico?</summary>
+    <p class="kv" style="font-family:inherit;margin-top:10px">Un caso al azar. Calcula los dos ángulos (o marca que no existe) y comprueba. Tolerancia ±0.5°.</p>
+    <div class="reto" id="retoTxt">—</div>
+    <div class="inrow">
+      <div class="inbox"><label for="rB">θ<sub>B</sub> (grados)</label><input id="rB" type="number" step="any" inputmode="decimal"></div>
+      <div class="inbox"><label for="rC">θ<sub>c</sub> (grados)</label><input id="rC" type="number" step="any" inputmode="decimal"><label class="nx"><input type="checkbox" id="rCno"> no existe</label></div>
+      <div class="inbox"><label>Aciertos</label><div id="rCount" class="v" style="font-size:18px;font-weight:700;color:var(--navy)">0 / 0</div></div>
+    </div>
+    <div class="btns">
+      <button class="btn" id="rNew">Nuevo caso</button>
+      <button class="btn" id="rChk">Comprobar</button>
+      <button class="btn" id="rSee" disabled>Ver en la gráfica</button>
+    </div>
+    <div class="fb" id="rFb" aria-live="polite"></div>
+  </details>
 
   <details class="card" open>
     <summary>Formulario y constantes</summary>
@@ -162,8 +228,10 @@
     <div class="eq">tan&thinsp;<var>&theta;</var><sub>B</sub> <span class="op">=</span> <var>n</var><sub>2</sub>/<var>n</var><sub>1</sub>&nbsp;&nbsp;(R<sub>&#8741;</sub> = 0)
     <span style="display:inline-block;width:1.6em"></span>
     sen&thinsp;<var>&theta;</var><sub>c</sub> <span class="op">=</span> <var>n</var><sub>2</sub>/<var>n</var><sub>1</sub>&nbsp;&nbsp;(solo si <var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>; m&aacute;s all&aacute;, R = 1)</div>
-    <div style="font-size:13.5px;color:var(--muted)">En θᵢ = 0 ambas curvas coinciden con el caso de incidencia normal, R = |(η₂−η₁)/(η₂+η₁)|². En θᵢ → 90° toda superficie se vuelve espejo (R → 1): por eso el lago refleja el atardecer. Medios sin pérdidas, μᵣ = 1.</div>
-    <p class="kv" style="color:var(--muted);font-family:inherit">Hipótesis y convención: medios sin pérdidas, μ<sub>r</sub> = 1; el signo de Γ∥ sigue la convención de Ulaby/Griffiths (Hecht usa la opuesta). Los índices de la lista son valores ópticos.</p>
+    <div class="eq">&theta;<sub>i</sub> &gt; &theta;<sub>c</sub>:&nbsp; cos&thinsp;<var>&theta;</var><sub>t</sub> <span class="op">=</span> &minus;j&thinsp;&radic;(sen&sup2;<var>&theta;</var><sub>t</sub> &minus; 1),&nbsp; |&Gamma;| = 1,&nbsp; <var>&alpha;</var> <span class="op">=</span> <var>k</var><sub>0</sub>&thinsp;&radic;(<var>n</var><sub>1</sub><sup>2</sup> sen&sup2;<var>&theta;</var><sub>i</sub> &minus; <var>n</var><sub>2</sub><sup>2</sup>)
+    <span style="display:inline-block;width:1.6em"></span> T <span class="op">=</span> 1 &minus; R</div>
+    <div style="font-size:13.5px;color:var(--muted)">En θᵢ = 0 ambas curvas coinciden con el caso de incidencia normal, R = |(η₂−η₁)/(η₂+η₁)|². En θᵢ → 90° toda superficie se vuelve espejo (R → 1): por eso el lago refleja el atardecer. En reflexión total la potencia reflejada es 100 % pero la fase de Γ depende del ángulo y de la polarización (se muestra en los recuadros); la penetración 1/α se da en longitudes de onda en el vacío, λ₀ = 2π/k₀.</div>
+    <p class="kv" style="color:var(--muted);font-family:inherit">Hipótesis y convención: medios sin pérdidas, μ<sub>r</sub> = 1; el signo de Γ∥ sigue la convención de Ulaby/Griffiths (Hecht usa la opuesta); la raíz de cos θₜ se elige para que la onda decaiga lejos de la frontera. Los índices de la lista son valores ópticos.</p>
     <p class="kv" style="margin-top:10px">Impedancia intrínseca del vacío &nbsp; <b class="cnat">η₀ = √(μ₀/ε₀) ≈ 376.73 Ω</b> &nbsp;<span style="color:var(--muted)">(en cada medio, η = η₀/n)</span></p>
     <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
   </details>
@@ -179,37 +247,47 @@
 var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
 var MATS=[["Aire",1.00],["Agua",1.33],["MgF₂",1.38],["Teflón (PTFE)",1.35],["Sílice fundida",1.46],["Vidrio (BK7)",1.52],["Zafiro",1.77],["Diamante",2.42]];
 var n1=1.00, n2=1.52, th=30, dragging=false;
-var cv=document.getElementById('cv');
-function sel(id,def,cb){var s=document.getElementById(id);
+var D=180/Math.PI;
+var cv=document.getElementById('cv'), cvr=document.getElementById('cvr');
+var S1=document.getElementById('m1'), S2=document.getElementById('m2');
+function sel(s,def,cb){
   MATS.forEach(function(mm,i){var o=document.createElement('option');o.value=i;o.textContent=mm[0]+'  (n = '+mm[1].toFixed(2)+')';s.appendChild(o);});
-  s.value=def; s.addEventListener('change',function(){cb(MATS[+s.value][1]);update();});
-  return s;}
-sel('m1',0,function(v){n1=v;}); sel('m2',5,function(v){n2=v;});
+  s.value=def; s.addEventListener('change',function(){cb(MATS[+s.value][1]);update();});}
+sel(S1,0,function(v){n1=v;}); sel(S2,5,function(v){n2=v;});
+function nombre(n){for(var i=0;i<MATS.length;i++)if(Math.abs(MATS[i][1]-n)<1e-9)return MATS[i][0];return "Medio";}
+function syncSel(){[[S1,n1],[S2,n2]].forEach(function(p){var k=-1;MATS.forEach(function(mm,i){if(Math.abs(mm[1]-p[1])<1e-9)k=i;});if(k>=0)p[0].value=k;});}
 
-// Fresnel con posible cos(theta_t) imaginario (reflexion total)
+// Fresnel; en reflexion total cos(theta_t) = -j b (onda que decae) y |Γ| = 1 con fase
 function coefs(thDeg){
-  var ti=thDeg*Math.PI/180, si=Math.sin(ti), ci=Math.cos(ti);
-  var st=n1/n2*si, e1=377/n1, e2=377/n2;
+  var ti=thDeg/D, si=Math.sin(ti), ci=Math.cos(ti);
+  var st=n1/n2*si, e1=1/n1, e2=1/n2;
   if(st<=1){
-    var ct=Math.sqrt(1-st*st);
+    var ct=Math.sqrt(Math.max(0,1-st*st));
     var gs=(e2*ci-e1*ct)/(e2*ci+e1*ct);
     var gp=(e2*ct-e1*ci)/(e2*ct+e1*ci);
-    return {tt:Math.asin(st)*180/Math.PI, gs:gs, gp:gp, Rs:gs*gs, Rp:gp*gp, tir:false};
+    return {tt:Math.asin(Math.min(1,st))*D, gs:gs, gp:gp, Rs:gs*gs, Rp:gp*gp, tir:false};
   }
-  // cos(theta_t) = -j b  → |Γ| = 1 en ambas polarizaciones
-  return {tt:NaN, gs:NaN, gp:NaN, Rs:1, Rp:1, tir:true};
+  var b=Math.sqrt(st*st-1);
+  var fs=2*Math.atan2(e1*b,e2*ci)*D;                 // Γ⊥ = (e2 c + j e1 b)/(e2 c − j e1 b)
+  var fp=180+2*Math.atan2(e2*b,e1*ci)*D;             // Γ∥ = −(e1 c + j e2 b)/(e1 c − j e2 b)
+  if(fp>180)fp-=360;
+  var inv=1/(2*Math.PI*Math.sqrt(n1*n1*si*si-n2*n2)); // 1/α en unidades de λ0
+  return {tt:NaN, fs:fs, fp:fp, Rs:1, Rp:1, tir:true, pen:inv};
 }
-function thB(){return Math.atan(n2/n1)*180/Math.PI;}
-function thC(){return n1>n2 ? Math.asin(n2/n1)*180/Math.PI : NaN;}
+function thB(){return Math.atan(n2/n1)*D;}
+function thC(){return n1>n2 ? Math.asin(n2/n1)*D : NaN;}
+function snap(t,tol){var b=thB(),c=thC();if(Math.abs(t-b)<tol)return b;if(!isNaN(c)&&Math.abs(t-c)<tol)return c;return t;}
+function fx(v,d){return (+v).toFixed(d).replace('-','−');}
 
-function draw(){
-  var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(340,r.width),H=430;
+function drawPlot(){
+  var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(300,r.width),H=430;
   cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
-  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),line=css('--line');
+  var mut=css('--muted'),panel=css('--panel'),line=css('--line'),GR=css('--green'),RD=css('--red');
   x.fillStyle=panel;x.fillRect(0,0,W,H);
   var ml=58,mr=18,mt=18,mb=46,pw=W-ml-mr,ph=H-mt-mb;
   function X(t){return ml+pw*t/90;} function Y(R){return mt+ph*(1-R);}
-  // rejilla
+  var tb=thB(), tc=thC();
+  if(!isNaN(tc)){x.fillStyle=RD;x.globalAlpha=.08;x.fillRect(X(tc),mt,X(90)-X(tc),ph);x.globalAlpha=1;}
   x.strokeStyle=line;x.lineWidth=1;x.font="12px sans-serif";x.fillStyle=mut;
   for(var i=0;i<=5;i++){var y=Y(i/5);x.beginPath();x.moveTo(ml,y);x.lineTo(ml+pw,y);x.stroke();
     x.textAlign="right";x.fillText((i*20)+" %",ml-7,y+4);}
@@ -218,21 +296,21 @@ function draw(){
   x.fillText("ángulo de incidencia θᵢ",ml+pw/2,H-8);
   x.save();x.translate(14,mt+ph/2);x.rotate(-Math.PI/2);x.textAlign="center";
   x.fillText("potencia reflejada R",0,0);x.restore();
-  // marcas Brewster / critico
-  var tb=thB(), tc=thC();
   x.setLineDash([5,5]);x.lineWidth=1.4;
-  x.strokeStyle=css('--green');x.beginPath();x.moveTo(X(tb),mt);x.lineTo(X(tb),mt+ph);x.stroke();
-  x.fillStyle=css('--green');x.textAlign="left";x.fillText("θB "+tb.toFixed(1)+"°",X(tb)+4,mt+14);
-  if(!isNaN(tc)){x.strokeStyle=css('--red');x.beginPath();x.moveTo(X(tc),mt);x.lineTo(X(tc),mt+ph);x.stroke();
-    x.fillStyle=css('--red');x.fillText("θc "+tc.toFixed(1)+"°",X(tc)+4,mt+30);}
-  x.setLineDash([]);
-  // curvas
+  x.strokeStyle=GR;x.beginPath();x.moveTo(X(tb),mt);x.lineTo(X(tb),mt+ph);x.stroke();
+  x.setLineDash([]);x.font="bold 12px sans-serif";
+  // Brewster siempre a la izquierda de su línea y el crítico a la derecha: nunca se enciman
+  x.fillStyle=GR;x.textAlign="right";x.fillText("θB "+tb.toFixed(1)+"° · R∥ = 0",X(tb)-10,mt+30);
+  if(!isNaN(tc)){x.setLineDash([5,5]);x.strokeStyle=RD;x.beginPath();x.moveTo(X(tc),mt);x.lineTo(X(tc),mt+ph);x.stroke();x.setLineDash([]);
+    x.fillStyle=RD;x.textAlign="left";x.fillText("θc "+tc.toFixed(1)+"° · θt = 90°",X(tc)+10,mt+30);
+    if(X(90)-X(tc)>90){x.font="12px sans-serif";x.textAlign="center";x.fillText("reflexión total",(X(tc)+X(90))/2,Y(0.5));}}
+  x.font="12px sans-serif";
   [["Rs",css('--sperp')],["Rp",css('--spar')]].forEach(function(S){
     x.strokeStyle=S[1];x.lineWidth=2.6;x.beginPath();
-    for(var i2=0;i2<=360;i2++){var t2=i2*90/360,c=coefs(t2);
+    for(var i2=0;i2<=540;i2++){var t2=i2*90/540,c=coefs(t2);
       var y2=Y(c[S[0]]); i2?x.lineTo(X(t2),y2):x.moveTo(X(t2),y2);}
     x.stroke();});
-  // linea de theta actual
+  x.strokeStyle=GR;x.lineWidth=2;x.beginPath();x.arc(X(tb),Y(0),6,0,7);x.stroke();
   var plane=css('--plane'),c0=coefs(th);
   x.strokeStyle=plane;x.lineWidth=2.4;x.setLineDash([7,5]);
   x.beginPath();x.moveTo(X(th),mt);x.lineTo(X(th),mt+ph);x.stroke();x.setLineDash([]);
@@ -241,31 +319,119 @@ function draw(){
   [["Rs",css('--sperp')],["Rp",css('--spar')]].forEach(function(S){
     x.fillStyle=S[1];x.beginPath();x.arc(X(th),Y(c0[S[0]]),5,0,7);x.fill();
     x.strokeStyle=panel;x.lineWidth=1.6;x.stroke();});
-  // readouts
-  document.getElementById('av').textContent=th.toFixed(1)+"°";
-  document.getElementById('ang').value=th;
-  document.getElementById('tt').textContent=c0.tir?"— (reflexión total)":c0.tt.toFixed(1)+"°";
-  document.getElementById('gs').textContent=c0.tir?"|Γ|=1 · 100 %":c0.gs.toFixed(3)+" · "+(100*c0.Rs).toFixed(1)+" %";
-  document.getElementById('gp').textContent=c0.tir?"|Γ|=1 · 100 %":c0.gp.toFixed(3)+" · "+(100*c0.Rp).toFixed(1)+" %";
-  document.getElementById('bb').textContent=tb.toFixed(1)+"° · "+(isNaN(tc)?"—":tc.toFixed(1)+"°");
+  return c0;
 }
+
+function arcBetween(x,ox,oy,a1,a2,r){var d=a2-a1;while(d>Math.PI)d-=2*Math.PI;while(d<=-Math.PI)d+=2*Math.PI;
+  x.beginPath();x.arc(ox,oy,r,a1,a1+d,d<0);x.stroke();return a1+d/2;}
+function ray(x,x0,y0,x1,y1,col,p,off,arrow){
+  var dx=x1-x0,dy=y1-y0,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,nx=-uy*off,ny=ux*off;
+  if(p<0.004){x.save();x.globalAlpha=.55;x.setLineDash([3,4]);x.strokeStyle=col;x.lineWidth=1.2;
+    x.beginPath();x.moveTo(x0+nx,y0+ny);x.lineTo(x1+nx,y1+ny);x.stroke();x.restore();return;}
+  x.save();x.globalAlpha=0.18+0.82*Math.sqrt(p);x.strokeStyle=col;x.fillStyle=col;x.lineWidth=1.2+3.4*Math.sqrt(p);
+  x.beginPath();x.moveTo(x0+nx,y0+ny);x.lineTo(x1+nx,y1+ny);x.stroke();
+  if(arrow){var ax=x0+nx+dx*arrow,ay=y0+ny+dy*arrow,h=9;
+    x.beginPath();x.moveTo(ax+ux*h,ay+uy*h);x.lineTo(ax-uy*h*.5,ay+ux*h*.5);x.lineTo(ax+uy*h*.5,ay-ux*h*.5);x.closePath();x.fill();}
+  x.restore();}
+
+function drawRays(c0){
+  var dpr=window.devicePixelRatio||1,r=cvr.getBoundingClientRect(),W=Math.max(300,r.width),H=320;
+  cvr.width=W*dpr;cvr.height=H*dpr;var x=cvr.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),blue=css('--blue'),GR=css('--green'),RD=css('--red');
+  var SP=css('--sperp'),PA=css('--spar');
+  var oy=Math.round(H*0.52),ox=Math.round(W/2),L=Math.min(W/2-24,oy-18,H-oy-18)*1.0;
+  x.fillStyle=panel;x.fillRect(0,0,W,H);
+  x.fillStyle=blue;x.globalAlpha=Math.min(.32,.03+.16*(n1-1));x.fillRect(0,0,W,oy);
+  x.globalAlpha=Math.min(.32,.03+.16*(n2-1));x.fillRect(0,oy,W,H-oy);x.globalAlpha=1;
+  x.strokeStyle=ink;x.lineWidth=1.4;x.beginPath();x.moveTo(0,oy);x.lineTo(W,oy);x.stroke();
+  x.font="12px sans-serif";x.fillStyle=mut;x.textAlign="left";
+  x.fillText("Medio 1 · "+nombre(n1)+" (n₁ = "+n1.toFixed(2)+")",10,16);
+  x.fillText("Medio 2 · "+nombre(n2)+" (n₂ = "+n2.toFixed(2)+")",10,H-8);
+  x.setLineDash([4,4]);x.strokeStyle=mut;x.lineWidth=1;x.beginPath();x.moveTo(ox,oy-L-6);x.lineTo(ox,oy+L+6);x.stroke();x.setLineDash([]);
+  var t=th/D, s=Math.sin(t), c=Math.cos(t);
+  var ix=ox-L*s, iy=oy-L*c, rx=ox+L*s, ry=oy-L*c;
+  var tb=thB(), tc=thC(), bY=W<560?H-28:oy-8;
+  var atC=!isNaN(tc)&&Math.abs(th-tc)<0.12, atB=Math.abs(th-tb)<0.12;
+  // onda evanescente
+  if(c0.tir&&!atC){var dep=Math.max(10,Math.min(H-oy-6,c0.pen*90));
+    var g=x.createLinearGradient(0,oy,0,oy+dep);g.addColorStop(0,"rgba(179,38,30,.38)");g.addColorStop(1,"rgba(179,38,30,0)");
+    x.fillStyle=g;x.fillRect(ox-L,oy,2*L,dep);
+    x.fillStyle=RD;x.textAlign="center";x.fillText("onda evanescente · 1/α = "+c0.pen.toFixed(2)+" λ₀",ox+L*.45,Math.min(H-24,oy+dep+14));}
+  // rayos: incidente, reflejado y transmitido; azul ⊥ y naranja ∥ lado a lado
+  ray(x,ix,iy,ox,oy,SP,1,-2.5,.55); ray(x,ix,iy,ox,oy,PA,1,2.5,.55);
+  ray(x,ox,oy,rx,ry,SP,c0.Rs,-2.5,.55); ray(x,ox,oy,rx,ry,PA,c0.Rp,2.5,.55);
+  var tx,ty,tt=NaN;
+  if(!c0.tir||atC){tt=atC?90:c0.tt;var st=Math.sin(tt/D),ct=Math.cos(tt/D);tx=ox+L*st;ty=oy+L*ct;
+    ray(x,ox,oy,tx,ty,SP,atC?0.12:1-c0.Rs,-2.5,.55); ray(x,ox,oy,tx,ty,PA,atC?0.12:1-c0.Rp,2.5,.55);}
+  if(c0.Rp<0.004&&!c0.tir){x.fillStyle=PA;x.textAlign="left";x.font="bold 12px sans-serif";x.fillText("R∥ = 0 (se borró)",rx+6,ry+4);x.font="12px sans-serif";}
+  // arcos de θi y θt
+  x.lineWidth=1.3;x.strokeStyle=ink;x.fillStyle=ink;
+  x.font="bold 13px sans-serif";
+  var am=arcBetween(x,ox,oy,-Math.PI/2,Math.atan2(iy-oy,ix-ox),34);
+  x.textAlign="center";if(th>4)x.fillText("θᵢ",ox+46*Math.cos(am),oy+46*Math.sin(am)+4);
+  if(!isNaN(tt)&&th>0.05){var am2=arcBetween(x,ox,oy,Math.PI/2,Math.atan2(ty-oy,tx-ox),30);
+    if(tt>4)x.fillText("θₜ",ox+44*Math.cos(am2),oy+44*Math.sin(am2)+4);}
+  x.font="12px sans-serif";x.fillStyle=ink;x.textAlign="left";
+  x.fillText("θᵢ = "+th.toFixed(1)+"°   θₜ = "+(c0.tir&&!atC?"— (no hay rayo transmitido)":(isNaN(tt)?c0.tt:tt).toFixed(1)+"°"),10,34);
+  // angulo entre reflejado y transmitido
+  if(!isNaN(tt)&&th>0.05){
+    var ang=180-th-tt;
+    if(atC){x.fillStyle=RD;x.font="bold 13px sans-serif";x.textAlign="right";
+      x.fillText("θₜ = 90°: transmitido rasante (crítico)",W-10,bY);}
+    else if(atB||Math.abs(ang-90)<0.12){var q=14,ur=[s,-c],ut=[Math.sin(tt/D),Math.cos(tt/D)];
+      x.strokeStyle=GR;x.lineWidth=2;x.beginPath();x.moveTo(ox+q*ur[0],oy+q*ur[1]);x.lineTo(ox+q*(ur[0]+ut[0]),oy+q*(ur[1]+ut[1]));x.lineTo(ox+q*ut[0],oy+q*ut[1]);x.stroke();
+      x.fillStyle=GR;x.font="bold 13px sans-serif";x.textAlign="right";x.fillText("reflejado ⟂ transmitido: 90° (Brewster)",W-10,bY);}
+    else{x.strokeStyle=mut;x.setLineDash([2,3]);var am3=arcBetween(x,ox,oy,Math.atan2(ry-oy,rx-ox),Math.atan2(ty-oy,tx-ox),20);x.setLineDash([]);
+      x.fillStyle=mut;x.textAlign="left";x.fillText(fx(ang,1)+"°",ox+26*Math.cos(am3)+6,oy+26*Math.sin(am3)+4);}
+    x.font="12px sans-serif";}
+  if(c0.tir&&!atC){x.fillStyle=RD;x.font="bold 13px sans-serif";x.textAlign="right";x.fillText("reflexión total: R⊥ = R∥ = 100 %",W-10,bY);x.font="12px sans-serif";}
+}
+
+function estado(c0){
+  var tb=thB(),tc=thC(),e=document.getElementById('estado'),cls="",msg;
+  var atC=!isNaN(tc)&&Math.abs(th-tc)<0.12, atB=Math.abs(th-tb)<0.12;
+  if(atB){cls="eB";msg="<b>Ángulo de Brewster.</b> Se <b>borra</b> el reflejo paralelo (R∥ = 0): la luz reflejada sale polarizada ⊥ y un polarizador puede apagarla. El 90° está <b>entre</b> el rayo reflejado y el transmitido (θB + θₜ = 90°).";}
+  else if(atC){cls="eC";msg="<b>Ángulo crítico.</b> Se <b>corta</b> la transmisión: θₜ = 90° y el transmitido sale rasante. El 90° <b>es</b> θₜ. A partir de aquí R = 100 % en las dos polarizaciones.";}
+  else if(c0.tir){cls="eC";msg="<b>Reflexión total interna</b> (θᵢ &gt; θc = "+tc.toFixed(1)+"°): R⊥ = R∥ = 100 %, sin importar la polarización; ningún polarizador apaga este reflejo. Del otro lado solo queda una onda evanescente que penetra 1/α = "+c0.pen.toFixed(2)+" λ₀.";}
+  else{msg="θᵢ = "+th.toFixed(1)+"°: se refleja "+(100*c0.Rs).toFixed(1)+" % de ⊥ y "+(100*c0.Rp).toFixed(1)+" % de ∥. ";
+    if(th<tb)msg+="Brewster está más adelante, en "+tb.toFixed(1)+"°.";
+    else if(!isNaN(tc))msg+="Ya pasamos Brewster ("+tb.toFixed(1)+"°); el crítico llega en "+tc.toFixed(1)+"°.";
+    else msg+="Ya pasamos Brewster ("+tb.toFixed(1)+"°).";
+    if(isNaN(tc))msg+=" Aquí <b>no hay ángulo crítico</b> para ningún θᵢ, porque n₁ &lt; n₂ (la luz entra a un medio más denso). Prueba ⇄.";}
+  e.className="estado "+cls; e.innerHTML=msg;
+}
+
+function tiles(c0){
+  var tb=thB(),tc=thC(),$=function(i){return document.getElementById(i);};
+  $('av').textContent=th.toFixed(1)+"°"; $('ang').value=th;
+  var atC=!isNaN(tc)&&Math.abs(th-tc)<0.12;
+  $('tt').textContent=c0.tir?(atC?"90.0° (rasante)":"— (no hay rayo)"):c0.tt.toFixed(1)+"°";
+  $('rt').textContent=c0.tir?"—":(180-th-c0.tt).toFixed(1)+"°";
+  $('gs').textContent=c0.tir?"|Γ|=1 ∠"+fx(c0.fs,1)+"° · 100 %":fx(c0.gs,3)+" · "+(100*c0.Rs).toFixed(1)+" %";
+  $('gp').textContent=c0.tir?"|Γ|=1 ∠"+fx(c0.fp,1)+"° · 100 %":fx(c0.gp,3)+" · "+(100*c0.Rp).toFixed(1)+" %";
+  $('tr').textContent=c0.tir?"0 % · 0 %":(100*(1-c0.Rs)).toFixed(1)+" % · "+(100*(1-c0.Rp)).toFixed(1)+" %";
+  $('ev').textContent=c0.tir&&!atC?c0.pen.toFixed(2)+" λ₀":"— (solo con θᵢ > θc)";
+  $('bb').textContent=tb.toFixed(1)+"°";
+  $('cc').textContent=isNaN(tc)?"no existe (n₁ < n₂)":tc.toFixed(1)+"°";
+}
+
 var IN={N1:document.getElementById('inN1'),N2:document.getElementById('inN2'),T:document.getElementById('inT')};
 function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
-var draw0=draw; draw=function(){draw0();
-  ponSiLibre(IN.N1,+n1.toFixed(2));ponSiLibre(IN.N2,+n2.toFixed(2));ponSiLibre(IN.T,+th.toFixed(1));};
-IN.N1.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n1=v;draw();});
-IN.N2.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n2=v;draw();});
-IN.T.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;th=Math.min(89.9,v);draw();});
+function draw(){var c0=drawPlot();drawRays(c0);estado(c0);tiles(c0);
+  ponSiLibre(IN.N1,+n1.toFixed(3));ponSiLibre(IN.N2,+n2.toFixed(3));ponSiLibre(IN.T,+th.toFixed(1));}
 function update(){draw();}
-document.getElementById('ang').addEventListener('input',function(e){th=+e.target.value;draw();});
+IN.N1.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n1=v;syncSel();draw();});
+IN.N2.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n2=v;syncSel();draw();});
+IN.T.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;th=Math.min(89.9,v);draw();});
+document.getElementById('ang').addEventListener('input',function(e){th=snap(+e.target.value,0.15);draw();});
 document.getElementById('bB').addEventListener('click',function(){th=thB();draw();});
 document.getElementById('bC').addEventListener('click',function(){var c=thC();if(!isNaN(c)){th=c;}draw();});
 document.getElementById('b0').addEventListener('click',function(){th=0;draw();});
-// arrastre
+document.getElementById('bS').addEventListener('click',function(){var t=n1;n1=n2;n2=t;var v=S1.value;S1.value=S2.value;S2.value=v;syncSel();draw();});
 function evX(e){var r=cv.getBoundingClientRect();return (e.clientX!==undefined?e.clientX:e.touches[0].clientX)-r.left;}
 function setFromX(px){
-  var r=cv.getBoundingClientRect(),W=Math.max(340,r.width),ml=58,pw=W-58-18;
-  th=Math.min(89.9,Math.max(0,(px-ml)/pw*90)); draw();
+  var r=cv.getBoundingClientRect(),W=Math.max(300,r.width),ml=58,pw=W-58-18;
+  th=snap(Math.min(89.9,Math.max(0,(px-ml)/pw*90)),0.4); draw();
 }
 cv.addEventListener('pointerdown',function(e){dragging=true;cv.setPointerCapture(e.pointerId);setFromX(evX(e));e.preventDefault();});
 cv.addEventListener('pointermove',function(e){if(dragging){setFromX(evX(e));e.preventDefault();}});
@@ -273,6 +439,28 @@ cv.addEventListener('pointerup',function(){dragging=false;});
 cv.addEventListener('pointercancel',function(){dragging=false;});
 window.addEventListener('resize',draw);
 var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',draw);
+
+// practica: ¿Brewster o critico?
+var R={a:0,b:1,ok:0,tot:0,done:false};
+var rB=document.getElementById('rB'),rC=document.getElementById('rC'),rCno=document.getElementById('rCno'),rFb=document.getElementById('rFb'),rSee=document.getElementById('rSee');
+function nuevo(){var a,b;do{a=Math.floor(Math.random()*MATS.length);b=Math.floor(Math.random()*MATS.length);}while(Math.abs(MATS[a][1]-MATS[b][1])<0.05);
+  R.a=a;R.b=b;R.done=false;rB.value="";rC.value="";rCno.checked=false;rC.disabled=false;rFb.innerHTML="";rSee.disabled=true;
+  document.getElementById('retoTxt').innerHTML="La luz viaja de <b>"+MATS[a][0]+"</b> (n₁ = "+MATS[a][1].toFixed(2)+") hacia <b>"+MATS[b][0]+"</b> (n₂ = "+MATS[b][1].toFixed(2)+").";}
+rCno.addEventListener('change',function(){rC.disabled=this.checked;if(this.checked)rC.value="";});
+document.getElementById('rNew').addEventListener('click',nuevo);
+document.getElementById('rChk').addEventListener('click',function(){
+  var a=MATS[R.a][1],b=MATS[R.b][1],B=Math.atan(b/a)*D,C=a>b?Math.asin(b/a)*D:NaN;
+  var vb=parseFloat(String(rB.value).replace(',','.')),vc=parseFloat(String(rC.value).replace(',','.'));
+  var okB=Math.abs(vb-B)<=0.5, okC=isNaN(C)?rCno.checked:(!rCno.checked&&Math.abs(vc-C)<=0.5);
+  var h="";
+  h+=okB?"✔ θB = "+B.toFixed(1)+"°. ":"✘ θB: usa la <b>tangente</b>, tan θB = n₂/n₁"+(Math.abs(vb-(isNaN(C)?-99:C))<=0.5?" (calculaste el crítico: ese es con seno)":(Math.abs(vb-Math.asin(Math.min(1,b/a))*D)<=0.5?" (usaste seno: ese es el crítico)":""))+". ";
+  if(isNaN(C))h+=okC?"✔ Sin ángulo crítico: n₁ &lt; n₂.":"✘ θc no existe: la luz va a un medio más denso (n₁ &lt; n₂), sen θc = n₂/n₁ &gt; 1.";
+  else h+=okC?"✔ θc = "+C.toFixed(1)+"° (y θB &lt; θc, como siempre).":(rCno.checked?"✘ Aquí sí existe: n₁ &gt; n₂. ":"✘ θc: usa el <b>seno</b>, sen θc = n₂/n₁. ")+(Math.abs(vc-B)<=0.5?"(Pusiste el de Brewster.)":"");
+  if(!R.done){R.tot++;if(okB&&okC)R.ok++;R.done=true;}
+  document.getElementById('rCount').textContent=R.ok+" / "+R.tot;
+  rFb.className="fb "+(okB&&okC?"fok":"fno");rFb.innerHTML=h;rSee.disabled=false;});
+rSee.addEventListener('click',function(){n1=MATS[R.a][1];n2=MATS[R.b][1];S1.value=R.a;S2.value=R.b;th=thB();draw();cv.scrollIntoView({behavior:'smooth',block:'center'});});
+nuevo();
 draw();
 })();
 </script>

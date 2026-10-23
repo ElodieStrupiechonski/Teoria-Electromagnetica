@@ -2,6 +2,13 @@
 
 La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones archivadas en Zenodo. Cada versión archivada tiene su propio DOI de versión; el DOI de concepto [10.5281/zenodo.23423156](https://doi.org/10.5281/zenodo.23423156) (citar «todas las versiones») resuelve siempre a la más reciente.
 
+## Sin versión archivada — 2026-10-21 (rama principal, después de la v1.3.1)
+- Documentación del expediente de auditoría según el informe de cierre: origen de los informes declarado (asistente de IA), informes de verificación y cierre añadidos, fecha de `CITATION.cff`.
+- Efecto piel: profundidades mayores que 10⁴ km en notación científica.
+- Portada con `<head>`/`<body>` explícitos (requisito del verificador de Google Search Console).
+- `.zenodo.json`: el sitio web como trabajo relacionado (*isSupplementedBy*), para las versiones futuras.
+- Fresnel (adelanta puntos de la 1.4): diagrama de rayos con potencia por polarización, escuadra de 90° en Brewster y rayo rasante en el crítico; botón «⇄ Invertir el sentido»; T⊥ y T∥, fase de Γ y penetración 1/α en reflexión total; tabla «Brewster o crítico» y práctica con retroalimentación; etiquetas `<label for>` en sus entradas.
+
 ## [1.3.1] — 2026-10-21 · DOI de versión [10.5281/zenodo.23538848](https://doi.org/10.5281/zenodo.23538848)
 
 Atiende el informe de verificación de la v1.3 (detalle en [`auditoria/RESPUESTA_AUDITORIA.md`](auditoria/RESPUESTA_AUDITORIA.md), sección 6).
@@ -16,11 +23,11 @@ Atiende el informe de verificación de la v1.3 (detalle en [`auditoria/RESPUESTA
 
 ### Añadido
 - Datos para buscadores en las 20 páginas (título descriptivo, descripción, URL canónica, Open Graph, schema.org *LearningResource*), `sitemap.xml` y verificación de Google Search Console; script `add_seo_em.py`.
-- Carpeta `auditoria/` con los informes de los auditores (auditoría de la v1.2+ y verificación de la v1.3, con sus anexos), publicados con su autorización, y la matriz de respuesta.
+- Carpeta `auditoria/` con los informes de auditoría, verificación y cierre (elaborados con Claude, asistente de IA de Anthropic, a petición de la autoría; ver `auditoria/README.md`) y la matriz de respuesta.
 
 ## [1.3] — 2026-10-19 · DOI de versión [10.5281/zenodo.23482923](https://doi.org/10.5281/zenodo.23482923)
 
-Versión que atiende la auditoría externa del sitio (19 de octubre de 2026). El detalle hallazgo por hallazgo, con la decisión tomada y la verificación, está en [`auditoria/RESPUESTA_AUDITORIA.md`](auditoria/RESPUESTA_AUDITORIA.md).
+Versión que atiende la auditoría del sitio asistida por IA (19 de octubre de 2026). El detalle hallazgo por hallazgo, con la decisión tomada y la verificación, está en [`auditoria/RESPUESTA_AUDITORIA.md`](auditoria/RESPUESTA_AUDITORIA.md).
 
 ### Añadido
 - Seis exploradores nuevos: Ley de Gauss, Capacitor con dieléctrico, Inducción de Faraday (Unidad 1); Línea de transmisión, Carta de Smith y Guía de onda rectangular (Unidad 4). La colección pasa de 13 a 19 exploradores.
@@ -40,7 +47,7 @@ Versión que atiende la auditoría externa del sitio (19 de octubre de 2026). El
 > Nota: la copia archivada en Zenodo de la v1.3 rotula sus páginas con el número «1.2», porque la etiqueta v1.2 ya estaba ocupada por el depósito anterior y la etiqueta se cambió al publicar. El contenido es el descrito aquí; la rotulación se unificó a «1.3» en el repositorio inmediatamente después.
 
 ## [1.2] — 2026-10-16 · DOI de versión [10.5281/zenodo.23423157](https://doi.org/10.5281/zenodo.23423157)
-- Primer depósito en Zenodo (páginas rotuladas internamente con el número «1.1»). Barra de navegación por temario, contador de visitas, portada ordenada por unidades, 13 exploradores. La auditoría externa se hizo sobre un commit posterior (`92f6190`, 19 de octubre), no depositado.
+- Primer depósito en Zenodo (páginas rotuladas internamente con el número «1.1»). Barra de navegación por temario, contador de visitas, portada ordenada por unidades, 13 exploradores. La auditoría se hizo sobre un commit posterior (`92f6190`, 19 de octubre), no depositado.
 
 ## [1.0]–[1.1] — septiembre–octubre de 2026 (sin depósito en Zenodo)
 - Primera publicación en GitHub Pages: 9 exploradores; después, navegación y contador.
