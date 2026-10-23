@@ -7,7 +7,7 @@ La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones arc
 - Efecto piel: profundidades mayores que 10⁴ km en notación científica.
 - Portada con `<head>`/`<body>` explícitos (requisito del verificador de Google Search Console).
 - `.zenodo.json`: el sitio web como trabajo relacionado (*isSupplementedBy*), para las versiones futuras.
-- Fresnel (adelanta puntos de la 1.4): diagrama de rayos con potencia por polarización, escuadra de 90° en Brewster y rayo rasante en el crítico; botón «⇄ Invertir el sentido»; T⊥ y T∥, fase de Γ y penetración 1/α en reflexión total; tabla «Brewster o crítico» y práctica con retroalimentación; etiquetas `<label for>` en sus entradas.
+- Fresnel (adelanta puntos de la 1.4): diagrama de rayos con potencia por polarización, escuadra de 90° en Brewster y rayo rasante en el crítico; botón «⇄ Invertir el sentido»; T⊥ y T∥, fase de Γ y penetración 1/α en reflexión total; tabla «Brewster o crítico» y práctica con retroalimentación; etiquetas `<label for>` en sus entradas. Paneles de campo evanescente (perfil e^(−αz), λ₀ en nm, sensado ATR) y de fibra óptica con una fibra vecina (reflexión total frustrada, fórmula de Zhu *et al.* 1986 verificada contra matriz de transferencia). Convención de color unificada: azul = ∥, rojo = ⊥; el ángulo crítico pasa a granate.
 
 ## [1.3.1] — 2026-10-21 · DOI de versión [10.5281/zenodo.23538848](https://doi.org/10.5281/zenodo.23538848)
 

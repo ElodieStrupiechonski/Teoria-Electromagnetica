@@ -72,8 +72,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#f4f1ea;--card:#fff;--ink:#1a1a1a;--muted:#5a5a5a;--navy:#1F3864;--blue:#2E5496;--accent:#C1571B;--green:#2E7D32;--red:#B3261E;--line:#e2dcc9;--panel:#fcfbf7;--sperp:#2a78d6;--spar:#eb6834;--plane:#f2c14e;--serif:'Spectral',Georgia,serif;}
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--red:#e88a80;--line:#333a44;--panel:#181c22;}}
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#1a1a1a;--muted:#5a5a5a;--navy:#1F3864;--blue:#2E5496;--accent:#C1571B;--green:#2E7D32;--red:#B3261E;--crit:#8e1b5b;--line:#e2dcc9;--panel:#fcfbf7;--sperp:#c62828;--spar:#1f5fbf;--plane:#f2c14e;--serif:'Spectral',Georgia,serif;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--red:#e88a80;--crit:#e07ab8;--line:#333a44;--panel:#181c22;}}
   *{box-sizing:border-box}
   body{background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45;margin:0}
   .wrap{max-width:960px;margin:0 auto;padding:22px 16px}
@@ -120,12 +120,12 @@
   .rayhead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14.5px;color:var(--navy);margin-bottom:8px}
   .muted{color:var(--muted);font-size:12.5px}
   .estado{margin-top:10px;padding:10px 13px;border-radius:9px;border-left:5px solid var(--line);background:var(--bg);font-size:14.5px;line-height:1.5}
-  .estado.eB{border-left-color:var(--green)} .estado.eC{border-left-color:var(--red)}
+  .estado.eB{border-left-color:var(--green)} .estado.eC{border-left-color:var(--crit)}
   .btnx{border-color:var(--accent);color:var(--accent)}
   .tile.tb{border-color:var(--green)} .tile.tb .v{color:var(--green)}
-  .tile.tc{border-color:var(--red)} .tile.tc .v{color:var(--red)}
-  .tile.tb .k b{color:var(--green)} .tile.tc .k b{color:var(--red)}
-  .gB{color:var(--green)} .gC{color:var(--red)}
+  .tile.tc{border-color:var(--crit)} .tile.tc .v{color:var(--crit)}
+  .tile.tb .k b{color:var(--green)} .tile.tc .k b{color:var(--crit)}
+  .gB{color:var(--green)} .gC{color:var(--crit)}
   .regla{font-size:15px;margin:10px 0}
   .cmpwrap{overflow-x:auto}
   table.cmp{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
@@ -136,11 +136,12 @@
   .inbox .nx input{width:auto}
   .fb{margin-top:10px;font-size:14.5px;line-height:1.5;padding:0 2px}
   .fb.fok{color:var(--green)} .fb.fno{color:var(--red)}
+  .nota{margin-top:10px;font-size:13.5px;color:var(--muted);line-height:1.5} .nota b{color:var(--ink)}
   @media (max-width:560px){.tile .v{font-size:15px}}
 </style>
 <div class="wrap">
   <h1>Coeficientes de Fresnel: incidencia oblicua</h1>
-  <div class="sub">Potencia reflejada de cada polarización contra el ángulo de incidencia. Arrastra la línea amarilla (o usa el deslizador) para mover θᵢ; cambia los medios y observa el <b>ángulo de Brewster</b> (R∥ = 0) y, cuando n₁ &gt; n₂, el <b>ángulo crítico</b> con reflexión total; el diagrama de rayos muestra dónde está «el 90°» de cada uno y el botón ⇄ invierte el sentido de la luz. En el curso de la ENES Juriquilla este explorador acompaña los temas 3.6 a 3.8.</div>
+  <div class="sub">Potencia reflejada de cada polarización contra el ángulo de incidencia. Arrastra la línea amarilla (o usa el deslizador) para mover θᵢ; cambia los medios y observa el <b>ángulo de Brewster</b> (R∥ = 0) y, cuando n₁ &gt; n₂, el <b>ángulo crítico</b> con reflexión total; el diagrama de rayos muestra dónde está «el 90°» de cada uno, el botón ⇄ invierte el sentido de la luz, y dos paneles muestran el campo evanescente (sensado ATR) y la fibra óptica con una vecina que le roba señal por efecto túnel. Colores en todo el explorador: <span style="color:#1f5fbf;font-weight:700">azul = ∥</span>, <span style="color:#c62828;font-weight:700">rojo = ⊥</span>. En el curso de la ENES Juriquilla este explorador acompaña los temas 3.6 a 3.8.</div>
 
   <div class="card">
     <canvas id="cv" role="img" aria-label="Curvas de potencia reflejada contra el ángulo de incidencia" height="430"></canvas>
@@ -149,12 +150,12 @@
       <span><i style="background:var(--spar)"></i>R∥ (E en el plano, p/TM)</span>
       <span><i style="background:var(--plane)"></i>θᵢ (arrástralo)</span>
       <span><i style="background:var(--green)"></i>θB: se borra R∥</span>
-      <span><i style="background:var(--red)"></i>θc: se corta la transmisión</span>
+      <span><i style="background:var(--crit)"></i>θc: se corta la transmisión</span>
     </div>
   </div>
 
   <div class="card">
-    <div class="rayhead"><b>Lo que hace la luz en la frontera</b><span class="muted">grosor e intensidad de cada rayo ∝ potencia; azul ⊥, naranja ∥</span></div>
+    <div class="rayhead"><b>Lo que hace la luz en la frontera</b><span class="muted">grosor e intensidad de cada rayo ∝ potencia; azul ∥, rojo ⊥</span></div>
     <canvas id="cvr" role="img" aria-label="Diagrama de rayos incidente, reflejado y transmitido en la frontera, con los ángulos marcados" height="320"></canvas>
     <div class="estado" id="estado" aria-live="polite">—</div>
   </div>
@@ -186,6 +187,31 @@
       <div class="tile tb"><div class="k">θB · tan θB = n₂/n₁ · <b>borra R∥</b></div><div class="v" id="bb">—</div></div>
       <div class="tile tc"><div class="k">θc · sen θc = n₂/n₁ · <b>corta T</b></div><div class="v" id="cc">—</div></div>
     </div>
+  </div>
+
+  <div class="card">
+    <div class="rayhead"><b>Campo evanescente en el medio menos denso</b><span class="muted">solo con θᵢ &gt; θc · amplitud ∝ e<sup>−αz</sup></span></div>
+    <canvas id="cve" role="img" aria-label="Perfil del campo evanescente en el medio 2 contra la distancia a la frontera" height="300"></canvas>
+    <div class="inrow" style="grid-template-columns:1fr 2fr">
+      <div class="inbox"><label for="inL">λ<sub>0</sub> en el vacío (nm)</label><input id="inL" type="number" step="any" min="1" inputmode="decimal" value="633"></div>
+      <div class="inbox"><label>Penetración</label><div class="v" id="evnm" style="font-size:16px;font-weight:700;color:var(--navy)">—</div></div>
+    </div>
+    <div class="nota"><b>Sensado por reflexión total atenuada (ATR).</b> El campo sí existe del otro lado, aunque no transporte potencia: «toca» una capa de grosor ~1/α. Si en esa capa hay una muestra que absorbe (un líquido, una proteína adsorbida, una película), parte de la energía se pierde y la reflexión deja de ser total: R &lt; 1 justo en las longitudes de onda que la muestra absorbe. Así funcionan la espectroscopía FTIR-ATR (un cristal de ZnSe o diamante con muchas reflexiones internas, y la muestra encima) y los biosensores de resonancia de plasmón superficial. Con λ₀ = 633 nm y vidrio → aire a 60°, el sensor «ve» solo los primeros ~120 nm: por eso es tan selectivo a lo que está pegado a la superficie.</div>
+  </div>
+
+  <div class="card">
+    <div class="rayhead"><b>Fibra óptica: muchas reflexiones totales… y una fibra vecina que roba señal</b><span class="muted">núcleo n₁, revestimiento n₂; el ángulo es el θᵢ de arriba</span></div>
+    <canvas id="cvf" role="img" aria-label="Rayo que rebota dentro de una fibra óptica y una segunda fibra cercana que recibe potencia por efecto túnel" height="270"></canvas>
+    <div class="controls" style="margin-top:10px">
+      <div class="ctl"><label><span>Separación entre fibras g</span> <span id="gv">0.50 λ₀</span></label><input id="gap" type="range" min="0" max="2" step="0.01" value="0.5" aria-label="Separación entre las dos fibras, en longitudes de onda"></div>
+      <div class="ctl"><label><span>Rebotes dibujados N</span> <span id="nv">8</span></label><input id="nreb" type="range" min="1" max="20" step="1" value="8" aria-label="Número de rebotes"></div>
+    </div>
+    <div class="tiles" style="grid-template-columns:repeat(3,1fr)">
+      <div class="tile"><div class="k">Fuga por rebote T(g) · ∥ · ⊥</div><div class="v" id="ftT">—</div></div>
+      <div class="tile"><div class="k">Queda en la fibra tras N rebotes · ∥ · ⊥</div><div class="v" id="ftN">—</div></div>
+      <div class="tile"><div class="k">Rebotes por metro (núcleo de 9 µm)</div><div class="v" id="ftM">—</div></div>
+    </div>
+    <div class="nota"><b>Reflexión total frustrada (efecto túnel óptico).</b> Si otra fibra (o un prisma) se acerca a menos de ~1/α, el campo evanescente llega hasta ella y vuelve a propagarse: cada rebote pierde una fracción T(g) que cae como e<sup>−2αg</sup>. Es el principio del <b>acoplador de fibra</b> (y de los divisores de haz de cubo) y también de una <b>intervención sin cortar el cable</b>: basta doblar la fibra o desnudarla y arrimar un detector. Una fibra con muchas pérdidas inexplicables puede estar siendo «escuchada»; de ahí los sistemas que vigilan el presupuesto de potencia. En aeroespacial el mismo acoplamiento se usa a propósito en los sensores de fibra distribuidos y en las redes ópticas de a bordo.</div>
   </div>
 
   <details class="card" open>
@@ -230,8 +256,11 @@
     sen&thinsp;<var>&theta;</var><sub>c</sub> <span class="op">=</span> <var>n</var><sub>2</sub>/<var>n</var><sub>1</sub>&nbsp;&nbsp;(solo si <var>n</var><sub>1</sub> &gt; <var>n</var><sub>2</sub>; m&aacute;s all&aacute;, R = 1)</div>
     <div class="eq">&theta;<sub>i</sub> &gt; &theta;<sub>c</sub>:&nbsp; cos&thinsp;<var>&theta;</var><sub>t</sub> <span class="op">=</span> &minus;j&thinsp;&radic;(sen&sup2;<var>&theta;</var><sub>t</sub> &minus; 1),&nbsp; |&Gamma;| = 1,&nbsp; <var>&alpha;</var> <span class="op">=</span> <var>k</var><sub>0</sub>&thinsp;&radic;(<var>n</var><sub>1</sub><sup>2</sup> sen&sup2;<var>&theta;</var><sub>i</sub> &minus; <var>n</var><sub>2</sub><sup>2</sup>)
     <span style="display:inline-block;width:1.6em"></span> T <span class="op">=</span> 1 &minus; R</div>
+    <div class="eq">Reflexi&oacute;n total frustrada (dos medios <var>n</var><sub>1</sub> separados por una capa <var>n</var><sub>2</sub> de grosor <var>g</var>):&nbsp; T(<var>g</var>) <span class="op">=</span> 1 / [1 + <var>F</var> senh&sup2;(<var>&alpha;g</var>)],&nbsp;
+    <var>F</var><sub>&#8869;</sub> <span class="op">=</span> (<var>n</var><sub>1</sub><sup>2</sup> &minus; <var>n</var><sub>2</sub><sup>2</sup>)<sup>2</sup> / [4 <var>n</var><sub>1</sub><sup>2</sup> cos&sup2;<var>&theta;</var><sub>i</sub> (<var>n</var><sub>1</sub><sup>2</sup> sen&sup2;<var>&theta;</var><sub>i</sub> &minus; <var>n</var><sub>2</sub><sup>2</sup>)],&nbsp;
+    <var>F</var><sub>&#8741;</sub> <span class="op">=</span> (<var>n</var><sub>2</sub><sup>4</sup> <var>k</var><sub>1z</sub><sup>2</sup> + <var>n</var><sub>1</sub><sup>4</sup> <var>&alpha;</var><sup>2</sup>)<sup>2</sup> / (4 <var>n</var><sub>1</sub><sup>4</sup> <var>n</var><sub>2</sub><sup>4</sup> <var>k</var><sub>1z</sub><sup>2</sup> <var>&alpha;</var><sup>2</sup>),&nbsp; <var>k</var><sub>1z</sub> <span class="op">=</span> <var>k</var><sub>0</sub> <var>n</var><sub>1</sub> cos&thinsp;<var>&theta;</var><sub>i</sub></div>
     <div style="font-size:13.5px;color:var(--muted)">En θᵢ = 0 ambas curvas coinciden con el caso de incidencia normal, R = |(η₂−η₁)/(η₂+η₁)|². En θᵢ → 90° toda superficie se vuelve espejo (R → 1): por eso el lago refleja el atardecer. En reflexión total la potencia reflejada es 100 % pero la fase de Γ depende del ángulo y de la polarización (se muestra en los recuadros); la penetración 1/α se da en longitudes de onda en el vacío, λ₀ = 2π/k₀.</div>
-    <p class="kv" style="color:var(--muted);font-family:inherit">Hipótesis y convención: medios sin pérdidas, μ<sub>r</sub> = 1; el signo de Γ∥ sigue la convención de Ulaby/Griffiths (Hecht usa la opuesta); la raíz de cos θₜ se elige para que la onda decaiga lejos de la frontera. Los índices de la lista son valores ópticos.</p>
+    <p class="kv" style="color:var(--muted);font-family:inherit">Hipótesis y convención: medios sin pérdidas, μ<sub>r</sub> = 1; el signo de Γ∥ sigue la convención de Ulaby/Griffiths (Hecht usa la opuesta); la raíz de cos θₜ se elige para que la onda decaiga lejos de la frontera. Los índices de la lista son valores ópticos. La fórmula de la reflexión total frustrada es la de Zhu <i>et al.</i>, <i>Am. J. Phys.</i> 54, 601 (1986), <a href="https://doi.org/10.1119/1.14514" target="_blank" rel="noopener">doi:10.1119/1.14514</a>.</p>
     <p class="kv" style="margin-top:10px">Impedancia intrínseca del vacío &nbsp; <b class="cnat">η₀ = √(μ₀/ε₀) ≈ 376.73 Ω</b> &nbsp;<span style="color:var(--muted)">(en cada medio, η = η₀/n)</span></p>
     <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
   </details>
@@ -282,7 +311,7 @@ function fx(v,d){return (+v).toFixed(d).replace('-','−');}
 function drawPlot(){
   var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(300,r.width),H=430;
   cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
-  var mut=css('--muted'),panel=css('--panel'),line=css('--line'),GR=css('--green'),RD=css('--red');
+  var mut=css('--muted'),panel=css('--panel'),line=css('--line'),GR=css('--green'),RD=css('--crit');
   x.fillStyle=panel;x.fillRect(0,0,W,H);
   var ml=58,mr=18,mt=18,mb=46,pw=W-ml-mr,ph=H-mt-mb;
   function X(t){return ml+pw*t/90;} function Y(R){return mt+ph*(1-R);}
@@ -337,7 +366,7 @@ function ray(x,x0,y0,x1,y1,col,p,off,arrow){
 function drawRays(c0){
   var dpr=window.devicePixelRatio||1,r=cvr.getBoundingClientRect(),W=Math.max(300,r.width),H=320;
   cvr.width=W*dpr;cvr.height=H*dpr;var x=cvr.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
-  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),blue=css('--blue'),GR=css('--green'),RD=css('--red');
+  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),blue=css('--blue'),GR=css('--green'),RD=css('--crit');
   var SP=css('--sperp'),PA=css('--spar');
   var oy=Math.round(H*0.52),ox=Math.round(W/2),L=Math.min(W/2-24,oy-18,H-oy-18)*1.0;
   x.fillStyle=panel;x.fillRect(0,0,W,H);
@@ -354,10 +383,10 @@ function drawRays(c0){
   var atC=!isNaN(tc)&&Math.abs(th-tc)<0.12, atB=Math.abs(th-tb)<0.12;
   // onda evanescente
   if(c0.tir&&!atC){var dep=Math.max(10,Math.min(H-oy-6,c0.pen*90));
-    var g=x.createLinearGradient(0,oy,0,oy+dep);g.addColorStop(0,"rgba(179,38,30,.38)");g.addColorStop(1,"rgba(179,38,30,0)");
+    var g=x.createLinearGradient(0,oy,0,oy+dep);g.addColorStop(0,"rgba(142,27,91,.38)");g.addColorStop(1,"rgba(142,27,91,0)");
     x.fillStyle=g;x.fillRect(ox-L,oy,2*L,dep);
     x.fillStyle=RD;x.textAlign="center";x.fillText("onda evanescente · 1/α = "+c0.pen.toFixed(2)+" λ₀",ox+L*.45,Math.min(H-24,oy+dep+14));}
-  // rayos: incidente, reflejado y transmitido; azul ⊥ y naranja ∥ lado a lado
+  // rayos: incidente, reflejado y transmitido; azul ∥ y rojo ⊥ lado a lado
   ray(x,ix,iy,ox,oy,SP,1,-2.5,.55); ray(x,ix,iy,ox,oy,PA,1,2.5,.55);
   ray(x,ox,oy,rx,ry,SP,c0.Rs,-2.5,.55); ray(x,ox,oy,rx,ry,PA,c0.Rp,2.5,.55);
   var tx,ty,tt=NaN;
@@ -415,9 +444,130 @@ function tiles(c0){
   $('cc').textContent=isNaN(tc)?"no existe (n₁ < n₂)":tc.toFixed(1)+"°";
 }
 
+
+// ---- campo evanescente y fibra ----
+var cve=document.getElementById('cve'), cvf=document.getElementById('cvf');
+var lam0=633, gap=0.5, nreb=8;
+function alphaL(){ // α en unidades de 1/λ0 (α λ0)
+  var si=Math.sin(th/D); var q=n1*n1*si*si-n2*n2; return q>0?2*Math.PI*Math.sqrt(q):NaN;}
+function ftir(){ // T(g) por polarización, g en λ0; Zhu et al. (1986)
+  var a=alphaL(); if(isNaN(a))return null;
+  var ci=Math.cos(th/D), si=Math.sin(th/D), k1z=2*Math.PI*n1*ci, kap=a;
+  var Fs=Math.pow(n1*n1-n2*n2,2)/(4*n1*n1*ci*ci*(n1*n1*si*si-n2*n2));
+  var Fp=Math.pow(Math.pow(n2,4)*k1z*k1z+Math.pow(n1,4)*kap*kap,2)/(4*Math.pow(n1,4)*Math.pow(n2,4)*k1z*k1z*kap*kap);
+  var sh=Math.sinh(a*gap); sh=sh*sh;
+  return {Ts:1/(1+Fs*sh), Tp:1/(1+Fp*sh), a:a};}
+
+function drawEvan(c0){
+  var dpr=window.devicePixelRatio||1,r=cve.getBoundingClientRect(),W=Math.max(300,r.width),H=300;
+  cve.width=W*dpr;cve.height=H*dpr;var x=cve.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),line=css('--line'),RD=css('--crit'),blue=css('--blue'),SP=css('--sperp'),PA=css('--spar');
+  x.fillStyle=panel;x.fillRect(0,0,W,H);
+  var ml=60,mr=16,mt=16,mb=44,pw=W-ml-mr,ph=H-mt-mb;
+  var fx0=ml+pw*0.28; // frontera
+  x.fillStyle=blue;x.globalAlpha=Math.min(.32,.03+.16*(n1-1));x.fillRect(ml,mt,fx0-ml,ph);
+  x.globalAlpha=Math.min(.32,.03+.16*(n2-1));x.fillRect(fx0,mt,ml+pw-fx0,ph);x.globalAlpha=1;
+  x.strokeStyle=ink;x.lineWidth=1.4;x.beginPath();x.moveTo(fx0,mt);x.lineTo(fx0,mt+ph);x.stroke();
+  x.font="12px sans-serif";x.fillStyle=mut;x.textAlign="center";
+  x.fillText("medio 1 (n₁ = "+n1.toFixed(2)+")",(ml+fx0)/2,mt+14);x.fillText("medio 2 (n₂ = "+n2.toFixed(2)+")",(fx0+ml+pw)/2,mt+14);
+  x.fillText("distancia a la frontera z (en λ₀)",ml+pw/2,H-8);
+  x.save();x.translate(14,mt+ph/2);x.rotate(-Math.PI/2);x.fillText("amplitud |E| (normalizada)",0,0);x.restore();
+  var a=alphaL();
+  var zmax=isNaN(a)?2:Math.max(0.6,Math.min(3,6/a)); // λ0 mostradas a la derecha
+  function X(z){return fx0+(ml+pw-fx0)*z/zmax;} function Y(v){return mt+ph*(1-v);}
+  x.strokeStyle=line;x.lineWidth=1;x.textAlign="center";
+  var stp=zmax>2?0.5:(zmax>1?0.25:0.1);
+  for(var z=0;z<=zmax+1e-9;z+=stp){x.beginPath();x.moveTo(X(z),mt);x.lineTo(X(z),mt+ph);x.stroke();x.fillStyle=mut;x.fillText(z.toFixed(2).replace(/\.?0+$/,''),X(z),mt+ph+16);}
+  if(isNaN(a)){x.fillStyle=ink;x.font="bold 14px sans-serif";x.fillText(isNaN(thC())?"Sin ángulo crítico (n₁ < n₂): no hay campo evanescente":"Lleva θᵢ más allá de θc = "+thC().toFixed(1)+"° para ver el campo evanescente",ml+pw/2,mt+ph/2);
+    document.getElementById('evnm').textContent="— (θᵢ ≤ θc)";return;}
+  // relleno del campo
+  var g=x.createLinearGradient(fx0,0,X(zmax),0);g.addColorStop(0,"rgba(142,27,91,.35)");g.addColorStop(1,"rgba(142,27,91,0)");
+  x.fillStyle=g;x.beginPath();x.moveTo(fx0,Y(0));x.lineTo(fx0,Y(A0));
+  for(var i=0;i<=200;i++){var zz=zmax*i/200;x.lineTo(X(zz),Y(A0*Math.exp(-a*zz)));}
+  x.lineTo(X(zmax),Y(0));x.closePath();x.fill();
+  // onda estacionaria en el medio 1 (esquemática): |E| = |1 + Γ e^{...}| ~ 2|cos(k1z z + φ/2)|
+  var k1z=2*Math.PI*n1*Math.cos(th/D), ph1=(c0.fs||0)/D, A0=Math.abs(Math.cos(ph1/2)); // fase de Γ⊥; |E(0)| = |1+Γ| = 2|cos(φ/2)|
+  x.strokeStyle=SP;x.lineWidth=2;x.beginPath();
+  var zL=(fx0-ml)/((ml+pw-fx0)/zmax);
+  for(var i2=0;i2<=300;i2++){var z1=-zL*(1-i2/300);var v=Math.abs(Math.cos(k1z*z1+ph1/2));var px=fx0+(ml+pw-fx0)*z1/zmax;i2?x.lineTo(px,Y(v)):x.moveTo(px,Y(v));}
+  x.stroke();
+  x.strokeStyle=RD;x.lineWidth=2.6;x.beginPath();
+  for(var i3=0;i3<=200;i3++){var z3=zmax*i3/200;var y3=Y(A0*Math.exp(-a*z3));i3?x.lineTo(X(z3),y3):x.moveTo(X(z3),y3);}
+  x.stroke();
+  // marca 1/α
+  var inv=1/a; x.setLineDash([4,4]);x.strokeStyle=RD;x.lineWidth=1.2;x.beginPath();x.moveTo(X(inv),Y(0));x.lineTo(X(inv),Y(A0*Math.exp(-1)));x.lineTo(fx0,Y(A0*Math.exp(-1)));x.stroke();x.setLineDash([]);
+  x.fillStyle=RD;x.font="bold 12px sans-serif";x.textAlign="left";x.fillText("1/α = "+inv.toFixed(2)+" λ₀  (|E| cae a 1/e)",X(inv)+6,Y(A0*Math.exp(-1))-6);
+  x.fillStyle=SP;x.textAlign="right";x.fillText("onda estacionaria (incidente + reflejada), ⊥",fx0-8,mt+ph-8);
+  var nm=inv*lam0; document.getElementById('evnm').textContent="1/α = "+(nm>=1000?(nm/1000).toFixed(2)+" µm":nm.toFixed(0)+" nm")+" · intensidad: 1/(2α) = "+(nm/2>=1000?(nm/2000).toFixed(2)+" µm":(nm/2).toFixed(0)+" nm");
+}
+
+function drawFiber(c0){
+  var dpr=window.devicePixelRatio||1,r=cvf.getBoundingClientRect(),W=Math.max(300,r.width),H=270;
+  cvf.width=W*dpr;cvf.height=H*dpr;var x=cvf.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),blue=css('--blue'),RD=css('--crit'),SP=css('--sperp'),PA=css('--spar'),GR=css('--green');
+  x.fillStyle=panel;x.fillRect(0,0,W,H);
+  var f=ftir(), tc=thC();
+  var core=58, gapPx=Math.max(4,gap*40), y1=56, y2=y1+core, y3=y2+gapPx, y4=y3+core; // fibra 1: y1..y2; fibra 2: y3..y4
+  var x0=20, xe=W-20;
+  // revestimientos
+  x.fillStyle=blue;x.globalAlpha=Math.min(.18,.02+.08*(n2-1));x.fillRect(x0,y1-24,xe-x0,core+48+gapPx+core);x.globalAlpha=1;
+  // núcleos
+  x.fillStyle=blue;x.globalAlpha=Math.min(.35,.05+.16*(n1-1));x.fillRect(x0,y1,xe-x0,core);x.fillRect(x0,y3,xe-x0,core);x.globalAlpha=1;
+  x.strokeStyle=ink;x.lineWidth=1.2;[y1,y2,y3,y4].forEach(function(y){x.beginPath();x.moveTo(x0,y);x.lineTo(xe,y);x.stroke();});
+  x.font="12px sans-serif";x.fillStyle=mut;x.textAlign="left";
+  x.fillText("fibra 1 · núcleo n₁ = "+n1.toFixed(2)+" · revestimiento n₂ = "+n2.toFixed(2),x0+4,y1-9);
+  x.fillText("fibra 2 (misma fibra) · separación g = "+gap.toFixed(2)+" λ₀"+(isNaN(f?f.a:NaN)?"":" = "+(gap*lam0).toFixed(0)+" nm"),x0+4,y4+16);
+  if(isNaN(tc)){x.fillStyle=ink;x.font="bold 14px sans-serif";x.textAlign="center";x.fillText("Con n₁ < n₂ la luz no queda guiada: no hay reflexión total",W/2,H-22);
+    ['ftT','ftN','ftM'].forEach(function(i){document.getElementById(i).textContent="—";});return;}
+  // rayo: ángulo θi con la normal a la pared ⇒ avance horizontal por rebote = core·tan θi
+  var t=th/D, dx=core*Math.tan(t);
+  var escapes=th<=tc+1e-9, Rmean=escapes?(c0.Rs+c0.Rp)/2:1;
+  var P=1, Ps=1, Pp=1, px=x0+10, py=y2, dir=-1, N=nreb;
+  for(var k=0;k<N&&px<xe;k++){
+    var nx=Math.min(xe,px+dx), ny=dir<0?y1:y2;
+    if(nx===xe){ny=py+dir*(xe-px)/Math.tan(t);}
+    // rayo principal (azul ∥ + rojo ⊥ lado a lado) con potencia media
+    var amp=Math.max(0.03,Math.sqrt((Ps+Pp)/2));
+    x.lineWidth=1+3*amp;x.globalAlpha=0.25+0.75*amp;
+    x.strokeStyle=PA;x.beginPath();x.moveTo(px,py-1.5);x.lineTo(nx,ny-1.5);x.stroke();
+    x.strokeStyle=SP;x.beginPath();x.moveTo(px,py+1.5);x.lineTo(nx,ny+1.5);x.stroke();x.globalAlpha=1;
+    if(nx===xe)break;
+    if(escapes){ // parte se escapa al revestimiento en cada rebote
+      var ex=nx+30*Math.sin(c0.tt/D)*1, ey=ny+dir*30*Math.cos(c0.tt/D)*(-1)*(-1);
+      ey=ny+(dir<0?-1:1)*30*Math.cos(c0.tt/D);
+      x.globalAlpha=0.6;x.lineWidth=1;x.strokeStyle=mut;x.setLineDash([3,3]);x.beginPath();x.moveTo(nx,ny);x.lineTo(ex,ey);x.stroke();x.setLineDash([]);x.globalAlpha=1;
+      Ps*=c0.Rs;Pp*=c0.Rp;
+    }else if(dir>0&&f){ // rebote en la pared inferior: fuga por túnel a la fibra 2
+      var Ls=Ps*f.Ts, Lp=Pp*f.Tp; Ps-=Ls; Pp-=Lp;
+      var a2=Math.max(0.12,Math.sqrt((Ls+Lp)/2)); if(k===1){x.fillStyle=RD;x.font='bold 12px sans-serif';x.textAlign='left';x.fillText('fuga T(g) = '+(100*(f.Tp+f.Ts)/2).toFixed(f.Ts<0.01?2:1)+' % por rebote',nx+12,y3+16);x.font='12px sans-serif';}
+      // zona evanescente
+      x.fillStyle="rgba(142,27,91,"+(0.1+0.3*a2)+")";x.fillRect(nx-8,y2,16,gapPx);
+      // rayo en la fibra 2, mismo ángulo
+      var ex2=Math.min(xe,nx+dx*1.5), ey2=y3+(ex2-nx)/Math.tan(t);
+      if(ey2>y4){ey2=y4;ex2=nx+core*Math.tan(t);}
+      x.lineWidth=1+3*a2;x.globalAlpha=0.3+0.7*a2;
+      x.strokeStyle=PA;x.beginPath();x.moveTo(nx,y3-1.5);x.lineTo(ex2,ey2-1.5);x.stroke();
+      x.strokeStyle=SP;x.beginPath();x.moveTo(nx,y3+1.5);x.lineTo(ex2,ey2+1.5);x.stroke();x.globalAlpha=1;
+    }
+    px=nx;py=ny;dir=-dir;
+  }
+  // ángulo marcado en el primer rebote
+  x.strokeStyle=ink;x.lineWidth=1;x.setLineDash([3,3]);x.beginPath();x.moveTo(x0+10+dx,y1);x.lineTo(x0+10+dx,y1+34);x.stroke();x.setLineDash([]);
+  x.fillStyle=ink;x.font="bold 12px sans-serif";x.textAlign="left";x.fillText("θᵢ = "+th.toFixed(1)+"°"+(escapes?"  ≤ θc = "+tc.toFixed(1)+"°: se escapa":"  > θc = "+tc.toFixed(1)+"°: guiada"),x0+16+dx,y1+30);
+  var $=function(i){return document.getElementById(i);};
+  if(escapes){$('ftT').textContent="— (no hay reflexión total)";
+    $('ftN').textContent=(100*Math.pow(c0.Rp,N)).toFixed(1)+" % · "+(100*Math.pow(c0.Rs,N)).toFixed(1)+" % (fuga por refracción)";}
+  else{$('ftT').textContent=(100*f.Tp).toFixed(2)+" % · "+(100*f.Ts).toFixed(2)+" %";
+    var nb=Math.floor(N/2); // solo los rebotes en la pared inferior fugan
+    $('ftN').textContent=(100*Math.pow(1-f.Tp,nb)).toFixed(1)+" % · "+(100*Math.pow(1-f.Ts,nb)).toFixed(1)+" % ("+nb+" rebotes en la cara vecina)";}
+  var per=1/(9e-6*Math.tan(t)); $('ftM').textContent=per>=1e6?(per/1e6).toFixed(2)+" millones":(per>=1e3?(per/1e3).toFixed(0)+" mil":per.toFixed(0));
+}
+document.getElementById('inL').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;lam0=v;draw();});
+document.getElementById('gap').addEventListener('input',function(e){gap=+e.target.value;document.getElementById('gv').textContent=gap.toFixed(2)+" λ₀";draw();});
+document.getElementById('nreb').addEventListener('input',function(e){nreb=+e.target.value;document.getElementById('nv').textContent=nreb;draw();});
 var IN={N1:document.getElementById('inN1'),N2:document.getElementById('inN2'),T:document.getElementById('inT')};
 function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
-function draw(){var c0=drawPlot();drawRays(c0);estado(c0);tiles(c0);
+function draw(){var c0=drawPlot();drawRays(c0);drawEvan(c0);drawFiber(c0);estado(c0);tiles(c0);
   ponSiLibre(IN.N1,+n1.toFixed(3));ponSiLibre(IN.N2,+n2.toFixed(3));ponSiLibre(IN.T,+th.toFixed(1));}
 function update(){draw();}
 IN.N1.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1))return;n1=v;syncSel();draw();});
