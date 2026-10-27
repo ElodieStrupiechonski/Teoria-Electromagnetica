@@ -36,6 +36,7 @@ NAV = [
  ]),
  ("Unidad 3 · Reflexión y refracción de ondas planas", [
    ("Reflexion_interactivo.html",     "Incidencia normal",           "3.2 · P8"),
+   ("TDR_explorador.html",            "TDR en cable coaxial",        "3.2 · P8"),
    ("CapaTresMedios_interactivo.html","Capa dieléctrica (3 medios)", "3.3"),
    ("CapaDielectrica_explorador.html","Impedancia efectiva η(d)",    "3.3"),
    ("Snell_explorador.html",          "Ley de Snell",                "3.5 · P10, P11"),

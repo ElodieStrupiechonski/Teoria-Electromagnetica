@@ -55,6 +55,9 @@ PAGINAS = {
  "Reflexion_interactivo.html": ("Reflexión de ondas planas con incidencia normal: simulador",
    "Onda estacionaria, coeficientes de reflexión y transmisión, razón de onda estacionaria e impedancia de onda η(d) en un plano móvil.",
    ["reflexión", "coeficiente de reflexión", "onda estacionaria"]),
+ "TDR_explorador.html": ("Reflectometría en cable coaxial (TDR): coeficiente de reflexión y velocidad",
+   "Escalón que viaja por un cable de 50 Ω y rebota en la carga: pantalla simulada del osciloscopio en la T o sobre la carga, onda en el cable, cómo llenar la tabla de la práctica y ejercicios de lectura.",
+   ["reflectometría", "coeficiente de reflexión", "cable coaxial", "línea de transmisión"]),
  "CapaTresMedios_interactivo.html": ("Capa dieléctrica entre dos medios: radomo y antirreflejante",
    "Mueve la segunda interfaz y elige materiales para ver la impedancia efectiva: capa de media onda transparente y capa de cuarto de onda antirreflejante.",
    ["recubrimiento antirreflejante", "radomo", "capa de cuarto de onda"]),
@@ -117,6 +120,18 @@ def bloque(f, titulo, desc, temas):
 </script>
 {FIN}'''
 
+def cabeza_explicita(s):
+    """Envuelve el encabezado en <head>…</head><body> si la página no los tiene
+    (los verificadores, como el de Google, buscan un <head> literal)."""
+    if re.search(r"<head[\s>]", s, re.I):
+        return s
+    s = re.sub(r"(<html[^>]*>\n?)", r"\1<head>\n", s, count=1)
+    # el <head> termina antes del primer elemento de contenido visible
+    m = re.search(r"\n(?=<(div|header|main|nav|section|body|h1|p)\b)", s)
+    if m:
+        s = s[:m.start()] + "\n</head>\n<body>" + s[m.start():]
+    return s
+
 def quitar(s):
     s = re.sub(re.escape(INI) + r".*?" + re.escape(FIN) + r"\n?", "", s, flags=re.S)
     return re.sub(r'<meta name="google-site-verification"[^>]*>\n?', "", s)
@@ -139,9 +154,12 @@ def main():
         if "--quitar" not in args:
             s = re.sub(r"<title>.*?</title>", "<title>" + tit.replace("&", "&amp;") + "</title>", s, count=1, flags=re.S)
             extra = bloque(f, tit, desc, temas)
-            if f == "index.html" and google:
-                extra = '<meta name="google-site-verification" content="%s">\n' % google + extra
             s = re.sub(r"(</title>)", r"\1\n" + extra.replace("\\", "\\\\"), s, count=1)
+            if f == "index.html" and google:
+                s = cabeza_explicita(s)
+                # la etiqueta de Google va al principio del <head>, justo tras el charset
+                s = s.replace('<meta charset="utf-8">',
+                              '<meta charset="utf-8">\n<meta name="google-site-verification" content="%s">' % google, 1)
         open(p, "w", encoding="utf-8").write(s)
     if "--quitar" not in args:
         hoy = datetime.date.today().isoformat()

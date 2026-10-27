@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
+<title>Reflectometría en cable coaxial (TDR): coeficiente de reflexión y velocidad</title>
+<!-- seo:inicio -->
+<meta name="description" content="Escalón que viaja por un cable de 50 Ω y rebota en la carga: pantalla simulada del osciloscopio en la T o sobre la carga, onda en el cable, cómo llenar la tabla de la práctica y ejercicios de lectura.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/TDR_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Reflectometría en cable coaxial (TDR): coeficiente de reflexión y velocidad">
+<meta property="og:description" content="Escalón que viaja por un cable de 50 Ω y rebota en la carga: pantalla simulada del osciloscopio en la T o sobre la carga, onda en el cable, cómo llenar la tabla de la práctica y ejercicios de lectura.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/TDR_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Reflectometría en cable coaxial (TDR): coeficiente de reflexión y velocidad",
+ "description": "Escalón que viaja por un cable de 50 Ω y rebota en la carga: pantalla simulada del osciloscopio en la T o sobre la carga, onda en el cable, cómo llenar la tabla de la práctica y ejercicios de lectura.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/TDR_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "reflectometría",
+  "coeficiente de reflexión",
+  "cable coaxial",
+  "línea de transmisión"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética — Exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México — ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#1a1a1a;--muted:#5a5a5a;--navy:#1F3864;--blue:#2E5496;--accent:#C1571B;--green:#2E7D32;--red:#B3261E;--crit:#8e1b5b;--line:#e2dcc9;--panel:#fcfbf7;--inc:#1f5fbf;--ref:#c62828;--tot:#2E7D32;--scr:#0b1a12;--grid:#1f4a33;--trace:#e8ff5a;--serif:'Spectral',Georgia,serif;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1e2228;--ink:#f0ece3;--muted:#a9a294;--navy:#9fb6e0;--blue:#a9c0ea;--accent:#e6924a;--green:#8bd08f;--red:#e88a80;--crit:#e07ab8;--line:#333a44;--panel:#181c22;}}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45;margin:0}
+  .wrap{max-width:960px;margin:0 auto;padding:22px 16px}
+  h1{font-size:24px;color:var(--navy);margin:.1em 0}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+  canvas{width:100%;border-radius:10px;display:block;touch-action:none}
+  .head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;margin-bottom:8px}
+  .head b{color:var(--navy);font-size:15px}
+  .muted{color:var(--muted);font-size:12.5px}
+  .controls{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+  .ctl{flex:1 1 220px;min-width:200px}
+  .ctl label{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-bottom:6px}
+  .ctl label span{color:var(--accent);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  select{font:inherit;font-size:14px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:100%}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .btn{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer}
+  .btn.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .seg button{font:inherit;font-size:13px;font-weight:700;border:0;background:var(--bg);color:var(--ink);padding:7px 12px;cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+  .tile .k{font-size:12px;color:var(--muted)}
+  .tile .v{font-size:18px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .tile.inc .v{color:var(--inc)} .tile.ref .v{color:var(--ref)} .tile.tot .v{color:var(--tot)}
+  .legend{display:flex;gap:16px;font-size:13.5px;margin:8px 0 0;flex-wrap:wrap}
+  .legend i{display:inline-block;width:16px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .eq{font-family:var(--serif);font-size:16px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;line-height:1.7}
+  .eq var{font-style:italic;color:var(--accent)} .eq sub,.eq sup{font-style:normal;font-size:.72em} .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .inrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  .cnat{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .kv{font-size:13.5px;margin:5px 0}
+  details.card summary{cursor:pointer;font-size:15px;font-weight:700;color:var(--navy);list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
+  table.t{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:8px}
+  table.t th,table.t td{border:1px solid var(--line);padding:5px 8px;text-align:center;font-variant-numeric:tabular-nums}
+  table.t th{background:var(--bg);font-weight:700;color:var(--navy)}
+  table.t td:first-child{text-align:left;font-weight:700}
+  table.t tr.cur td{background:#fff6ec} @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) table.t tr.cur td{background:#3a2a1a}}
+  .twrap{overflow-x:auto}
+  .estado{margin-top:10px;padding:10px 13px;border-radius:9px;border-left:5px solid var(--accent);background:var(--bg);font-size:14.5px;line-height:1.5}
+  .paso{border-left:5px solid var(--navy);background:var(--bg);border-radius:9px;padding:10px 13px;margin-top:10px;font-size:14.5px;line-height:1.5}
+  .paso b{color:var(--navy)}
+  .fb{margin-top:10px;font-size:14.5px;line-height:1.5} .fb.ok{color:var(--green)} .fb.no{color:var(--red)}
+  .credits{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}.inrow{grid-template-columns:1fr 1fr}input[type=range]{height:26px}h1{font-size:26px}.tile .v{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Reflectometría en cable coaxial (TDR): repaso de la práctica 8</h1>
+  <div class="sub">Un escalón de tensión viaja por un cable de 50 Ω hasta una carga y rebota según Γ = (<i>Z</i><sub>L</sub> − <i>Z</i>₀)/(<i>Z</i><sub>L</sub> + <i>Z</i>₀). Elige la carga, la longitud del cable y <b>dónde está el osciloscopio</b> (en la T o sobre la carga) y compara la pantalla con la onda que viaja por el cable. Colores: <span style="color:#1f5fbf;font-weight:700">azul = incidente</span>, <span style="color:#c62828;font-weight:700">rojo = reflejada</span>, <span style="color:#2E7D32;font-weight:700">verde = total (lo que mide el osciloscopio)</span>. En el curso de la ENES Juriquilla acompaña el tema 3.2 y la práctica P8.</div>
+
+  <div class="card">
+    <div class="controls">
+      <div class="ctl"><label>Carga <span id="zlv">50 Ω</span></label>
+        <div class="btns" style="margin-top:0">
+          <button class="btn" data-z="0">Corto</button><button class="btn" data-z="22">22 Ω</button><button class="btn on" data-z="50">50 Ω</button><button class="btn" data-z="100">100 Ω</button><button class="btn" data-z="inf">Abierto</button>
+        </div>
+        <input id="zl" type="range" min="0" max="300" step="1" value="50" aria-label="Resistencia de carga en ohms" style="margin-top:8px"></div>
+      <div class="ctl"><label><span style="color:var(--ink)">Longitud del cable <i>L</i></span> <span id="Lv">10.0 m</span></label><input id="L" type="range" min="1" max="30" step="0.5" value="10" aria-label="Longitud del cable en metros"></div>
+      <div class="ctl"><label><span style="color:var(--ink)">Osciloscopio en…</span></label>
+        <div class="seg"><button id="mA" class="on">A · la T (z = 0)</button><button id="mC">C · la carga (z = L)</button></div></div>
+    </div>
+    <div class="inrow">
+      <div class="inbox"><label for="inZ"><span class="vinc">Z</span><sub>L</sub> (Ω, vacío = abierto)</label><input id="inZ" type="number" step="any" min="0" inputmode="decimal"></div>
+      <div class="inbox"><label for="inVc">Factor de velocidad <span class="vinc">v</span>/c</label><input id="inVc" type="number" step="0.01" min="0.3" max="1" value="0.66" inputmode="decimal"></div>
+      <div class="inbox"><label for="inVg">Generador: amplitud (Vpp) y ajuste de carga</label><div style="display:flex;gap:6px"><input id="inVg" type="number" step="any" min="0.1" value="2" inputmode="decimal" style="width:45%"><select id="selLoad" aria-label="Ajuste Load del generador"><option value="hz">High Z</option><option value="50">50 Ω</option></select></div></div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">Γ = (Z<sub>L</sub> − 50)/(Z<sub>L</sub> + 50) · S</div><div class="v" id="gv">—</div></div>
+      <div class="tile inc"><div class="k">V<sub>inc</sub> (escalón que llega)</div><div class="v" id="vi">—</div></div>
+      <div class="tile ref"><div class="k">V<sub>ref</sub> = Γ·V<sub>inc</sub> (escalón que rebota)</div><div class="v" id="vr">—</div></div>
+      <div class="tile tot"><div class="k">V<sub>carga</sub> = V<sub>inc</sub>(1 + Γ)</div><div class="v" id="vc">—</div></div>
+      <div class="tile"><div class="k">Ida y vuelta Δt = 2L/v</div><div class="v" id="dt">—</div></div>
+      <div class="tile"><div class="k">Solo ida L/v</div><div class="v" id="dt1">—</div></div>
+      <div class="tile"><div class="k">v = c·(v/c) · ε<sub>r</sub> = (c/v)²</div><div class="v" id="vv">—</div></div>
+      <div class="tile"><div class="k">V<sub>pp</sub> que marca el osciloscopio</div><div class="v" id="vpp">—</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="head"><b>Circuito</b><span class="muted">convenciones eléctricas: fuente con su resistencia interna, línea de transmisión, carga y voltímetro (osciloscopio)</span></div>
+    <canvas id="cvc" role="img" aria-label="Esquema eléctrico: generador con 50 ohms en serie, línea de transmisión, carga y osciloscopio conectado en la T o en la carga" height="240"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="head"><b>Pantalla del osciloscopio</b><span class="muted" id="scrinfo">—</span></div>
+    <canvas id="cvs" role="img" aria-label="Pantalla simulada del osciloscopio con la tensión en el punto de medida contra el tiempo" height="360"></canvas>
+    <div class="estado" id="estado">—</div>
+  </div>
+
+  <div class="card">
+    <div class="head"><b>La onda en el cable</b><span class="muted">tensión a lo largo del cable en el instante t; arrastra el tiempo o pulsa ▶</span></div>
+    <canvas id="cvl" role="img" aria-label="Tensión a lo largo del cable en el instante elegido: onda incidente, reflejada y total" height="300"></canvas>
+    <div class="controls" style="margin-top:8px">
+      <div class="ctl" style="flex:3 1 300px"><label><span style="color:var(--ink)">Tiempo t</span> <span id="tv">0 ns</span></label><input id="tt" type="range" min="0" max="1000" step="1" value="0" aria-label="Tiempo"></div>
+      <div class="ctl" style="flex:0 0 auto"><div class="btns" style="margin-top:0"><button class="btn" id="play">▶ Reproducir</button><button class="btn" id="tA">Ir a t = Δt</button></div></div>
+    </div>
+    <div class="legend"><span><i style="background:var(--inc)"></i>incidente V⁺</span><span><i style="background:var(--ref)"></i>reflejada V⁻ = ΓV⁺</span><span><i style="background:var(--tot)"></i>total V⁺ + V⁻ (lo que se mide)</span></div>
+  </div>
+
+  <details class="card" open>
+    <summary>Cómo llenar la Tabla A de la hoja con lo que marca la pantalla</summary>
+    <div class="paso" id="guia">—</div>
+    <div class="twrap"><table class="t" id="tabla"></table></div>
+    <p class="kv" style="color:var(--muted)">Las dos columnas significan lo mismo en los dos montajes: V<sub>inc</sub> es la onda que llega y V<sub>ref</sub> la que rebota. En la T las ves separadas en el tiempo; en la carga están apiladas y hay que restar. Con 50 Ω no hay rebote: por eso esa medición es la «regla» para las demás.</p>
+  </details>
+
+  <details class="card">
+    <summary>Practica: lee la pantalla y di cuál es Γ</summary>
+    <p class="kv" style="margin-top:10px">Se oculta la carga y se muestra una pantalla con una carga al azar (montaje y cable actuales). Lee V<sub>inc</sub> y V<sub>ref</sub> (o V<sub>pp</sub>) y calcula Γ. Tolerancia ±0.05.</p>
+    <div class="btns"><button class="btn" id="qNew">Nueva pantalla</button><button class="btn" id="qShow" disabled>Revelar la carga</button></div>
+    <div class="inrow" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="inbox"><label for="qG">Γ leído</label><input id="qG" type="number" step="any" inputmode="decimal"></div>
+      <div class="inbox"><label for="qZ">Z<sub>L</sub> despejada (Ω)</label><input id="qZ" type="number" step="any" inputmode="decimal"></div>
+      <div class="inbox"><label>Aciertos</label><div style="font-size:18px;font-weight:700;color:var(--navy)" id="qCount">0 / 0</div></div>
+    </div>
+    <div class="btns"><button class="btn" id="qChk">Comprobar</button></div>
+    <div class="fb" id="qFb" aria-live="polite"></div>
+  </details>
+
+  <details class="card">
+    <summary>Formulario y constantes</summary>
+    <div class="eq" style="margin-top:10px"><var>Γ</var> <span class="op">=</span> (<var>Z</var><sub>L</sub> <span class="op">−</span> <var>Z</var><sub>0</sub>) / (<var>Z</var><sub>L</sub> <span class="op">+</span> <var>Z</var><sub>0</sub>)&nbsp;&nbsp;&nbsp; <var>S</var> <span class="op">=</span> (1 + |<var>Γ</var>|)/(1 − |<var>Γ</var>|)&nbsp;&nbsp;&nbsp; <var>Z</var><sub>L</sub> <span class="op">=</span> <var>Z</var><sub>0</sub>(1 + <var>Γ</var>)/(1 − <var>Γ</var>)</div>
+    <div class="eq"><var>V</var>(<var>z</var>,<var>t</var>) <span class="op">=</span> <var>V</var><sub>inc</sub>·u(<var>t</var> − <var>z</var>/<var>v</var>) <span class="op">+</span> <var>Γ</var><var>V</var><sub>inc</sub>·u(<var>t</var> − (2<var>L</var> − <var>z</var>)/<var>v</var>)&nbsp;&nbsp;&nbsp; Δ<var>t</var> <span class="op">=</span> 2<var>L</var>/<var>v</var>&nbsp;&nbsp;&nbsp; <var>v</var> <span class="op">=</span> <span class="cnat">c</span>/√<var>ε</var><sub>r</sub></div>
+    <div class="eq"><var>V</var><sub>inc</sub> <span class="op">=</span> <var>V</var><sub>g</sub>·<var>Z</var><sub>0</sub>/(<var>Z</var><sub>0</sub> + <var>R</var><sub>s</sub>) <span class="op">=</span> <var>V</var><sub>g</sub>/2 (con <var>R</var><sub>s</sub> = <var>Z</var><sub>0</sub> = 50 Ω)&nbsp;&nbsp;&nbsp; <var>V</var><sub>carga</sub> <span class="op">=</span> <var>V</var><sub>inc</sub>(1 + <var>Γ</var>) <span class="op">=</span> <var>V</var><sub>g</sub>·<var>Z</var><sub>L</sub>/(<var>Z</var><sub>L</sub> + <var>R</var><sub>s</sub>)</div>
+    <p class="kv" style="color:var(--muted)">Hipótesis: línea sin pérdidas de Z₀ = 50 Ω; generador con R<sub>s</sub> = 50 Ω (DG1022), de modo que el eco se absorbe al volver y no hay reflexiones múltiples; flanco del generador de ~10 ns; osciloscopio de 1 MΩ (no carga la línea). «Ajuste Load»: con <b>High Z</b> el display del generador muestra la tensión en circuito abierto V<sub>g</sub>; con <b>50 Ω</b> muestra la mitad (lo que caería sobre 50 Ω), así que V<sub>g</sub> es el doble de lo mostrado. Un escalón de la onda cuadrada va de −V<sub>g</sub>/2 a +V<sub>g</sub>/2; por eso el escalón incidente en la línea vale V<sub>g</sub>/2.</p>
+    <p class="kv">Velocidad de la luz <b class="cnat">c = 2.998×10⁸ m/s</b> · RG-58 (polietileno): v/c ≈ 0.66, ε<sub>r</sub> ≈ 2.3.</p>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span></p>
+  </details>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Reflectometría en cable coaxial (TDR) — Explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+  </div>
+</div>
+<script>
+(function(){
+"use strict";
+var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+var C0=2.998e8, Z0=50, RS=50, TR=10; // TR: tiempo de subida del generador (ns)
+var ZL=50, L=10, vc=0.66, Vg_set=2, loadHZ=true, modo='A', tNow=0, playing=false, quiz=null;
+var $=function(i){return document.getElementById(i);};
+function v(){return C0*vc;}
+function Vg(){return loadHZ?Vg_set:2*Vg_set;}       // tensión en circuito abierto (Vpp)
+function Vinc(){return Vg()/2;}                     // escalón incidente (V)
+function gamma(z){return isFinite(z)?(z-Z0)/(z+Z0):1;}
+function G(){return gamma(ZL);}
+function dtRT(){return 2*L/v()*1e9;}                // ns
+function fx(x,d){return (+x).toFixed(d).replace('-','−');}
+function zlTxt(z){return isFinite(z)?(Math.round(z*10)/10)+" Ω":"abierto (∞)";}
+function step(t){ // escalón suave de 0 a 1 con tiempo de subida TR (10–90 %)
+  var w=TR/0.8; var x=t/w+0.5; if(x<=0)return 0; if(x>=1)return 1; return x*x*(3-2*x);}
+// tensión en el punto z (m) en el instante t (ns), respecto al nivel bajo anterior al flanco
+function Vat(z,t){var g=G(),vi=Vinc(),tz=z/v()*1e9,tr=(2*L-z)/v()*1e9;
+  return {inc:vi*step(t-tz), ref:g*vi*step(t-tr)};}
+
+// ---------- circuito ----------
+function drawCircuit(){
+  var cv=$('cvc'),dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(320,r.width),H=240;
+  cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),navy=css('--navy'),acc=css('--accent'),grn=css('--green');
+  x.fillStyle=panel;x.fillRect(0,0,W,H);
+  var yT=120,yB=200,x0=70,xs=150,xr=205,xA=265,xB=W-130,xL=W-60;
+  x.strokeStyle=ink;x.lineWidth=1.8;x.lineJoin="round";x.font="12px sans-serif";x.fillStyle=ink;
+  // fuente
+  x.beginPath();x.arc(x0,(yT+yB)/2,16,0,7);x.stroke();
+  x.beginPath();for(var i=0;i<=20;i++){var px=x0-9+18*i/20,py=(yT+yB)/2-5*Math.sin(i/20*2*Math.PI*1);i?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();
+  x.beginPath();x.moveTo(x0,(yT+yB)/2-16);x.lineTo(x0,yT);x.lineTo(xs-18,yT);x.moveTo(x0,(yT+yB)/2+16);x.lineTo(x0,yB);x.lineTo(xB,yB);x.stroke();
+  x.textAlign="center";x.fillStyle=mut;x.fillText("V_g (onda cuadrada)",x0,yB+22);
+  // Rs
+  function res(xa,ya,xb,yb,label,color){var dx=xb-xa,dy=yb-ya,Lr=Math.hypot(dx,dy),ux=dx/Lr,uy=dy/Lr,nx=-uy,ny=ux;x.strokeStyle=color||ink;x.beginPath();x.moveTo(xa,ya);
+    for(var i=1;i<=7;i++){var s=i/8,amp=(i%2?6:-6);if(i===7)amp=0;x.lineTo(xa+ux*Lr*s+nx*amp,ya+uy*Lr*s+ny*amp);}x.lineTo(xb,yb);x.stroke();
+    x.fillStyle=color||ink;x.fillText(label,(xa+xb)/2+nx*16,(ya+yb)/2+ny*16+4);x.strokeStyle=ink;x.fillStyle=ink;}
+  res(xs-18,yT,xs+18,yT,"R_s = 50 Ω");
+  x.beginPath();x.moveTo(xs+18,yT);x.lineTo(xA,yT);x.stroke();
+  // nodo T
+  x.fillStyle=ink;x.beginPath();x.arc(xA,yT,3.5,0,7);x.fill();x.beginPath();x.arc(xA,yB,3.5,0,7);x.fill();
+  // línea de transmisión: dos conductores con rectángulo punteado
+  x.setLineDash([6,4]);x.strokeStyle=mut;x.strokeRect(xA+12,yT-22,xB-xA-24,yB-yT+44);x.setLineDash([]);
+  x.strokeStyle=ink;x.beginPath();x.moveTo(xA,yT);x.lineTo(xB,yT);x.stroke();
+  x.fillStyle=navy;x.font="bold 12px sans-serif";x.fillText("línea coaxial · Z₀ = 50 Ω · L = "+L.toFixed(1)+" m · v = "+vc+"c",(xA+xB)/2,yT-28);
+  x.font="12px sans-serif";x.fillStyle=mut;x.fillText("z = 0",xA,yB+22);x.fillText("z = L",xB,yB+22);
+  // carga
+  x.fillStyle=ink;x.beginPath();x.arc(xB,yT,3.5,0,7);x.fill();x.beginPath();x.arc(xB,yB,3.5,0,7);x.fill();
+  if(ZL===0){x.strokeStyle=acc;x.lineWidth=2.4;x.beginPath();x.moveTo(xB,yT);x.lineTo(xB,yB);x.stroke();x.fillStyle=acc;x.textAlign="left";x.fillText("corto",xB+8,(yT+yB)/2+4);}
+  else if(!isFinite(ZL)){x.strokeStyle=acc;x.lineWidth=2;x.beginPath();x.moveTo(xB,yT);x.lineTo(xB,yT+22);x.moveTo(xB,yB);x.lineTo(xB,yB-22);x.stroke();x.fillStyle=acc;x.textAlign="left";x.fillText("abierto",xB+8,(yT+yB)/2+4);}
+  else{x.lineWidth=2;x.textAlign="left";res(xB,yT+8,xB,yB-8,"",acc);x.fillStyle=acc;x.fillText("Z_L = "+zlTxt(ZL),xB+14,(yT+yB)/2+4);x.beginPath();x.moveTo(xB,yT);x.lineTo(xB,yT+8);x.moveTo(xB,yB-8);x.lineTo(xB,yB);x.stroke();}
+  // osciloscopio = voltímetro
+  var xm=modo==='A'?xA:xB, ym=yT-0;
+  x.strokeStyle=grn;x.lineWidth=2;x.setLineDash([3,3]);x.beginPath();x.moveTo(xm,yT);x.lineTo(xm,yT-52);x.stroke();x.setLineDash([]);
+  x.beginPath();x.arc(xm,yT-66,13,0,7);x.fillStyle=panel;x.fill();x.stroke();x.fillStyle=grn;x.font="bold 13px sans-serif";x.textAlign="center";x.fillText("V",xm,yT-61);
+  x.font="11px sans-serif";x.fillText(modo==='A'?"osciloscopio en la T":"osciloscopio sobre la carga",xm+(modo==='A'?0:-40),yT-90);
+  x.textAlign="left";x.fillStyle=mut;x.font="11px sans-serif";if(modo==='A')x.fillText("1 MΩ (no carga la línea)",xm+18,yT-62);else{x.textAlign="right";x.fillText("1 MΩ (no carga la línea)",xm-18,yT-62);}
+}
+
+// ---------- pantalla del osciloscopio ----------
+var SC={nsdiv:20,vdiv:0.5,t0:0};
+function pickScale(){var tot=modo==='A'?dtRT()+40:L/v()*1e9+40; var opts=[5,10,20,50,100,200,500];SC.nsdiv=opts[opts.length-1];
+  for(var i=0;i<opts.length;i++){if(tot<=opts[i]*8){SC.nsdiv=opts[i];break;}}
+  var vm=Math.max(Vinc()*(1+Math.abs(G())),Vinc())/2; var vo=[0.1,0.2,0.5,1,2,5];SC.vdiv=vo[vo.length-1];
+  for(var j=0;j<vo.length;j++){if(vm*1.15<=vo[j]*3){SC.vdiv=vo[j];break;}}}
+function traceAt(t){ // tensión en el punto de medida, centrada: nivel bajo = −(Vinc+ΓVinc)/2 ... usamos onda cuadrada centrada en 0
+  var z=modo==='A'?0:L; var a=Vat(z,t); var lo=-(Vinc()+G()*Vinc())/2; return lo+a.inc+a.ref;}
+function drawScope(hideLoad){
+  var cv=$('cvs'),dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(320,r.width),H=360;
+  cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+  pickScale();
+  var ml=46,mr=14,mt=14,mb=34,pw=W-ml-mr,ph=H-mt-mb;
+  x.fillStyle=css('--scr');x.fillRect(0,0,W,H);
+  x.strokeStyle=css('--grid');x.lineWidth=1;
+  for(var i=0;i<=10;i++){var gx=ml+pw*i/10;x.beginPath();x.moveTo(gx,mt);x.lineTo(gx,mt+ph);x.stroke();}
+  for(var j=0;j<=8;j++){var gy=mt+ph*j/8;x.beginPath();x.moveTo(ml,gy);x.lineTo(ml+pw,gy);x.stroke();}
+  x.strokeStyle="#3a7a55";x.lineWidth=1.2;x.beginPath();x.moveTo(ml,mt+ph/2);x.lineTo(ml+pw,mt+ph/2);x.moveTo(ml+pw/2,mt);x.lineTo(ml+pw/2,mt+ph);x.stroke();
+  var trigDiv=1.5, tOf=-trigDiv*SC.nsdiv; // t=0 (flanco del generador en z=0) en la división 1.5
+  function X(t){return ml+pw*(t-tOf)/(10*SC.nsdiv);} function Y(vv){return mt+ph/2-ph*vv/(8*SC.vdiv);}
+  // traza
+  x.strokeStyle=css('--trace');x.lineWidth=2.2;x.beginPath();
+  for(var k=0;k<=600;k++){var t=tOf+10*SC.nsdiv*k/600;var vv=traceAt(t);k?x.lineTo(X(t),Y(vv)):x.moveTo(X(t),Y(vv));}
+  x.stroke();
+  // anotaciones
+  x.font="12px sans-serif";x.textAlign="left";
+  var vi=Vinc(),g=G(),lo=-(vi+g*vi)/2,mid=lo+vi,hi=lo+vi+g*vi;
+  if(modo==='A'){
+    // cursores: Δt y niveles
+    x.setLineDash([4,4]);x.strokeStyle="#7fd1ff";x.lineWidth=1;
+    x.beginPath();x.moveTo(X(0),mt);x.lineTo(X(0),mt+ph);x.moveTo(X(dtRT()),mt);x.lineTo(X(dtRT()),mt+ph);x.stroke();x.setLineDash([]);
+    x.fillStyle="#7fd1ff";x.fillText("Δt = "+dtRT().toFixed(1)+" ns",X(dtRT()/2)-28,mt+16);
+    x.fillStyle="#9ecbff";x.fillText("V_inc = "+fx(vi,2)+" V",X(0)+6,Y((lo+mid)/2)+4);
+    if(Math.abs(g)>0.02){x.fillStyle="#ff9c9c";x.fillText("V_ref = "+fx(g*vi,2)+" V",X(dtRT())+6,Y((mid+hi)/2)+4);}
+    else{x.fillStyle="#ff9c9c";x.fillText("sin eco: V_ref ≈ 0",X(dtRT())+6,Y(mid)-8);}
+  }else{
+    var t1=L/v()*1e9;
+    x.setLineDash([4,4]);x.strokeStyle="#7fd1ff";x.lineWidth=1;x.beginPath();x.moveTo(X(t1),mt);x.lineTo(X(t1),mt+ph);x.stroke();x.setLineDash([]);
+    x.fillStyle="#7fd1ff";x.fillText("llega en L/v = "+t1.toFixed(1)+" ns",X(t1)+6,mt+16);
+    x.fillStyle="#9ecbff";x.fillText("V_carga = V_inc + V_ref = "+fx(hi-lo,2)+" V (un solo escalón)",X(t1)+6,Y((lo+hi)/2)+4);
+  }
+  // escala
+  x.fillStyle="#cfe7d6";x.font="12px sans-serif";x.textAlign="left";
+  x.fillText("CH1 "+(SC.vdiv>=1?SC.vdiv.toFixed(0):SC.vdiv.toFixed(1))+" V/div",ml+4,H-10);
+  x.textAlign="right";x.fillText("H "+SC.nsdiv+" ns/div",ml+pw-4,H-10);
+  x.textAlign="center";x.fillText("Pk-Pk = "+fx(hi-lo,2)+" V",ml+pw/2,H-10);
+  x.fillStyle="#cfe7d6";x.textAlign="right";for(var q=-4;q<=4;q+=2){x.fillText(fx(q*SC.vdiv,1),ml-4,Y(q*SC.vdiv)+4);}
+  $('scrinfo').textContent=(modo==='A'?"montaje A: punta en la T, disparo en el flanco del generador":"montaje C: punta sobre la carga, disparo externo (Sync) en el flanco del generador")+" · "+(hideLoad?"carga oculta":"carga "+zlTxt(ZL));
+}
+
+// ---------- onda en el cable ----------
+function drawLine(){
+  var cv=$('cvl'),dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(320,r.width),H=300;
+  cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+  var ink=css('--ink'),mut=css('--muted'),panel=css('--panel'),line=css('--line'),INC=css('--inc'),REF=css('--ref'),TOT=css('--tot'),acc=css('--accent');
+  x.fillStyle=panel;x.fillRect(0,0,W,H);
+  var ml=50,mr=70,mt=16,mb=70,pw=W-ml-mr,ph=H-mt-mb;
+  var vi=Vinc(),g=G(),vmax=Math.max(vi*(1+Math.abs(g)),vi)*1.15;
+  function X(z){return ml+pw*z/L;} function Y(vv){return mt+ph*(1-(vv+vmax)/(2*vmax));}
+  x.strokeStyle=line;x.lineWidth=1;x.beginPath();x.moveTo(ml,Y(0));x.lineTo(ml+pw,Y(0));x.stroke();
+  x.font="12px sans-serif";x.fillStyle=mut;x.textAlign="right";x.fillText("0",ml-6,Y(0)+4);x.fillText(fx(vi,1)+" V",ml-6,Y(vi)+4);
+  x.strokeStyle=line;x.setLineDash([3,3]);x.beginPath();x.moveTo(ml,Y(vi));x.lineTo(ml+pw,Y(vi));x.stroke();x.setLineDash([]);
+  // curvas
+  function curve(f,col,lw,dash){x.strokeStyle=col;x.lineWidth=lw;x.setLineDash(dash||[]);x.beginPath();for(var k=0;k<=300;k++){var z=L*k/300,a=Vat(z,tNow),val=f(a);k?x.lineTo(X(z),Y(val)):x.moveTo(X(z),Y(val));}x.stroke();x.setLineDash([]);}
+  curve(function(a){return a.inc;},INC,2,[6,4]);
+  curve(function(a){return a.ref;},REF,2,[6,4]);
+  curve(function(a){return a.inc+a.ref;},TOT,3);
+  // frentes
+  var zi=Math.min(L,v()*tNow*1e-9), zr=2*L-v()*tNow*1e-9;
+  if(zi<L){x.fillStyle=INC;x.beginPath();x.moveTo(X(zi),Y(vi)-2);x.lineTo(X(zi)+12,Y(vi)-8);x.lineTo(X(zi)+12,Y(vi)+4);x.closePath();x.fill();x.textAlign="left";x.fillText("V⁺ →",X(zi)+15,Y(vi)+4);}
+  if(zr>0&&zr<L&&Math.abs(g)>0.02){x.fillStyle=REF;x.beginPath();x.moveTo(X(zr),Y(g*vi)-2);x.lineTo(X(zr)-12,Y(g*vi)-8);x.lineTo(X(zr)-12,Y(g*vi)+4);x.closePath();x.fill();x.textAlign="right";x.fillText("← V⁻",X(zr)-15,Y(g*vi)+4);}
+  // cable dibujado abajo
+  var yc=H-40;x.strokeStyle=ink;x.lineWidth=6;x.beginPath();x.moveTo(ml,yc);x.lineTo(ml+pw,yc);x.stroke();x.strokeStyle="#fff";x.lineWidth=2;x.beginPath();x.moveTo(ml,yc);x.lineTo(ml+pw,yc);x.stroke();
+  x.fillStyle=mut;x.textAlign="center";x.textAlign="left";x.fillText("z = 0 (T, generador)",ml-30,yc+20);x.textAlign="center";x.fillText("z = L = "+L.toFixed(1)+" m · carga: "+zlTxt(ZL),ml+pw-30,yc+20);
+  // marcador del osciloscopio
+  var xm=modo==='A'?ml:ml+pw;x.fillStyle=TOT;x.beginPath();x.arc(xm,yc,7,0,7);x.fill();x.font="bold 12px sans-serif";x.fillText("osc.",xm,yc-12);
+  // valor medido ahora
+  var a0=Vat(modo==='A'?0:L,tNow);x.fillStyle=TOT;x.textAlign="left";x.font="12px sans-serif";x.textAlign="center";x.fillText("t = "+tNow.toFixed(0)+" ns: el osciloscopio lee "+fx(a0.inc+a0.ref,2)+" V",ml+pw/2,mt+ph+16);
+}
+
+// ---------- textos ----------
+function tiles(){
+  var g=G(),vi=Vinc(),S=Math.abs(g)<1?(1+Math.abs(g))/(1-Math.abs(g)):Infinity;
+  $('gv').textContent=fx(g,3)+" · "+(isFinite(S)?S.toFixed(2):"∞");
+  $('vi').textContent=fx(vi,2)+" V";$('vr').textContent=fx(g*vi,2)+" V";$('vc').textContent=fx(vi*(1+g),2)+" V";
+  $('dt').textContent=dtRT().toFixed(1)+" ns";$('dt1').textContent=(L/v()*1e9).toFixed(1)+" ns";
+  $('vv').textContent=(v()/1e8).toFixed(2)+"×10⁸ m/s · "+(1/(vc*vc)).toFixed(2);
+  $('vpp').textContent=modo==='A'?fx(vi*(1+g),2)+" V (tras el eco)":fx(vi*(1+g),2)+" V";
+  $('zlv').textContent=zlTxt(ZL);$('Lv').textContent=L.toFixed(1)+" m";
+  var e=$('estado');
+  if(modo==='A'){e.innerHTML="<b>Montaje A.</b> Primero sube el escalón incidente de "+fx(vi,2)+" V (lo que la fuente de 50 Ω entrega a una línea de 50 Ω). "+(Math.abs(g)<0.02?"Como la carga es 50 Ω, nada rebota: la traza queda plana. Esta pantalla es la <b>regla</b> para medir las demás.":"Δt = "+dtRT().toFixed(1)+" ns después llega el eco, un segundo escalón de "+fx(g*vi,2)+" V ("+(g>0?"hacia arriba: Z<sub>L</sub> &gt; Z₀":"hacia abajo: Z<sub>L</sub> &lt; Z₀")+"). V<sub>ref</sub> se lee directamente como la altura de ese segundo escalón.");}
+  else{e.innerHTML="<b>Montaje C.</b> En la carga la onda incidente y la reflejada nacen en el mismo punto y al mismo tiempo: la pantalla muestra un solo escalón de V<sub>inc</sub>(1 + Γ) = "+fx(vi*(1+g),2)+" V, que llega L/v = "+(L/v()*1e9).toFixed(1)+" ns después del flanco del generador. No se ve el eco por separado: para obtener V<sub>ref</sub> hay que restar V<sub>inc</sub>, y V<sub>inc</sub> se conoce midiendo con la carga de 50 Ω (ahí V<sub>carga</sub> = V<sub>inc</sub>).";}
+  guia();
+}
+function guia(){
+  var g=G(),vi=Vinc(),vpp50=vi,vppZ=vi*(1+g);
+  var h;
+  if(modo==='A'){h="<b>Con la punta en la T:</b> (1) lee la altura del primer escalón → <b>V<sub>inc</sub> = "+fx(vi,2)+" V</b>; (2) lee la altura del segundo escalón, con signo → <b>V<sub>ref</sub> = "+fx(g*vi,2)+" V</b>; (3) Γ = V<sub>ref</sub>/V<sub>inc</sub> = <b>"+fx(g,3)+"</b>; (4) Δt entre los dos flancos = "+dtRT().toFixed(1)+" ns → v = 2L/Δt.";}
+  else{h="<b>Con la punta sobre la carga:</b> (1) con 50 Ω mide Pk-Pk → "+fx(vpp50,2)+" V; eso es <b>V<sub>inc</sub> = "+fx(vi,2)+" V</b> (la regla); (2) con la carga de hoy mide Pk-Pk → <b>V<sub>carga</sub> = "+fx(vppZ,2)+" V</b>; (3) resta: <b>V<sub>ref</sub> = V<sub>carga</sub> − V<sub>inc</sub> = "+fx(vppZ-vi,2)+" V</b>; (4) Γ = V<sub>ref</sub>/V<sub>inc</sub> = V<sub>carga</sub>/V<sub>inc</sub> − 1 = <b>"+fx(g,3)+"</b>. Para v hace falta el disparo externo: el escalón llega L/v = "+(L/v()*1e9).toFixed(1)+" ns después del flanco; con dos cables, v = (L₁ − L₂)/(t₁ − t₂).";}
+  $('guia').innerHTML=h;
+  var rows=[["Abierto",Infinity],["100 Ω",100],["50 Ω",50],["22 Ω",22],["Corto",0]];
+  var t='<tr><th>Carga</th><th>Γ</th><th>S</th><th>V<sub>inc</sub> (V)</th><th>V<sub>ref</sub> (V)</th><th>'+(modo==='A'?'Pantalla A: 1.º escalón → 2.º escalón':'Pantalla C: Pk-Pk sobre la carga')+'</th><th>Z<sub>L</sub> despejada</th></tr>';
+  rows.forEach(function(r){var gg=gamma(r[1]),S=Math.abs(gg)<1?((1+Math.abs(gg))/(1-Math.abs(gg))).toFixed(2):"∞";var cur=(r[1]===ZL)||(isFinite(r[1])&&isFinite(ZL)&&Math.abs(r[1]-ZL)<0.5);
+    t+='<tr'+(cur?' class="cur"':'')+'><td>'+r[0]+'</td><td>'+fx(gg,3)+'</td><td>'+S+'</td><td>'+fx(vi,2)+'</td><td>'+fx(gg*vi,2)+'</td><td>'+(modo==='A'?fx(vi,2)+' V, luego '+(Math.abs(gg)<0.02?'nada':fx(gg*vi,2)+' V'):fx(vi*(1+gg),2)+' V')+'</td><td>'+(Math.abs(gg)<1?(Z0*(1+gg)/(1-gg)).toFixed(1)+' Ω':'∞')+'</td></tr>';});
+  $('tabla').innerHTML=t;
+}
+
+// ---------- control ----------
+function setZ(z){ZL=z;document.querySelectorAll('[data-z]').forEach(function(b){var bz=b.getAttribute('data-z')==='inf'?Infinity:+b.getAttribute('data-z');b.classList.toggle('on',bz===ZL);});
+  if(document.activeElement!==$('zl'))$('zl').value=isFinite(ZL)?Math.min(300,ZL):300;
+  if(document.activeElement!==$('inZ'))$('inZ').value=isFinite(ZL)?+ZL.toFixed(1):"";draw();}
+function draw(){tiles();drawCircuit();drawScope(false);$('tt').max=Math.round(dtRT()*1.5+30);drawLine();$('tv').textContent=tNow.toFixed(0)+" ns";}
+document.querySelectorAll('[data-z]').forEach(function(b){b.addEventListener('click',function(){var z=b.getAttribute('data-z');setZ(z==='inf'?Infinity:+z);});});
+$('zl').addEventListener('input',function(){var z=+this.value;setZ(z>=300?Infinity:z);});
+$('inZ').addEventListener('input',function(){var s=this.value.trim();if(s===""){setZ(Infinity);return;}var z=parseFloat(s.replace(',','.'));if(z>=0)setZ(z);});
+$('L').addEventListener('input',function(){L=+this.value;draw();});
+$('inVc').addEventListener('input',function(){var q=parseFloat(this.value);if(q>=0.3&&q<=1){vc=q;draw();}});
+$('inVg').addEventListener('input',function(){var q=parseFloat(this.value);if(q>0){Vg_set=q;draw();}});
+$('selLoad').addEventListener('change',function(){loadHZ=this.value==='hz';draw();});
+$('mA').addEventListener('click',function(){modo='A';$('mA').classList.add('on');$('mC').classList.remove('on');draw();});
+$('mC').addEventListener('click',function(){modo='C';$('mC').classList.add('on');$('mA').classList.remove('on');draw();});
+$('tt').addEventListener('input',function(){tNow=+this.value;playing=false;$('play').textContent="▶ Reproducir";drawLine();$('tv').textContent=tNow.toFixed(0)+" ns";});
+$('tA').addEventListener('click',function(){tNow=dtRT();$('tt').value=tNow;drawLine();$('tv').textContent=tNow.toFixed(0)+" ns";});
+var last=0;function anim(ts){if(!playing)return;if(ts-last>30){last=ts;tNow+=Math.max(1,dtRT()/120);if(tNow>+$('tt').max){tNow=0;}$('tt').value=tNow;drawLine();$('tv').textContent=tNow.toFixed(0)+" ns";}requestAnimationFrame(anim);}
+$('play').addEventListener('click',function(){playing=!playing;this.textContent=playing?"⏸ Pausa":"▶ Reproducir";if(playing)requestAnimationFrame(anim);});
+// practica
+var Q={ok:0,tot:0,done:false,save:null};
+$('qNew').addEventListener('click',function(){var pool=[0,15,22,33,50,68,75,100,150,220,Infinity];Q.z=pool[Math.floor(Math.random()*pool.length)];Q.done=false;Q.save=ZL;ZL=Q.z;
+  $('qG').value="";$('qZ').value="";$('qFb').textContent="";$('qShow').disabled=false;tiles();$('zlv').textContent="¿?";$('gv').textContent="¿?";$('vr').textContent="¿?";$('vc').textContent="¿?";$('vpp').textContent="(lee la pantalla)";
+  $('guia').innerHTML="Lee la pantalla de arriba y calcula Γ. Luego despeja Z<sub>L</sub> = 50(1 + Γ)/(1 − Γ).";$('tabla').innerHTML="";drawScope(true);drawCircuit();drawLine();
+  $('cvs').scrollIntoView({behavior:'smooth',block:'center'});});
+$('qChk').addEventListener('click',function(){if(Q.z===undefined)return;var g=gamma(Q.z),vg=parseFloat(String($('qG').value).replace(',','.')),vz=parseFloat(String($('qZ').value).replace(',','.'));
+  var okG=Math.abs(vg-g)<=0.05,okZ=isFinite(Q.z)?Math.abs(vz-Q.z)<=0.12*Q.z+2:(vz>1000||!isFinite(vz));
+  var h=(okG?"✔ Γ = "+fx(g,3)+". ":"✘ Γ es "+fx(g,3)+". "+(modo==='C'?"Recuerda: V_ref = V_carga − V_inc; Γ = V_carga/V_inc − 1 (V_inc = Pk-Pk con 50 Ω). ":"Recuerda: V_ref es la altura del SEGUNDO escalón, con signo. "))+(okZ?"✔ Z_L correcta.":"✘ Z_L = 50(1+Γ)/(1−Γ) = "+(isFinite(Q.z)?Q.z+" Ω":"∞ (abierto)")+".");
+  if(!Q.done){Q.tot++;if(okG&&okZ)Q.ok++;Q.done=true;}$('qCount').textContent=Q.ok+" / "+Q.tot;$('qFb').className="fb "+(okG&&okZ?"ok":"no");$('qFb').innerHTML=h;});
+$('qShow').addEventListener('click',function(){if(Q.z===undefined)return;setZ(Q.z);$('qShow').disabled=true;});
+window.addEventListener('resize',draw);
+var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',draw);
+setZ(50);
+})();
+</script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
+</body>
+</html>
+<!-- navegacion:inicio -->
+<style>
+  body{margin-top:50px!important}
+  .nvbar{position:fixed;top:0;left:0;right:0;z-index:9999;height:44px;display:flex;align-items:center;
+    gap:10px;padding:0 14px;background:var(--card,#fff);border-bottom:1px solid var(--line,#e2dcc9);
+    font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+  .nvbar a{text-decoration:none;color:var(--navy,var(--ink,#1F3864))}
+  .nv-home{font-weight:700;white-space:nowrap}
+  .nv-home small{font-weight:400;color:var(--muted,#5a5a5a)}
+  .nv-step{display:flex;align-items:center;justify-content:center;width:34px;height:30px;border:1px solid var(--line,#e2dcc9);
+    border-radius:8px;font-size:17px;line-height:1}
+  .nv-step:hover{background:var(--bg,#f4f1ea)}
+  .nv-step[aria-disabled="true"]{opacity:.25;pointer-events:none}
+  .nv-aquibar{flex:1;min-width:0;text-align:center;font-weight:700;color:var(--ink,#1a1a1a);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nv-aquibar small{font-weight:400;color:var(--muted,#8a8fa0)}
+  .nvbar details{position:relative}
+  .nvbar summary{list-style:none;cursor:pointer;font-weight:700;color:var(--accent,#C1571B);
+    border:1px solid var(--line,#e2dcc9);border-radius:8px;padding:5px 12px;user-select:none;white-space:nowrap}
+  .nvbar summary::-webkit-details-marker{display:none}
+  .nv-menu{position:absolute;right:0;top:40px;width:min(640px,calc(100vw - 24px));max-height:calc(100vh - 70px);overflow:auto;
+    background:var(--card,#fff);border:1px solid var(--line,#e2dcc9);border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.18);padding:10px;column-count:2;column-gap:18px}
+  .nv-grp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8a8fa0);
+    padding:10px 10px 5px;break-after:avoid;border-top:1px solid var(--line,#eee)}
+  .nv-menu .nv-grp:first-child{border-top:0;padding-top:4px}
+  .nv-menu a{display:block;padding:8px 10px;border-radius:7px;color:var(--ink,#1a1a1a);break-inside:avoid}
+  .nv-menu a small{color:var(--muted,#8a8fa0);margin-left:4px}
+  .nv-menu a:hover{background:var(--bg,#f4f1ea)}
+  .nv-menu a.nv-aqui{background:var(--bg,#f4f1ea);font-weight:700;color:var(--accent,#C1571B)}
+  .nv-pie{column-span:all;margin-top:6px;padding:7px 10px 2px;border-top:1px solid var(--line,#eee);
+    font-size:11.5px;color:var(--muted,#8a8fa0)}
+  @media (max-width:720px){
+    .nv-home small{display:none}
+    .nv-aquibar{display:none}
+    .nv-menu{column-count:1;position:fixed;left:12px;right:12px;top:50px;width:auto}
+  }
+  @media print{.nvbar{display:none} body{margin-top:0!important}}
+</style>
+<nav class="nvbar" aria-label="Navegación del sitio">
+  <a class="nv-home" href="index.html">⌁ Exploradores EM <small>· ENES Juriquilla</small></a>
+  <a class="nv-step" id="nv-ant" href="#" title="Explorador anterior (tecla ←)" aria-label="Anterior">‹</a>
+  <span class="nv-aquibar" id="nv-aqui-bar"></span>
+  <a class="nv-step" id="nv-sig" href="#" title="Explorador siguiente (tecla →)" aria-label="Siguiente">›</a>
+  <details id="nvdet"><summary>Temario ▾</summary>
+    <div class="nv-menu">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
+<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel <small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización <small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler <small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal <small>3.2 · P8</small></a>
+<a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial <small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios) <small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d) <small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell <small>3.5 · P10, P11</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel <small>3.6–3.8</small></a>
+<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
+<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR <small>4.3–4.4</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith <small>4.7–4.8</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular <small>4.10–4.12</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético <small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica <small>cómputo · P6</small></a>
+    <div class="nv-pie">Atajos: ← anterior · → siguiente · Esc cierra el menú</div>
+    </div>
+  </details>
+</nav>
+<script>
+(function(){
+  var orden=[], datos={};
+  var l=document.querySelectorAll('.nv-menu a[data-nv]');
+  for(var i=0;i<l.length;i++){
+    var f=l[i].getAttribute('data-nv'); orden.push(f);
+    datos[f]={el:l[i], titulo:l[i].childNodes[0].textContent.trim(),
+               sub:(l[i].querySelector('small')||{textContent:''}).textContent};
+  }
+  var aqui=(location.pathname.split('/').pop()||'index.html');
+  var idx=orden.indexOf(aqui);
+  var ant=document.getElementById('nv-ant'), sig=document.getElementById('nv-sig'),
+      bar=document.getElementById('nv-aqui-bar');
+  if(idx>=0){
+    datos[aqui].el.className='nv-aqui';
+    bar.innerHTML=datos[aqui].titulo+' <small>'+datos[aqui].sub+'</small>';
+    if(idx>0) ant.href=orden[idx-1]; else ant.setAttribute('aria-disabled','true');
+    if(idx<orden.length-1) sig.href=orden[idx+1]; else sig.setAttribute('aria-disabled','true');
+    if(idx>0) ant.title='Anterior: '+datos[orden[idx-1]].titulo+'  (tecla ←)';
+    if(idx<orden.length-1) sig.title='Siguiente: '+datos[orden[idx+1]].titulo+'  (tecla →)';
+  } else {
+    // índice u otra página: sin anterior/siguiente
+    ant.setAttribute('aria-disabled','true'); sig.setAttribute('aria-disabled','true');
+    bar.textContent='';
+  }
+  document.addEventListener('click',function(e){
+    var d=document.getElementById('nvdet');
+    if(d&&d.open&&!d.contains(e.target)) d.open=false;
+  });
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toUpperCase();
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
+    var d=document.getElementById('nvdet');
+    if(e.key==='Escape'&&d&&d.open){d.open=false;return;}
+    if(idx<0) return;
+    if(e.key==='ArrowLeft'&&idx>0) location.href=orden[idx-1];
+    if(e.key==='ArrowRight'&&idx<orden.length-1) location.href=orden[idx+1];
+  });
+})();
+</script>
+<!-- navegacion:fin -->

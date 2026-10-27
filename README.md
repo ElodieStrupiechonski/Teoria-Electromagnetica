@@ -28,6 +28,7 @@ Para que los enlaces de la portada funcionen, **mantén todos los archivos en la
 | `Polarizacion_explorador.html` | Polarización lineal, circular y elíptica; enlace satélite–estación terrena | U2 · 2.8 · P7 |
 | `Doppler_explorador.html` | Efecto Doppler relativista: frentes de onda, señal por observador y corrimiento al rojo | U2 · 2.9 |
 | `Reflexion_interactivo.html` | Reflexión con incidencia normal: onda estacionaria, Γ, τ, SWR y plano móvil que mide η(d) | U3 · 3.2 · P8 |
+| `TDR_explorador.html` | Reflectometría en cable coaxial (TDR): escalón que rebota en la carga, osciloscopio simulado en la T o sobre la carga, onda en el cable y guía para la tabla de la P8 | U3 · 3.2 · P8 |
 | `CapaTresMedios_interactivo.html` | Capa dieléctrica entre dos medios: interfaz móvil en z = −d, radomo (λ/2) y antirreflejante (λ/4) | U3 · 3.3 |
 | `CapaDielectrica_explorador.html` | Impedancia efectiva η(d): potencia reflejada contra d/λ₂ y condición η₂ = √(η₁η₃) | U3 · 3.3 |
 | `Snell_explorador.html` | Ley de Snell, reflexión total interna y ángulo de Brewster | U3 · 3.5 · P10, P11 |
