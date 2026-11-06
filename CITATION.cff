@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "Teoría Electromagnética — Exploradores interactivos"
+title: "Teoría Electromagnética: exploradores interactivos"
 message: "Si usas este material, por favor cítalo con los datos siguientes."
 type: dataset
 authors:
@@ -12,7 +12,7 @@ authors:
     orcid: "https://orcid.org/0000-0002-7591-5235"
     affiliation: "Centro de Física Aplicada y Tecnología Avanzada (CFATA), UNAM"
 version: "1.3.1"
-date-released: "2026-10-20"
+date-released: "2026-10-21"
 license: CC-BY-4.0
 keywords:
   - electromagnetismo

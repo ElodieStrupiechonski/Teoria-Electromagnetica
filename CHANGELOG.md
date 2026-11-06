@@ -2,16 +2,23 @@
 
 La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones archivadas en Zenodo. Cada versión archivada tiene su propio DOI de versión; el DOI de concepto [10.5281/zenodo.23423156](https://doi.org/10.5281/zenodo.23423156) (citar «todas las versiones») resuelve siempre a la más reciente.
 
-## Sin versión archivada — 2026-10-21 (rama principal, después de la v1.3.1)
+## Sin versión archivada · 2026-11-06 (estilo académico y navegación lateral)
+- Tipografía institucional del Manual de identidad gráfica de la ENES Juriquilla (nov. 2025): Century Gothic en títulos (respaldo web Questrial), Arial/Helvética en texto, controles y lecturas con cifras tabulares, Cambria en fórmulas (respaldo STIX Two Text). Se retiran Spectral e IBM Plex. Script `add_tipografia_em.py` (idempotente).
+- Notación: los subíndices y superíndices escritos a mano (Z_L, Z_in, v_p, V_inc, e^(−z/δ)) y los subíndices Unicode (Z₀, η₁, TE₁₀) se muestran como subíndices y superíndices reales en el texto, en las lecturas que generan los scripts y en los lienzos (canvas). Script `estilo_academico_em.py` (idempotente).
+- Puntuación académica: la raya (U+2014) se sustituye por dos puntos, comas o punto medio en todo el sitio y en los scripts de mantenimiento; los intervalos conservan la semirraya (3.6–3.8). Los valores aún no calculados se muestran con «…».
+- Navegación: el menú superior pasa a un panel lateral fijo a la izquierda con anterior/siguiente (nombre del explorador vecino), buscador (tecla /), lista por unidades con la página actual marcada y atajos ← →; en pantallas de menos de 1100 px se abre con «☰ Temario» y se cierra con ✕, Esc o tocando fuera.
+- Línea de transmisión: la etiqueta del plano de medición ya no se corta en el borde del lienzo.
+
+## Sin versión archivada · 2026-10-21 (rama principal, después de la v1.3.1)
 - Documentación del expediente de auditoría según el informe de cierre: origen de los informes declarado (asistente de IA), informes de verificación y cierre añadidos, fecha de `CITATION.cff`.
 - Efecto piel: profundidades mayores que 10⁴ km en notación científica.
 - Portada con `<head>`/`<body>` explícitos (requisito del verificador de Google Search Console).
 - `.zenodo.json`: el sitio web como trabajo relacionado (*isSupplementedBy*), para las versiones futuras.
 - Fresnel (adelanta puntos de la 1.4): diagrama de rayos con potencia por polarización, escuadra de 90° en Brewster y rayo rasante en el crítico; botón «⇄ Invertir el sentido»; T⊥ y T∥, fase de Γ y penetración 1/α en reflexión total; tabla «Brewster o crítico» y práctica con retroalimentación; etiquetas `<label for>` en sus entradas. Paneles de campo evanescente (perfil e^(−αz), λ₀ en nm, sensado ATR) y de fibra óptica con una fibra vecina (reflexión total frustrada, fórmula de Zhu *et al.* 1986 verificada contra matriz de transferencia). Convención de color unificada: azul = ∥, rojo = ⊥; el ángulo crítico pasa a granate.
 - Explorador nuevo `TDR_explorador.html` (3.2 · P8): escalón en cable coaxial de 50 Ω con carga variable (corto … abierto, 22/50/100 Ω), longitud L y factor de velocidad; esquema eléctrico con convenciones (fuente con R_s, línea, carga, voltímetro); pantalla de osciloscopio simulada con el punto de medida en la T (montaje A) o sobre la carga (montaje C); onda V⁺, V⁻ y total a lo largo del cable con animación; guía para llenar la Tabla A de la práctica en los dos montajes; práctica de lectura de Γ y Z_L. Portada: 20 exploradores.
-- Reparto Snell/Fresnel sin duplicar: Snell (3.5) se queda con la geometría —refracción, ángulo crítico, fibra óptica con rebotes, apertura numérica y fibra vecina por reflexión total frustrada (la luz acoplada queda guiada también en la segunda fibra)—; Fresnel (3.6–3.8) con amplitudes y polarización —coeficientes, Brewster, campo evanescente, ATR—. El ángulo de Brewster sale del título y del formulario de Snell; cada página enlaza a la otra. Portada actualizada.
+- Reparto Snell/Fresnel sin duplicar: Snell (3.5) se queda con la geometría (refracción, ángulo crítico, fibra óptica con rebotes, apertura numérica y fibra vecina por reflexión total frustrada (la luz acoplada queda guiada también en la segunda fibra)); Fresnel (3.6–3.8) con amplitudes y polarización (coeficientes, Brewster, campo evanescente, ATR). El ángulo de Brewster sale del título y del formulario de Snell; cada página enlaza a la otra. Portada actualizada.
 
-## [1.3.1] — 2026-10-21 · DOI de versión [10.5281/zenodo.23538848](https://doi.org/10.5281/zenodo.23538848)
+## [1.3.1] · 2026-10-21 · DOI de versión [10.5281/zenodo.23538848](https://doi.org/10.5281/zenodo.23538848)
 
 Atiende el informe de verificación de la v1.3 (detalle en [`auditoria/RESPUESTA_AUDITORIA.md`](auditoria/RESPUESTA_AUDITORIA.md), sección 6).
 
@@ -27,7 +34,7 @@ Atiende el informe de verificación de la v1.3 (detalle en [`auditoria/RESPUESTA
 - Datos para buscadores en las 20 páginas (título descriptivo, descripción, URL canónica, Open Graph, schema.org *LearningResource*), `sitemap.xml` y verificación de Google Search Console; script `add_seo_em.py`.
 - Carpeta `auditoria/` con los informes de auditoría, verificación y cierre (elaborados con Claude, asistente de IA de Anthropic, a petición de la autoría; ver `auditoria/README.md`) y la matriz de respuesta.
 
-## [1.3] — 2026-10-19 · DOI de versión [10.5281/zenodo.23482923](https://doi.org/10.5281/zenodo.23482923)
+## [1.3] · 2026-10-19 · DOI de versión [10.5281/zenodo.23482923](https://doi.org/10.5281/zenodo.23482923)
 
 Versión que atiende la auditoría del sitio asistida por IA (19 de octubre de 2026). El detalle hallazgo por hallazgo, con la decisión tomada y la verificación, está en [`auditoria/RESPUESTA_AUDITORIA.md`](auditoria/RESPUESTA_AUDITORIA.md).
 
@@ -48,8 +55,8 @@ Versión que atiende la auditoría del sitio asistida por IA (19 de octubre de 2
 
 > Nota: la copia archivada en Zenodo de la v1.3 rotula sus páginas con el número «1.2», porque la etiqueta v1.2 ya estaba ocupada por el depósito anterior y la etiqueta se cambió al publicar. El contenido es el descrito aquí; la rotulación se unificó a «1.3» en el repositorio inmediatamente después.
 
-## [1.2] — 2026-10-16 · DOI de versión [10.5281/zenodo.23423157](https://doi.org/10.5281/zenodo.23423157)
+## [1.2] · 2026-10-16 · DOI de versión [10.5281/zenodo.23423157](https://doi.org/10.5281/zenodo.23423157)
 - Primer depósito en Zenodo (páginas rotuladas internamente con el número «1.1»). Barra de navegación por temario, contador de visitas, portada ordenada por unidades, 13 exploradores. La auditoría se hizo sobre un commit posterior (`92f6190`, 19 de octubre), no depositado.
 
-## [1.0]–[1.1] — septiembre–octubre de 2026 (sin depósito en Zenodo)
+## [1.0]–[1.1] · septiembre–octubre de 2026 (sin depósito en Zenodo)
 - Primera publicación en GitHub Pages: 9 exploradores; después, navegación y contador.

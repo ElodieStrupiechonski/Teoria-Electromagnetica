@@ -1,4 +1,4 @@
-# Teoría Electromagnética — Exploradores interactivos
+# Teoría Electromagnética: exploradores interactivos
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23423156.svg)](https://doi.org/10.5281/zenodo.23423156)
 
@@ -17,7 +17,7 @@ Para que los enlaces de la portada funcionen, **mantén todos los archivos en la
 
 | Archivo | Tema | Unidad · práctica |
 |---|---|---|
-| `index.html` | Portada de la colección | — |
+| `index.html` | Portada de la colección |: |
 | `CampoGauss_explorador.html` | Ley de Gauss: carga puntual, esfera y lámina con superficie gaussiana arrastrable | U1 · 1.1 · P1 |
 | `Capacitor_explorador.html` | Capacitor de placas paralelas con dieléctrico deslizable, a V fijo o Q fija | U1 · 1.2 · P1 |
 | `Solenoide_explorador.html` | Campo de un solenoide finito frente al ideal μ₀nI (efecto de borde) | U1 · 1.4 · P3 |
@@ -45,8 +45,8 @@ Navegador con HTML5 y `<canvas>`. Sin dependencias externas ni servidor. Las tip
 
 ## Autoría
 
-- **Elodie Strupiechonski** — ENES Juriquilla, UNAM — ORCID [0000-0001-8991-8499](https://orcid.org/0000-0001-8991-8499)
-- **Andrés de Luna Bugallo** — CFATA, UNAM — ORCID [0000-0002-7591-5235](https://orcid.org/0000-0002-7591-5235)
+- **Elodie Strupiechonski**, ENES Juriquilla, UNAM. ORCID [0000-0001-8991-8499](https://orcid.org/0000-0001-8991-8499)
+- **Andrés de Luna Bugallo**, CFATA, UNAM. ORCID [0000-0002-7591-5235](https://orcid.org/0000-0002-7591-5235)
 
 ## Licencia
 
@@ -54,5 +54,5 @@ Navegador con HTML5 y `<canvas>`. Sin dependencias externas ni servidor. Las tip
 
 ## Cómo citar
 
-> Strupiechonski, E., & de Luna Bugallo, A. (2026). *Teoría Electromagnética — Exploradores interactivos* (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.23423156
+> Strupiechonski, E., & de Luna Bugallo, A. (2026). *Teoría Electromagnética: exploradores interactivos* (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: 10.5281/zenodo.23423156
 

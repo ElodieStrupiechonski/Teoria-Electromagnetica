@@ -7,8 +7,8 @@ Uso (desde la carpeta del repo):
     python3 set_doi_em.py 10.5281/zenodo.23423157
     python3 set_doi_em.py 10.5281/zenodo.23423157 --dir RUTA
 
-Reemplaza el marcador 10.5281/zenodo.XXXXXXX — o cualquier DOI de Zenodo
-anterior — en .html, .md, .cff y .json (salvo CHANGELOG.md, que guarda los
+Reemplaza el marcador 10.5281/zenodo.XXXXXXX, o cualquier DOI de Zenodo
+anterior, en .html, .md, .cff y .json (salvo CHANGELOG.md, que guarda los
 DOI de versión; la carpeta auditoria/ tampoco se toca); quita la nota «(se completa al
 publicar en Zenodo)»; en las páginas HTML convierte el DOI en enlace a
 doi.org, y añade la insignia de Zenodo al inicio del README si no está.

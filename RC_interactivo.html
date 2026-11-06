@@ -1,6 +1,93 @@
 <!doctype html>
 <html lang="es">
 <meta charset="utf-8">
+<!-- tipografia:inicio -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root:root{
+    --f-tit:"Century Gothic","Questrial","URW Gothic","Avant Garde",sans-serif;
+    --sans:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",Calibri,sans-serif;
+    --serif:Cambria,"STIX Two Text","Times New Roman",serif;
+    --mono:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",sans-serif;
+  }
+  body,button,input,select,textarea{font-family:var(--sans)}
+  body{font-variant-numeric:tabular-nums}
+  h1,h2,h3,.ct,.eyebrow,header .sub{font-family:var(--f-tit)!important;letter-spacing:0}
+  sub,sup{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}
+  sub{bottom:-.25em} sup{top:-.45em}
+</style>
+<script>
+(function(){
+  // ---- lienzos: subíndices y superíndices escritos como Z_L, V_inc, e^(−z/δ) ----
+  var RX=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})/g;
+  var P=CanvasRenderingContext2D.prototype, F=P.fillText;
+  P.fillText=function(t,x,y,mw){
+    t=String(t);
+    if((t.indexOf('_')<0&&t.indexOf('^')<0)||/\.(html|py|png|csv|txt|svg|jpg|pdf)\b/i.test(t)) return F.call(this,t,x,y,mw);
+    var sg=[],last=0,m; RX.lastIndex=0;
+    while((m=RX.exec(t))){
+      if(m[1]){sg.push([t.slice(last,m.index)+m[1],0]);sg.push([m[2].replace(/[{}]/g,''),1]);}
+      else{sg.push([t.slice(last,m.index),0]);sg.push([m[3].replace(/[{}()]/g,''),2]);}
+      last=RX.lastIndex;
+    }
+    if(!sg.length) return F.call(this,t,x,y,mw);
+    sg.push([t.slice(last),0]);
+    var f0=this.font, mm=/(\d+(?:\.\d+)?)px/.exec(f0), px=mm?+mm[1]:12,
+        fs=mm?f0.replace(mm[0],(px*0.72).toFixed(1)+'px'):f0, W=0,i;
+    for(i=0;i<sg.length;i++){this.font=sg[i][1]?fs:f0;sg[i][2]=this.measureText(sg[i][0]).width;W+=sg[i][2];}
+    var a=this.textAlign, x0=x;
+    if(a==='center') x0=x-W/2; else if(a==='right'||a==='end') x0=x-W;
+    this.textAlign='left';
+    for(i=0;i<sg.length;i++){
+      this.font=sg[i][1]?fs:f0;
+      F.call(this,sg[i][0],x0,y+(sg[i][1]===1?0.28*px:sg[i][1]===2?-0.38*px:0));
+      x0+=sg[i][2];
+    }
+    this.font=f0; this.textAlign=a;
+  };
+  // ---- texto generado por los scripts: misma notación en <sub>/<sup> ----
+  if(/AnatomiaGrafica/.test(location.pathname)) return;
+  var US=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})|([₀-₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ]+)/g;
+  var UNI="₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ", ASC="0123456789aeoxhklmnpstiruvj";
+  var SALTA={SCRIPT:1,STYLE:1,TEXTAREA:1,OPTION:1,PRE:1,CODE:1,TITLE:1,INPUT:1,SELECT:1};
+  function arreglar(n){
+    var p=n.parentNode; if(!p||SALTA[p.nodeName]||p.namespaceURI==='http://www.w3.org/2000/svg') return;
+    var t=n.nodeValue; US.lastIndex=0; if(!US.test(t)||/\.(html|py|png|csv)\b/.test(t)) return;
+    US.lastIndex=0; var fr=document.createDocumentFragment(), last=0, m, e;
+    while((m=US.exec(t))){
+      var antes=t.slice(last,m.index);
+      if(m[1]){fr.appendChild(document.createTextNode(antes+m[1]));e=document.createElement('sub');e.textContent=m[2].replace(/[{}]/g,'');}
+      else if(m[3]){fr.appendChild(document.createTextNode(antes));e=document.createElement('sup');e.textContent=m[3].replace(/[{}()]/g,'');}
+      else{fr.appendChild(document.createTextNode(antes));e=document.createElement('sub');
+        e.textContent=m[4].split('').map(function(c){return ASC[UNI.indexOf(c)];}).join('');}
+      fr.appendChild(e); last=US.lastIndex;
+    }
+    fr.appendChild(document.createTextNode(t.slice(last)));
+    p.replaceChild(fr,n);
+  }
+  function recorrer(r){
+    if(r.nodeType===3){arreglar(r);return;}
+    if(r.nodeType!==1||SALTA[r.nodeName]) return;
+    var w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT,null), l=[], n;
+    while((n=w.nextNode())) l.push(n);
+    l.forEach(arreglar);
+  }
+  function inicio(){
+    recorrer(document.body);
+    new MutationObserver(function(ms){ms.forEach(function(m){
+      if(m.type==='characterData') arreglar(m.target); else m.addedNodes.forEach(recorrer);
+    });}).observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',inicio); else inicio();
+})();
+</script>
+<!-- tipografia:fin -->
+
+
+
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- movil:inicio -->
 <style>
@@ -46,7 +133,7 @@
  "identifier": "https://doi.org/10.5281/zenodo.23423156",
  "isPartOf": {
   "@type": "Collection",
-  "name": "Teoría Electromagnética — Exploradores interactivos",
+  "name": "Teoría Electromagnética: exploradores interactivos",
   "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
  },
  "author": [
@@ -63,14 +150,13 @@
  ],
  "provider": {
   "@type": "CollegeOrUniversity",
-  "name": "Universidad Nacional Autónoma de México — ENES Juriquilla"
+  "name": "Universidad Nacional Autónoma de México, ENES Juriquilla"
  }
 }
 </script>
 <!-- seo:fin -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#f4f1ea; --card:#ffffff; --ink:#1a1a1a; --muted:#5a5a5a; --navy:#1F3864; --blue:#2E5496;
@@ -89,7 +175,7 @@
     --vin:#7aa2e0; --vr:#e6924a; --vc:#8bd08f;
   }
   *{box-sizing:border-box}
-  body{background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.45}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.45}
   .wrap{max-width:1040px;margin:0 auto;padding-block:22px;padding-left:16px;padding-right:16px}
   h1{font-size:25px;color:var(--navy);margin:.1em 0}
   .sub{color:var(--muted);font-size:15px;margin-bottom:16px}
@@ -200,12 +286,12 @@
       <div class="card">
         <h3>Valores calculados</h3>
         <div class="tiles">
-          <div class="tile"><div class="k">X<sub>C</sub>=1/(ωC)</div><div class="v" id="xc">—</div></div>
-          <div class="tile"><div class="k">Z=√(R²+X<sub>C</sub>²)</div><div class="v" id="z">—</div></div>
-          <div class="tile"><div class="k">φ=arctan(X<sub>C</sub>/R)</div><div class="v" id="phi">—</div></div>
-          <div class="tile"><div class="k">Δt=(φ/360)T</div><div class="v" id="dt">—</div></div>
-          <div class="tile"><div class="k">|I|=V<sub>in</sub>/Z</div><div class="v" id="ii">—</div></div>
-          <div class="tile"><div class="k">V<sub>R</sub>, V<sub>C</sub> pico</div><div class="v" id="vrc">—</div></div>
+          <div class="tile"><div class="k">X<sub>C</sub>=1/(ωC)</div><div class="v" id="xc">…</div></div>
+          <div class="tile"><div class="k">Z=√(R²+X<sub>C</sub>²)</div><div class="v" id="z">…</div></div>
+          <div class="tile"><div class="k">φ=arctan(X<sub>C</sub>/R)</div><div class="v" id="phi">…</div></div>
+          <div class="tile"><div class="k">Δt=(φ/360)T</div><div class="v" id="dt">…</div></div>
+          <div class="tile"><div class="k">|I|=V<sub>in</sub>/Z</div><div class="v" id="ii">…</div></div>
+          <div class="tile"><div class="k">V<sub>R</sub>, V<sub>C</sub> pico</div><div class="v" id="vrc">…</div></div>
         </div>
       </div>
       <div class="card">
@@ -236,9 +322,9 @@
       </g>
       <text x="342" y="16" fill="var(--vr)" font-size="15" font-weight="700" text-anchor="middle">R</text>
       <text x="504" y="80" fill="var(--vc)" font-size="15" font-weight="700">C</text>
-      <text x="70" y="140" fill="var(--vin)" font-size="13" text-anchor="middle">fuente (V_in)</text>
-      <text x="200" y="22" fill="var(--muted)" font-size="12" text-anchor="middle">CH1: V_in (toda la serie)</text>
-      <text x="348" y="52" fill="var(--muted)" font-size="12" text-anchor="middle">CH2: V_R</text>
+      <text x="70" y="140" fill="var(--vin)" font-size="13" text-anchor="middle">fuente (V<tspan baseline-shift="sub" font-size="72%">in</tspan>)</text>
+      <text x="200" y="22" fill="var(--muted)" font-size="12" text-anchor="middle">CH1: V<tspan baseline-shift="sub" font-size="72%">in</tspan> (toda la serie)</text>
+      <text x="348" y="52" fill="var(--muted)" font-size="12" text-anchor="middle">CH2: V<tspan baseline-shift="sub" font-size="72%">R</tspan></text>
     </svg>
   </div>
 
@@ -258,7 +344,7 @@
 
   <div class="credits">
     <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
-    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Circuito RC y fasores — Explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Circuito RC y fasores: explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
   </div>
 </div>
 
@@ -432,115 +518,130 @@
 <!-- contador:fin -->
 <!-- navegacion:inicio -->
 <style>
-  body{margin-top:50px!important}
-  .nvbar{position:fixed;top:0;left:0;right:0;z-index:9999;height:44px;display:flex;align-items:center;
-    gap:10px;padding:0 14px;background:var(--card,#fff);border-bottom:1px solid var(--line,#e2dcc9);
-    font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-  .nvbar a{text-decoration:none;color:var(--navy,var(--ink,#1F3864))}
-  .nv-home{font-weight:700;white-space:nowrap}
-  .nv-home small{font-weight:400;color:var(--muted,#5a5a5a)}
-  .nv-step{display:flex;align-items:center;justify-content:center;width:34px;height:30px;border:1px solid var(--line,#e2dcc9);
-    border-radius:8px;font-size:17px;line-height:1}
-  .nv-step:hover{background:var(--bg,#f4f1ea)}
-  .nv-step[aria-disabled="true"]{opacity:.25;pointer-events:none}
-  .nv-aquibar{flex:1;min-width:0;text-align:center;font-weight:700;color:var(--ink,#1a1a1a);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .nv-aquibar small{font-weight:400;color:var(--muted,#8a8fa0)}
-  .nvbar details{position:relative}
-  .nvbar summary{list-style:none;cursor:pointer;font-weight:700;color:var(--accent,#C1571B);
-    border:1px solid var(--line,#e2dcc9);border-radius:8px;padding:5px 12px;user-select:none;white-space:nowrap}
-  .nvbar summary::-webkit-details-marker{display:none}
-  .nv-menu{position:absolute;right:0;top:40px;width:min(640px,calc(100vw - 24px));max-height:calc(100vh - 70px);overflow:auto;
-    background:var(--card,#fff);border:1px solid var(--line,#e2dcc9);border-radius:12px;
-    box-shadow:0 8px 30px rgba(0,0,0,.18);padding:10px;column-count:2;column-gap:18px}
-  .nv-grp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#8a8fa0);
-    padding:10px 10px 5px;break-after:avoid;border-top:1px solid var(--line,#eee)}
-  .nv-menu .nv-grp:first-child{border-top:0;padding-top:4px}
-  .nv-menu a{display:block;padding:8px 10px;border-radius:7px;color:var(--ink,#1a1a1a);break-inside:avoid}
-  .nv-menu a small{color:var(--muted,#8a8fa0);margin-left:4px}
-  .nv-menu a:hover{background:var(--bg,#f4f1ea)}
-  .nv-menu a.nv-aqui{background:var(--bg,#f4f1ea);font-weight:700;color:var(--accent,#C1571B)}
-  .nv-pie{column-span:all;margin-top:6px;padding:7px 10px 2px;border-top:1px solid var(--line,#eee);
-    font-size:11.5px;color:var(--muted,#8a8fa0)}
-  @media (max-width:720px){
-    .nv-home small{display:none}
-    .nv-aquibar{display:none}
-    .nv-menu{column-count:1;position:fixed;left:12px;right:12px;top:50px;width:auto}
+  :root{--nv-w:272px}
+  body{margin-top:0!important}
+  @media (min-width:1100px){ body{margin-left:var(--nv-w)!important} }
+  .nvside{position:fixed;top:0;left:0;bottom:0;width:var(--nv-w);z-index:9999;display:flex;flex-direction:column;
+    background:var(--card,#fff);border-right:1px solid var(--line,#e2dcc9);
+    font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:14px;color:var(--ink,#1a1a1a);
+    box-shadow:1px 0 8px rgba(0,0,0,.05);transition:transform .2s ease}
+  .nvside a{text-decoration:none;color:inherit}
+  .nv-cab{padding:14px 16px 10px;border-bottom:1px solid var(--line,#e2dcc9)}
+  .nv-marca{display:block;font-family:"Century Gothic","Questrial",Arial,sans-serif;font-weight:700;font-size:15px;
+    line-height:1.25;color:var(--navy,var(--ink,#1F3864))}
+  .nv-marca small{display:block;font-weight:400;font-size:12px;color:var(--muted,#5a5a5a);margin-top:2px}
+  .nv-pasos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .nv-paso{display:flex;flex-direction:column;gap:1px;padding:6px 8px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font-size:11px;color:var(--muted,#5a5a5a);min-width:0}
+  .nv-paso b{font-size:12.5px;color:var(--ink,#1a1a1a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nv-paso.sig{text-align:right}
+  .nv-paso:hover{background:var(--bg,#f4f1ea)}
+  .nv-paso[aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-busca{margin-top:8px;width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font:inherit;background:var(--bg,#f8f6f0);color:inherit}
+  .nv-lista{flex:1;overflow-y:auto;padding:6px 8px 10px}
+  .nv-grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8a8fa0);padding:12px 8px 4px}
+  .nv-lista a{display:block;padding:6px 8px 6px 10px;border-radius:6px;border-left:3px solid transparent;line-height:1.3}
+  .nv-lista a small{display:block;font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-lista a:hover{background:var(--bg,#f4f1ea)}
+  .nv-lista a.nv-aqui{background:var(--bg,#f4f1ea);border-left-color:var(--accent,#C1571B);font-weight:700}
+  .nv-pie{padding:8px 14px;border-top:1px solid var(--line,#e2dcc9);font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-boton{display:none;position:fixed;top:10px;left:10px;z-index:10000;gap:6px}
+  .nv-boton a,.nv-boton button{display:flex;align-items:center;justify-content:center;height:38px;min-width:38px;padding:0 10px;
+    border:1px solid var(--line,#e2dcc9);border-radius:9px;background:var(--card,#fff);color:var(--ink,#1a1a1a);
+    font:600 14px Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .nv-boton [aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-velo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:10001}
+  .nv-cierra{display:none;position:absolute;top:10px;right:10px;width:32px;height:32px;border:1px solid var(--line,#e2dcc9);border-radius:8px;background:var(--card,#fff);color:inherit;font-size:16px;cursor:pointer}
+  .nv-cab{position:relative}
+  @media (max-width:1099px){
+    body{margin-top:56px!important}
+    .nvside{transform:translateX(-102%);width:min(320px,88vw)}
+    .nvside.abierto{transform:none;z-index:10002}
+    .nv-cierra{display:block}
+    .nv-boton{display:flex}
+    .nvside.abierto ~ .nv-velo{display:block}
   }
-  @media print{.nvbar{display:none} body{margin-top:0!important}}
+  @media print{.nvside,.nv-boton,.nv-velo{display:none} body{margin:0!important}}
 </style>
-<nav class="nvbar" aria-label="Navegación del sitio">
-  <a class="nv-home" href="index.html">⌁ Exploradores EM <small>· ENES Juriquilla</small></a>
-  <a class="nv-step" id="nv-ant" href="#" title="Explorador anterior (tecla ←)" aria-label="Anterior">‹</a>
-  <span class="nv-aquibar" id="nv-aqui-bar"></span>
-  <a class="nv-step" id="nv-sig" href="#" title="Explorador siguiente (tecla →)" aria-label="Siguiente">›</a>
-  <details id="nvdet"><summary>Temario ▾</summary>
-    <div class="nv-menu">
-<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
-<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss <small>1.1 · P1</small></a>
-<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico <small>1.2 · P1</small></a>
-<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito <small>1.4 · P3</small></a>
-<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday <small>1.6 · P3</small></a>
-<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
-<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores <small>fasores · P4</small></a>
-<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas <small>2.3 · P5</small></a>
-<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel <small>2.6 · P6</small></a>
-<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización <small>2.8 · P7</small></a>
-<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler <small>2.9</small></a>
-<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
-<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal <small>3.2 · P8</small></a>
-<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios) <small>3.3</small></a>
-<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d) <small>3.3</small></a>
-<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell <small>3.5 · P10, P11</small></a>
-<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel <small>3.6–3.8</small></a>
-<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
-<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR <small>4.3–4.4</small></a>
-<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith <small>4.7–4.8</small></a>
-<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular <small>4.10–4.12</small></a>
-<div class="nv-grp">Transversales</div>
-<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético <small>todo el curso</small></a>
-<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica <small>cómputo · P6</small></a>
-    <div class="nv-pie">Atajos: ← anterior · → siguiente · Esc cierra el menú</div>
+<nav class="nvside" id="nvside" aria-label="Exploradores del curso">
+  <div class="nv-cab">
+    <button class="nv-cierra" id="nv-cierra" aria-label="Cerrar el temario">✕</button>
+    <a class="nv-marca" href="index.html">Exploradores de Teoría Electromagnética<small>ENES Juriquilla, UNAM · inicio</small></a>
+    <div class="nv-pasos">
+      <a class="nv-paso" id="nv-ant" href="#" aria-label="Explorador anterior">‹ anterior<b id="nv-ant-t">…</b></a>
+      <a class="nv-paso sig" id="nv-sig" href="#" aria-label="Explorador siguiente">siguiente ›<b id="nv-sig-t">…</b></a>
     </div>
-  </details>
+    <input class="nv-busca" id="nv-busca" type="search" placeholder="Buscar (tecla /)" aria-label="Buscar explorador">
+  </div>
+  <div class="nv-lista" id="nv-lista">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss<small>1.1 · P1</small></a>
+<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico<small>1.2 · P1</small></a>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito<small>1.4 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday<small>1.6 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores<small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas<small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel<small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización<small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler<small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal<small>3.2 · P8</small></a>
+<a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10, P11</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8</small></a>
+<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
+<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7–4.8</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>
+  </div>
+  <div class="nv-pie">Teclas: ← anterior · → siguiente · / buscar · Esc cerrar</div>
 </nav>
+<div class="nv-boton"><button id="nv-abre" aria-controls="nvside" aria-expanded="false">☰ Temario</button>
+  <a id="nv-ant2" href="#" aria-label="Anterior">‹</a><a id="nv-sig2" href="#" aria-label="Siguiente">›</a></div>
+<div class="nv-velo" id="nv-velo"></div>
 <script>
 (function(){
-  var orden=[], datos={};
-  var l=document.querySelectorAll('.nv-menu a[data-nv]');
-  for(var i=0;i<l.length;i++){
-    var f=l[i].getAttribute('data-nv'); orden.push(f);
-    datos[f]={el:l[i], titulo:l[i].childNodes[0].textContent.trim(),
-               sub:(l[i].querySelector('small')||{textContent:''}).textContent};
-  }
-  var aqui=(location.pathname.split('/').pop()||'index.html');
-  var idx=orden.indexOf(aqui);
-  var ant=document.getElementById('nv-ant'), sig=document.getElementById('nv-sig'),
-      bar=document.getElementById('nv-aqui-bar');
-  if(idx>=0){
-    datos[aqui].el.className='nv-aqui';
-    bar.innerHTML=datos[aqui].titulo+' <small>'+datos[aqui].sub+'</small>';
-    if(idx>0) ant.href=orden[idx-1]; else ant.setAttribute('aria-disabled','true');
-    if(idx<orden.length-1) sig.href=orden[idx+1]; else sig.setAttribute('aria-disabled','true');
-    if(idx>0) ant.title='Anterior: '+datos[orden[idx-1]].titulo+'  (tecla ←)';
-    if(idx<orden.length-1) sig.title='Siguiente: '+datos[orden[idx+1]].titulo+'  (tecla →)';
-  } else {
-    // índice u otra página: sin anterior/siguiente
-    ant.setAttribute('aria-disabled','true'); sig.setAttribute('aria-disabled','true');
-    bar.textContent='';
-  }
-  document.addEventListener('click',function(e){
-    var d=document.getElementById('nvdet');
-    if(d&&d.open&&!d.contains(e.target)) d.open=false;
-  });
+  var lista=document.getElementById('nv-lista'), side=document.getElementById('nvside');
+  var l=lista.querySelectorAll('a[data-nv]'), orden=[], dat={};
+  for(var i=0;i<l.length;i++){var f=l[i].getAttribute('data-nv');orden.push(f);
+    dat[f]={el:l[i],t:l[i].childNodes[0].textContent.trim()};}
+  var aqui=(location.pathname.split('/').pop()||'index.html'), k=orden.indexOf(aqui);
+  function paso(idA,idT,j){var a=document.getElementById(idA);
+    if(j<0||j>=orden.length){a.setAttribute('aria-disabled','true');if(idT)document.getElementById(idT).textContent='';return;}
+    a.href=orden[j];a.title=dat[orden[j]].t+(j<k?' (tecla ←)':' (tecla →)');if(idT)document.getElementById(idT).textContent=dat[orden[j]].t;}
+  if(k>=0){dat[aqui].el.className='nv-aqui';dat[aqui].el.setAttribute('aria-current','page');
+    paso('nv-ant','nv-ant-t',k-1);paso('nv-sig','nv-sig-t',k+1);paso('nv-ant2',null,k-1);paso('nv-sig2',null,k+1);
+    setTimeout(function(){var r=dat[aqui].el;lista.scrollTop=r.offsetTop-lista.clientHeight/3;},0);}
+  else{paso('nv-ant','nv-ant-t',-1);paso('nv-sig','nv-sig-t',0);paso('nv-ant2',null,-1);paso('nv-sig2',null,0);}
+  var bus=document.getElementById('nv-busca');
+  bus.addEventListener('input',function(){var q=bus.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    var grp=null,vis=0;
+    Array.prototype.forEach.call(lista.children,function(c){
+      if(c.classList.contains('nv-grp')){if(grp)grp.style.display=vis?'':'none';grp=c;vis=0;return;}
+      var t=c.textContent.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      var ok=!q||t.indexOf(q)>=0;c.style.display=ok?'':'none';if(ok)vis++;});
+    if(grp)grp.style.display=vis?'':'none';});
+  bus.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=lista.querySelector('a[data-nv]:not([style*="none"])');if(v)location.href=v.href;}});
+  var abre=document.getElementById('nv-abre'), velo=document.getElementById('nv-velo');
+  function cambia(on){side.classList.toggle('abierto',on);abre.setAttribute('aria-expanded',on?'true':'false');}
+  abre.addEventListener('click',function(){cambia(!side.classList.contains('abierto'));});
+  velo.addEventListener('click',function(){cambia(false);});
+  document.getElementById('nv-cierra').addEventListener('click',function(){cambia(false);});
   document.addEventListener('keydown',function(e){
     var t=(e.target.tagName||'').toUpperCase();
+    if(e.key==='Escape'){cambia(false);if(t==='INPUT')e.target.blur();return;}
     if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
-    var d=document.getElementById('nvdet');
-    if(e.key==='Escape'&&d&&d.open){d.open=false;return;}
-    if(idx<0) return;
-    if(e.key==='ArrowLeft'&&idx>0) location.href=orden[idx-1];
-    if(e.key==='ArrowRight'&&idx<orden.length-1) location.href=orden[idx+1];
+    if(e.key==='/'){e.preventDefault();if(innerWidth<1100)cambia(true);bus.focus();return;}
+    if(k<0) return;
+    if(e.key==='ArrowLeft'&&k>0) location.href=orden[k-1];
+    if(e.key==='ArrowRight'&&k<orden.length-1) location.href=orden[k+1];
   });
 })();
 </script>

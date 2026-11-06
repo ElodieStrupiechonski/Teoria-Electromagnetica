@@ -22,7 +22,7 @@ INI, FIN = "<!-- seo:inicio -->", "<!-- seo:fin -->"
 
 # archivo: (título, descripción ≤ ~160 caracteres, temas)
 PAGINAS = {
- "index.html": ("Teoría Electromagnética — Exploradores interactivos (ENES Juriquilla, UNAM)",
+ "index.html": ("Teoría Electromagnética: exploradores interactivos (ENES Juriquilla, UNAM)",
    "19 simuladores gratuitos de electromagnetismo en español: Gauss, inducción, ondas planas, Fresnel, líneas de transmisión, carta de Smith y guías de onda.",
    ["electromagnetismo", "ondas electromagnéticas", "líneas de transmisión"]),
  "CampoGauss_explorador.html": ("Ley de Gauss: simulador interactivo de flujo eléctrico",
@@ -99,11 +99,11 @@ def bloque(f, titulo, desc, temas):
       "about": temas,
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "identifier": DOI,
-      "isPartOf": {"@type": "Collection", "name": "Teoría Electromagnética — Exploradores interactivos", "url": BASE},
+      "isPartOf": {"@type": "Collection", "name": "Teoría Electromagnética: exploradores interactivos", "url": BASE},
       "author": [
         {"@type": "Person", "name": "Elodie Strupiechonski", "sameAs": "https://orcid.org/0000-0001-8991-8499"},
         {"@type": "Person", "name": "Andrés de Luna Bugallo", "sameAs": "https://orcid.org/0000-0002-7591-5235"}],
-      "provider": {"@type": "CollegeOrUniversity", "name": "Universidad Nacional Autónoma de México — ENES Juriquilla"}
+      "provider": {"@type": "CollegeOrUniversity", "name": "Universidad Nacional Autónoma de México, ENES Juriquilla"}
     }
     esc = lambda t: t.replace("&", "&amp;").replace('"', "&quot;")
     return f'''{INI}
