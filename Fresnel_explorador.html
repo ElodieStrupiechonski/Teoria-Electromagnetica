@@ -88,6 +88,7 @@
 
 
 
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- movil:inicio -->
 <style>
@@ -224,6 +225,33 @@
   .fb.fok{color:var(--green)} .fb.fno{color:var(--red)}
   .nota{margin-top:10px;font-size:13.5px;color:var(--muted);line-height:1.5} .nota b{color:var(--ink)}
   @media (max-width:560px){.tile .v{font-size:15px}}
+  /* P11: tarjeta de laboratorio */
+  .ptit{font-size:19px;color:var(--navy);margin:0 0 8px}
+  .psub{font-size:16px;color:var(--navy);margin:18px 0 6px}
+  .ptiles{grid-template-columns:repeat(3,1fr)}
+  .pfig{margin:16px 0 4px}
+  .pfig svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto;color:var(--ink)}
+  .sv-med{fill:var(--blue);fill-opacity:.12}
+  .sv-int{stroke:currentColor;stroke-width:1.4}
+  .sv-normal{stroke:var(--muted);stroke-width:1.1;stroke-dasharray:4 4}
+  .sv-p{stroke:var(--spar);stroke-width:2.6} .sv-s{stroke:var(--sperp);stroke-width:2.6}
+  .sv-hp{fill:var(--spar)} .sv-hs{fill:var(--sperp)}
+  .sv-ra{fill:none;stroke:var(--green);stroke-width:2}
+  .sv-arc{fill:none;stroke:currentColor;stroke-width:1.2}
+  .sv-pol{fill:var(--card);fill-opacity:.85;stroke:currentColor;stroke-width:1.5}
+  .sv-ax{stroke:var(--spar);stroke-width:2;stroke-dasharray:5 2}
+  .sv-det{fill:var(--muted);fill-opacity:.5}
+  .sv-t{font-family:var(--sans);font-size:12px;fill:currentColor}
+  .sv-m{fill:var(--muted)} .sv-g{fill:var(--green);font-weight:700} .sv-r{fill:var(--sperp);font-weight:700} .sv-bl{fill:var(--spar);font-weight:700}
+  .sv-b{font-size:15px;font-weight:700;font-style:italic}
+  .plist{font-size:14px;color:var(--muted);padding-left:20px;margin:6px 0;line-height:1.5}
+  .plist li{margin:5px 0} .plist b{color:var(--ink)}
+  table.ptab{min-width:0}
+  table.ptab th,table.ptab td{vertical-align:middle}
+  table.ptab td:first-child{color:var(--ink)}
+  table.ptab input{width:100%;max-width:110px;min-width:0;font:inherit;font-size:14px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:4px 6px}
+  table.ptab tr.pmin td{background:color-mix(in srgb,var(--green) 14%,transparent)}
+  @media (max-width:560px){.ptiles{grid-template-columns:1fr 1fr!important} table.ptab{font-size:12.5px} table.ptab th,table.ptab td{padding:5px 5px}}
 </style>
 <div class="wrap">
   <h1>Coeficientes de Fresnel: incidencia oblicua</h1>
@@ -300,6 +328,83 @@
     <p class="kv" style="font-family:inherit">Si existen los dos, siempre θ<sub>B</sub> &lt; θ<sub>c</sub>, porque tan <var class="vinc">x</var> &gt; sen <var class="vinc">x</var> para 0 &lt; <var class="vinc">x</var> &lt; 90°. Y θ<sub>B</sub>(1→2) + θ<sub>B</sub>(2→1) = 90°: compruébalo con el botón ⇄.</p>
   </details>
 
+  <div class="card" id="p11">
+    <h2 class="ptit">Para la práctica P11 (Brewster y reflexión total interna)</h2>
+    <p class="nota" style="margin-top:0">Material: apuntador láser, una superficie de acrílico (PMMA, <span class="vinc">n</span> ≈ 1.49) o de agua (<span class="vinc">n</span> ≈ 1.333) y un polarizador que se usa como <b>analizador</b> frente al haz reflejado. Con el semicilindro de la práctica P10 se mide además el ángulo crítico desde dentro del acrílico.</p>
+    <div class="tiles ptiles">
+      <div class="tile tb"><div class="k">θB · aire → acrílico · arctan 1.49</div><div class="v">56.1°</div></div>
+      <div class="tile tb"><div class="k">θB · aire → agua · arctan 1.333</div><div class="v">53.1°</div></div>
+      <div class="tile tb"><div class="k">θB · acrílico → aire (dentro)</div><div class="v">33.9°</div></div>
+      <div class="tile tc"><div class="k">θc · acrílico → aire · arcsen(1/1.49)</div><div class="v">42.2°</div></div>
+      <div class="tile tc"><div class="k">θc · agua → aire · arcsen(1/1.333)</div><div class="v">48.6°</div></div>
+      <div class="tile"><div class="k">Comprobación</div><div class="v" style="font-size:14px">56.1° + 33.9° = 90°</div></div>
+    </div>
+    <div class="btns">
+      <button class="btn" type="button" data-p11="1,1.49,B">Ver aire → acrílico en θB</button>
+      <button class="btn" type="button" data-p11="1,1.333,B">Ver aire → agua en θB</button>
+      <button class="btn" type="button" data-p11="1.49,1,C">Ver acrílico → aire en θc</button>
+      <button class="btn" type="button" data-p11="1.333,1,C">Ver agua → aire en θc</button>
+    </div>
+    <p class="muted" style="margin:6px 0 0">Cada botón fija los medios y θ<sub>i</sub> en el explorador de arriba y lleva a la gráfica R(θ), donde el ángulo queda sobre la línea verde (θB) o la guinda (θc).</p>
+
+    <figure class="pfig">
+      <svg viewBox="0 0 440 290" role="img" aria-label="Plano de incidencia con el haz incidente en el ángulo de Brewster, el haz reflejado solo con polarización perpendicular dirigido a un analizador con eje paralelo, y el haz refractado formando 90 grados con el reflejado">
+        <rect x="8" y="150" width="424" height="132" class="sv-med"/>
+        <line x1="8" y1="150" x2="432" y2="150" class="sv-int"/>
+        <line x1="200" y1="22" x2="200" y2="278" class="sv-normal"/>
+        <text x="14" y="20" class="sv-t sv-m">plano de incidencia = plano del dibujo</text>
+        <text x="14" y="144" class="sv-t sv-m">aire · n₁ = 1.00</text>
+        <text x="14" y="272" class="sv-t sv-m">acrílico · n₂ = 1.49</text>
+        <line x1="99" y1="85.2" x2="198.6" y2="152.1" class="sv-p"/>
+        <line x1="101.8" y1="81" x2="201.4" y2="147.9" class="sv-s"/>
+        <polygon points="0,0 -11,-4.5 -11,4.5" class="sv-hp" transform="translate(150.2,116.6) rotate(33.9)"/>
+        <line x1="200" y1="150" x2="353.6" y2="46.8" class="sv-s"/>
+        <polygon points="0,0 -11,-4.5 -11,4.5" class="sv-hs" transform="translate(262.3,108.2) rotate(-33.9)"/>
+        <line x1="198" y1="151.4" x2="264.8" y2="251" class="sv-p"/>
+        <line x1="202" y1="148.6" x2="268.8" y2="248.2" class="sv-s"/>
+        <polygon points="0,0 -11,-4.5 -11,4.5" class="sv-hp" transform="translate(244.6,216.4) rotate(56.1)"/>
+        <polyline points="211.6,142.2 219.4,153.8 207.8,161.6" class="sv-ra"/>
+        <text x="224" y="168" class="sv-t sv-g">90°</text>
+        <path d="M200,112 A38,38 0 0 0 168.4,128.8" class="sv-arc"/>
+        <path d="M200,188 A38,38 0 0 0 221.2,181.6" class="sv-arc"/>
+        <text x="168" y="102" class="sv-t sv-b">θ<tspan baseline-shift="sub" font-size="70%">B</tspan></text>
+        <text x="204" y="208" class="sv-t sv-b">θ<tspan baseline-shift="sub" font-size="70%">t</tspan></text>
+        <ellipse cx="324.5" cy="66.4" rx="20" ry="6" transform="rotate(56.1 324.5 66.4)" class="sv-pol"/>
+        <line x1="311.1" y1="46.5" x2="337.9" y2="86.3" class="sv-ax"/>
+        <text x="344" y="98" class="sv-t">analizador</text>
+        <text x="344" y="112" class="sv-t sv-bl">eje ∥ (p)</text>
+        <rect x="356" y="30" width="8" height="26" transform="rotate(56.1 360 43)" class="sv-det"/>
+        <text x="372" y="34" class="sv-t sv-m">pantalla</text>
+        <text x="60" y="70" class="sv-t sv-m">láser</text>
+        <text x="268" y="128" class="sv-t sv-r">reflejado: solo ⊥</text>
+        <text x="276" y="240" class="sv-t sv-m">refractado</text>
+        <text x="276" y="254" class="sv-t sv-m">(∥ y ⊥)</text>
+      </svg>
+      <figcaption class="nota">En θ<sub>B</sub> el reflejado y el refractado forman 90° y la componente ∥ (azul) no se refleja: el reflejo queda polarizado ⊥ (rojo). Un analizador con su eje en el plano de incidencia (∥) bloquea ese reflejo y la pantalla se oscurece; con el eje ⊥ ocurre lo contrario.</figcaption>
+    </figure>
+
+    <h3 class="psub">Procedimiento y consejos</h3>
+    <ul class="plist">
+      <li><b>Orienta el analizador para transmitir la polarización paralela</b> al plano de incidencia (p, ∥): su eje de transmisión en el plano que forman el haz incidente y la normal. Así solo ves la parte ∥ del reflejo, la que se anula en θ<sub>B</sub>.</li>
+      <li><b>Busca un mínimo, no un cero.</b> Barre θ<sub>i</sub> de 5° en 5° y luego de 1° en 1° cerca de la predicción; el ángulo de Brewster es donde la mancha reflejada es <b>más tenue</b>. Con un apuntador casi nunca se apaga del todo: el haz no es perfectamente paralelo, el polarizador no es ideal y la superficie no es perfectamente lisa.</li>
+      <li><b>La mayoría de los apuntadores ya están parcialmente polarizados</b> (el diodo láser emite luz con una polarización preferente). Gira el apuntador sobre su eje: si el reflejo cambia mucho de brillo, colócalo para que su polarización tenga componente ∥ apreciable, o el mínimo será difícil de distinguir del ruido.</li>
+      <li><b>Ángulo crítico:</b> desde dentro del semicilindro (haz entrando por la cara curva hacia el centro) aumenta θ<sub>i</sub> hasta que el haz transmitido sale rasante y desaparece; ahí el reflejo interno se vuelve brillante de golpe. Ese reflejo total <b>no</b> se apaga con ningún giro del analizador.</li>
+      <li>Mide θ<sub>i</sub> desde la normal y repite cada lectura acercándote por los dos lados del mínimo.</li>
+    </ul>
+
+    <h3 class="psub">Tabla de registro</h3>
+    <div class="inrow" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <div class="inbox"><label for="pMed">Superficie (desde el aire)</label><select id="pMed"><option value="1.49">acrílico · 1.49</option><option value="1.333">agua · 1.333</option></select></div>
+      <div class="inbox"><label>Mínimo medido · θB predicho</label><div class="v" id="pMin" style="font-size:16px;font-weight:700;color:var(--navy)">…</div></div>
+    </div>
+    <div class="cmpwrap"><table class="cmp ptab" id="pReg">
+      <thead><tr><th>Ángulo θ<sub>i</sub> (°)</th><th>Intensidad relativa (0–5 o lux)</th><th>R∥ predicha</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="muted" style="margin:6px 0 0">La intensidad puede ser una lectura subjetiva de 0 (no se ve) a 5 (muy brillante) o el valor de una aplicación de luxómetro del teléfono con el sensor en el lugar de la pantalla. La columna R∥ predicha es la fracción de la potencia ∥ reflejada (Fresnel, sin pérdidas): compárala solo en su forma, porque tu lectura no está calibrada.</p>
+    <div class="btns"><button class="btn" type="button" id="pRegEj">Ángulos sugeridos</button><button class="btn" type="button" id="pRegBo">Borrar</button></div>
+  </div>
+
   <details class="card">
     <summary>Practica: ¿Brewster o crítico?</summary>
     <p class="kv" style="font-family:inherit;margin-top:10px">Un caso al azar. Calcula los dos ángulos (o marca que no existe) y comprueba. Tolerancia ±0.5°.</p>
@@ -342,7 +447,7 @@
 (function(){
 "use strict";
 var css=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
-var MATS=[["Aire",1.00],["Agua",1.33],["MgF₂",1.38],["Teflón (PTFE)",1.35],["Sílice fundida",1.46],["Vidrio (BK7)",1.52],["Zafiro",1.77],["Diamante",2.42]];
+var MATS=[["Aire",1.00],["Agua",1.333],["MgF₂",1.38],["Teflón (PTFE)",1.35],["Sílice fundida",1.46],["Acrílico (PMMA)",1.49],["Vidrio (BK7)",1.52],["Zafiro",1.77],["Diamante",2.42]];
 var n1=1.00, n2=1.52, th=30, dragging=false;
 var D=180/Math.PI;
 var cv=document.getElementById('cv'), cvr=document.getElementById('cvr');
@@ -350,7 +455,7 @@ var S1=document.getElementById('m1'), S2=document.getElementById('m2');
 function sel(s,def,cb){
   MATS.forEach(function(mm,i){var o=document.createElement('option');o.value=i;o.textContent=mm[0]+'  (n = '+mm[1].toFixed(2)+')';s.appendChild(o);});
   s.value=def; s.addEventListener('change',function(){cb(MATS[+s.value][1]);update();});}
-sel(S1,0,function(v){n1=v;}); sel(S2,5,function(v){n2=v;});
+sel(S1,0,function(v){n1=v;}); sel(S2,6,function(v){n2=v;});
 function nombre(n){for(var i=0;i<MATS.length;i++)if(Math.abs(MATS[i][1]-n)<1e-9)return MATS[i][0];return "Medio";}
 function syncSel(){[[S1,n1],[S2,n2]].forEach(function(p){var k=-1;MATS.forEach(function(mm,i){if(Math.abs(mm[1]-p[1])<1e-9)k=i;});if(k>=0)p[0].value=k;});}
 
@@ -607,6 +712,26 @@ document.getElementById('rChk').addEventListener('click',function(){
   document.getElementById('rCount').textContent=R.ok+" / "+R.tot;
   rFb.className="fb "+(okB&&okC?"fok":"fno");rFb.innerHTML=h;rSee.disabled=false;});
 rSee.addEventListener('click',function(){n1=MATS[R.a][1];n2=MATS[R.b][1];S1.value=R.a;S2.value=R.b;th=thB();draw();cv.scrollIntoView({behavior:'smooth',block:'center'});});
+// ---- P11: botones que llevan la gráfica a θB o θc y tabla de registro ----
+Array.prototype.forEach.call(document.querySelectorAll('[data-p11]'),function(b){b.addEventListener('click',function(){
+  var p=b.getAttribute('data-p11').split(',');n1=+p[0];n2=+p[1];syncSel();
+  th=p[2]==='B'?thB():thC();draw();cv.scrollIntoView({behavior:'smooth',block:'center'});});});
+var pTb=document.querySelector('#pReg tbody'),pMed=document.getElementById('pMed'),NR=10,SUG=[40,45,50,52,54,56,58,60,65,70];
+function rpar(n,t){var ti=t/D,ci=Math.cos(ti),st=Math.sin(ti)/n,ct=Math.sqrt(1-st*st),g=(ct-n*ci)/(ct+n*ci);return g*g;}
+for(var ip=0;ip<NR;ip++){var trp=document.createElement('tr');
+  trp.innerHTML='<td><input type="number" step="any" min="0" max="89.9" inputmode="decimal" placeholder="…" aria-label="ángulo de incidencia, fila '+(ip+1)+'"></td><td><input type="number" step="any" min="0" inputmode="decimal" placeholder="…" aria-label="intensidad relativa, fila '+(ip+1)+'"></td><td>…</td>';
+  pTb.appendChild(trp);}
+function pReg(){var n=+pMed.value,best=null,bi=-1,rows=pTb.rows;
+  for(var i=0;i<rows.length;i++){var ins=rows[i].getElementsByTagName('input'),a=parseFloat(ins[0].value),I=parseFloat(ins[1].value);
+    rows[i].className='';rows[i].cells[2].textContent=(a>=0&&a<90)?(100*rpar(n,a)).toFixed(2)+' %':'…';
+    if(a>=0&&a<90&&I>=0&&(best===null||I<best)){best=I;bi=i;}}
+  if(bi>=0)rows[bi].className='pmin';
+  var tB=(Math.atan(n)*D).toFixed(1)+'°';
+  document.getElementById('pMin').textContent=(bi>=0?parseFloat(rows[bi].getElementsByTagName('input')[0].value).toFixed(1)+'°':'…')+' · '+tB;}
+pTb.addEventListener('input',pReg);pMed.addEventListener('change',pReg);
+document.getElementById('pRegEj').addEventListener('click',function(){for(var i=0;i<NR;i++){var ins=pTb.rows[i].getElementsByTagName('input');ins[0].value=SUG[i];}pReg();});
+document.getElementById('pRegBo').addEventListener('click',function(){for(var i=0;i<NR;i++){var ins=pTb.rows[i].getElementsByTagName('input');ins[0].value='';ins[1].value='';}pReg();});
+pReg();
 nuevo();
 draw();
 })();
@@ -721,12 +846,14 @@ draw();
 <a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
 <a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
 <a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
-<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10, P11</small></a>
-<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8 · P11</small></a>
 <div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
 <a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
-<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7–4.8</small></a>
-<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12</small></a>
+<a href="ImpedanciaEntrada_explorador.html" data-nv="ImpedanciaEntrada_explorador.html">Líneas cortas como reactancias<small>4.5–4.6 · P14</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7 · P15</small></a>
+<a href="Acoplamiento_explorador.html" data-nv="Acoplamiento_explorador.html">Acoplamiento λ/4 y stub<small>4.8–4.9 · P15</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12 · P16</small></a>
 <div class="nv-grp">Transversales</div>
 <a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
 <a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>

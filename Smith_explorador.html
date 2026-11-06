@@ -88,6 +88,7 @@
 
 
 
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- movil:inicio -->
 <style>
@@ -204,6 +205,24 @@
   details.card summary::-webkit-details-marker{display:none}
   details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
   @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}h1{font-size:26px}.card{padding:18px 16px}}
+  /* v1.4: admitancias, V máx/mín, escala de longitudes de onda, práctica y paso a paso */
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:12px}
+  .seg .btn{border:0;border-radius:0;margin:0}
+  .seg .btn+.btn{border-left:1px solid var(--line)}
+  .seg .btn[aria-pressed="true"]{background:var(--accent);color:#fff}
+  .ctrl label.chk{display:flex;justify-content:flex-start;gap:8px;align-items:center;font-size:13.5px;font-weight:400;color:var(--muted);margin:10px 0 0;cursor:pointer}
+  .chk input{accent-color:var(--accent);margin:0}
+  .tile.ytile{border-color:var(--blueSoft)} .tile.ytile .v{color:var(--blue)}
+  .btnx{border-color:var(--accent);color:var(--accent)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .reto{font-size:15px;background:var(--bg);border:1px dashed var(--accent);border-radius:9px;padding:9px 12px;margin-top:6px}
+  .fb{margin-top:10px;font-size:14.5px;line-height:1.55}
+  .fb p{margin:4px 0}
+  .fb .ok{color:var(--green)} .fb .no{color:var(--red)}
+  .pcwrap{max-width:420px;margin:0 auto;width:100%}
+  ol.pasos{padding-left:22px;margin:12px 0 0}
+  ol.pasos li{margin:7px 0}
+  .tile .v{overflow-wrap:anywhere}
 </style>
 <div class="wrap">
   <header>
@@ -221,10 +240,18 @@
           <span><i style="background:var(--accent)"></i>carga z<sub>L</sub> (arrástrala)</span>
           <span><i style="background:var(--greenSoft)"></i>z<sub>in</sub> tras girar d/λ</span>
           <span><i style="background:var(--blueSoft);border-radius:2px;height:3px;width:15px"></i>círculo de VSWR (|Γ| constante)</span>
+          <span><i style="background:var(--redSoft);border-radius:2px"></i>V<sub>máx</sub> (<var>r</var> = S)</span>
+          <span><i style="background:transparent;border:2px solid var(--blueSoft);border-radius:2px"></i>V<sub>mín</sub> (<var>r</var> = 1/S)</span>
+          <span id="legY" hidden><i style="background:var(--panel);border:2.5px solid var(--blueSoft);border-radius:2px"></i>admitancia y (punto opuesto, −Γ)</span>
         </div>
       </div>
       <div class="ctrl">
-        <label><span>Hacia el generador: d/λ</span> <b id="dv">0.000</b></label>
+        <div class="seg" role="group" aria-label="Qué leer en la carta">
+          <button class="btn" id="mZ" type="button" aria-pressed="true">Impedancia z</button>
+          <button class="btn" id="mY" type="button" aria-pressed="false">Admitancia y</button>
+        </div>
+        <label class="chk" for="gY"><input type="checkbox" id="gY"><span>superponer la rejilla de admitancias (círculos <var>g</var> y <var>b</var>, en azul punteado)</span></label>
+        <label for="dr"><span>Hacia el generador: d/λ</span> <b id="dv">0.000</b></label>
         <input id="dr" type="range" min="0" max="0.5" step="0.001" value="0">
         <div class="row">
           <button class="btn" data-zl="50,0">adaptada</button>
@@ -235,27 +262,73 @@
           <button class="btn" data-zl="73,42.5">antena</button>
         </div>
         <div class="inrow">
-          <div class="inbox"><label><span class="vinc">Z</span><sub>0</sub> (Ω)</label><input id="inZ0" type="number" step="any" min="0" inputmode="decimal"></div>
-          <div class="inbox"><label><span class="vinc">R</span><sub>L</sub> (Ω)</label><input id="inRL" type="number" step="any" min="0" inputmode="decimal"></div>
-          <div class="inbox"><label><span class="vinc">X</span><sub>L</sub> (Ω)</label><input id="inXL" type="number" step="any" inputmode="decimal"></div>
+          <div class="inbox"><label for="inZ0"><span class="vinc">Z</span><sub>0</sub> (Ω)</label><input id="inZ0" type="number" step="any" min="0" inputmode="decimal"></div>
+          <div class="inbox"><label for="inRL"><span class="vinc">R</span><sub>L</sub> (Ω)</label><input id="inRL" type="number" step="any" min="0" inputmode="decimal"></div>
+          <div class="inbox"><label for="inXL"><span class="vinc">X</span><sub>L</sub> (Ω)</label><input id="inXL" type="number" step="any" inputmode="decimal"></div>
         </div>
         <div class="tiles">
           <div class="tile"><div class="k">z<sub>L</sub> = Z<sub>L</sub>/Z<sub>0</sub></div><div class="v" id="ozl">…</div></div>
           <div class="tile"><div class="k">Γ (módulo ∠ fase)</div><div class="v" id="og">…</div></div>
-          <div class="tile key"><div class="k">VSWR</div><div class="v" id="os">…</div></div>
+          <div class="tile key"><div class="k">VSWR = S = <var>r</var><sub>máx</sub></div><div class="v" id="os">…</div></div>
+          <div class="tile ytile"><div class="k">y<sub>L</sub> = 1/z<sub>L</sub></div><div class="v" id="oyl">…</div></div>
+          <div class="tile"><div class="k">d<sub>máx</sub>/λ (primer máximo)</div><div class="v" id="odx">…</div></div>
           <div class="tile"><div class="k">d<sub>mín</sub>/λ (primer mínimo)</div><div class="v" id="odm">…</div></div>
           <div class="tile" style="grid-column:span 2"><div class="k">Z<sub>in</sub>(d) (Ω)</div><div class="v" id="ozin">…</div></div>
+          <div class="tile ytile" style="grid-column:span 2"><div class="k">Y<sub>in</sub>(d) (mS)</div><div class="v" id="oyin">…</div></div>
         </div>
       </div>
     </div>
-    <p class="note" style="margin-top:12px">Lectura rápida: el círculo de VSWR corta el eje real en <var style="color:var(--accent)">r</var> = VSWR (máximo de voltaje, a la derecha) y en <var style="color:var(--accent)">r</var> = 1/VSWR (mínimo, a la izquierda). Media vuelta en la carta = λ/4 en la línea; una vuelta completa = λ/2 (la impedancia se repite). Compara con el patrón de onda estacionaria del explorador de <a href="LineaTransmision_interactivo.html">línea de transmisión</a>.</p>
+    <p class="note" style="margin-top:12px">Lectura rápida: el círculo de VSWR corta el eje real en <var style="color:var(--accent)">r</var> = VSWR (máximo de voltaje, a la derecha) y en <var style="color:var(--accent)">r</var> = 1/VSWR (mínimo, a la izquierda). Media vuelta en la carta = λ/4 en la línea; una vuelta completa = λ/2 (la impedancia se repite). La escala exterior mide esos giros en longitudes de onda hacia el generador: 0 a la izquierda, 0.25 a la derecha. Compara con el patrón de onda estacionaria del explorador de <a href="LineaTransmision_interactivo.html">línea de transmisión</a>.</p>
+    <p class="note">Admitancia: como z(d + λ/4) = 1/z(d), la admitancia y = 1/z se lee girando media vuelta (λ/4) sobre el círculo de VSWR, es decir, en el punto diametralmente opuesto −Γ; esto es útil porque los stubs se conectan en paralelo y en paralelo las admitancias simplemente se suman, como veremos en el explorador de <a href="Acoplamiento_explorador.html">acoplamiento con stubs</a>.</p>
+  </section>
+
+  <details class="card">
+    <summary>Paso a paso: leer la carta para Z<sub>L</sub> = 100 + j50 Ω</summary>
+    <p class="note" style="margin-top:10px">Línea de <var>Z</var><sub>0</sub> = 50 Ω. Seguimos el procedimiento que usaríamos con una carta impresa y comparamos con el cálculo.</p>
+    <ol class="pasos">
+      <li><b>Normalizar.</b> z<sub>L</sub> = Z<sub>L</sub>/Z<sub>0</sub> = (100 + j50)/50 = 2 + j1.</li>
+      <li><b>Ubicar.</b> El punto está en la intersección del círculo <var>r</var> = 2 con el arco <var>x</var> = +1 (mitad superior: carga inductiva). Ahí Γ<sub>L</sub> = (z<sub>L</sub> − 1)/(z<sub>L</sub> + 1) = 0.4 + j0.2 = 0.447 ∠ 26.6°.</li>
+      <li><b>Trazar el círculo de VSWR.</b> Con centro en el origen y radio |Γ<sub>L</sub>| = 0.447. Corta el eje real a la derecha en <var>r</var> = 2.62 y a la izquierda en <var>r</var> = 1/2.62 = 0.382.</li>
+      <li><b>Leer S.</b> S = <var>r</var><sub>máx</sub> = (1 + 0.447)/(1 − 0.447) = 2.62. La carga queda en 0.213 λ de la escala exterior; el primer máximo de voltaje está a d<sub>máx</sub> = 0.037 λ (al cruzar el eje real derecho) y el primer mínimo a d<sub>mín</sub> = 0.037 + 0.25 = 0.287 λ.</li>
+      <li><b>Girar hacia el generador.</b> Para d = λ/8 = 0.125 λ giramos en sentido horario 2β<var>d</var> = 90° sobre el círculo: la escala exterior pasa de 0.213 λ a 0.338 λ y Γ(d) = 0.447 ∠ −63.4°.</li>
+      <li><b>Leer z<sub>in</sub>.</b> El nuevo punto cae sobre el círculo <var>r</var> = 1 y el arco <var>x</var> = −1: z<sub>in</sub> = 1 − j1 (capacitivo).</li>
+      <li><b>Desnormalizar.</b> Z<sub>in</sub> = Z<sub>0</sub> z<sub>in</sub> = 50 − j50 Ω. Comprobación con la fórmula de la línea: Z<sub>in</sub> = Z<sub>0</sub>(Z<sub>L</sub> + jZ<sub>0</sub> tan β<var>d</var>)/(Z<sub>0</sub> + jZ<sub>L</sub> tan β<var>d</var>) con tan(π/4) = 1 da el mismo resultado.</li>
+    </ol>
+    <p class="note">La admitancia de la carga está en el punto opuesto: y<sub>L</sub> = 0.4 − j0.2, es decir, Y<sub>L</sub> = 8 − j4 mS.</p>
+    <div class="row"><button class="btn btnx" id="cargaEj" type="button">Cargar este ejemplo en el explorador</button></div>
+  </details>
+
+  <section class="card">
+    <p class="sec-tag">Modo práctica · lee la carta</p>
+    <p class="note" style="margin-top:0">Una carga al azar sobre una línea de 50 Ω. Ubícala en la carta (o calcula), escribe |Γ|, S y d<sub>mín</sub>/λ y comprueba. Tolerancia: 5 % en |Γ| y S, ±0.01 λ en d<sub>mín</sub>. Si fallas dos veces un campo, te mostramos el valor correcto.</p>
+    <div class="grid2">
+      <div class="pcwrap">
+        <canvas id="pc" role="img" aria-label="Carta de Smith de práctica con la carga a analizar" class="panelcanvas" height="380" style="cursor:default"></canvas>
+      </div>
+      <div>
+        <div class="reto" id="pReto">…</div>
+        <div class="inrow">
+          <div class="inbox"><label for="pG">|Γ|</label><input id="pG" type="number" step="any" min="0" inputmode="decimal"></div>
+          <div class="inbox"><label for="pS">S (VSWR)</label><input id="pS" type="number" step="any" min="1" inputmode="decimal"></div>
+          <div class="inbox"><label for="pD">d<sub>mín</sub>/λ</label><input id="pD" type="number" step="any" min="0" inputmode="decimal"></div>
+        </div>
+        <div class="row">
+          <button class="btn" id="pNew" type="button">Nueva carga</button>
+          <button class="btn btnx" id="pChk" type="button">Comprobar</button>
+          <button class="btn" id="pSol" type="button">Mostrar solución</button>
+        </div>
+        <div class="fb" id="pFb" aria-live="polite"></div>
+      </div>
+    </div>
   </section>
 
   <details class="card" open>
     <summary>Formulario</summary>
     <div class="eq"><var>z</var><sub>L</sub> <span class="op">=</span> <var>Z</var><sub>L</sub>/<var>Z</var><sub>0</sub><span class="op">,</span>&emsp;<var>Γ</var> <span class="op">=</span> (<var>z</var><sub>L</sub> − 1)/(<var>z</var><sub>L</sub> + 1)<span class="op">,</span>&emsp;<var>z</var> <span class="op">=</span> (1 + <var>Γ</var>)/(1 − <var>Γ</var>)</div>
     <div class="eq"><var>Γ</var>(<var>d</var>) <span class="op">=</span> <var>Γ</var><sub>L</sub> e<sup>−j2β<var>d</var></sup><span class="op">,</span>&emsp;2β<var>d</var> <span class="op">=</span> 4π<var>d</var>/λ &nbsp;(horario, hacia el generador)</div>
-    <div class="eq">VSWR <span class="op">=</span> (1 + |<var>Γ</var>|)/(1 − |<var>Γ</var>|)<span class="op">;</span>&emsp;el círculo |<var>Γ</var>| corta el eje real en <var>r</var> = VSWR y <var>r</var> = 1/VSWR</div>
+    <div class="eq">VSWR <span class="op">=</span> <var>S</var> <span class="op">=</span> (1 + |<var>Γ</var>|)/(1 − |<var>Γ</var>|) <span class="op">=</span> <var>r</var><sub>máx</sub> <span class="op">=</span> 1/<var>r</var><sub>mín</sub><span class="op">;</span>&emsp;|<var>Γ</var>| <span class="op">=</span> (<var>S</var> − 1)/(<var>S</var> + 1)</div>
+    <div class="eq"><var>d</var><sub>máx</sub>/λ <span class="op">=</span> <var>θ</var><sub>Γ</sub>/(4π)&emsp;(mód 1/2)<span class="op">,</span>&emsp;<var>d</var><sub>mín</sub>/λ <span class="op">=</span> (<var>θ</var><sub>Γ</sub> + π)/(4π)&emsp;(mód 1/2)<span class="op">,</span>&emsp;<var>Γ</var><sub>L</sub> <span class="op">=</span> |<var>Γ</var><sub>L</sub>| e<sup>j<var>θ</var><sub>Γ</sub></sup></div>
+    <div class="eq"><var>y</var> <span class="op">=</span> 1/<var>z</var> <span class="op">=</span> (1 − <var>Γ</var>)/(1 + <var>Γ</var>)<span class="op">,</span>&emsp;<var>Γ</var><sub>y</sub> <span class="op">=</span> −<var>Γ</var>&emsp;(punto opuesto: giro de λ/4)<span class="op">,</span>&emsp;<var>Y</var> <span class="op">=</span> <var>y</var>/<var>Z</var><sub>0</sub></div>
     <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span>. En este explorador no interviene ninguna constante de la naturaleza: todo está normalizado a Z<sub>0</sub> y λ.</p>
   </details>
 
@@ -268,13 +341,22 @@
 <script>
 (function(){
   var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
-  var Z0=50, RL=100, XL=0, dLam=0, dragging=false;
-  var cv=document.getElementById('sm');
+  var Z0=50, RL=100, XL=0, dLam=0, dragging=false, yMode=false, yGrid=false;
+  var cv=document.getElementById('sm'), pc=document.getElementById('pc');
+  var PI=Math.PI;
   function cdiv(a,b){var d=b[0]*b[0]+b[1]*b[1];return [(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d];}
-  function GamL(){ return cdiv([RL/Z0-1,XL/Z0],[RL/Z0+1,XL/Z0]); }
-  function rot(G,d){ var ph=-4*Math.PI*d, c=Math.cos(ph), s=Math.sin(ph);
+  function gamOf(R,X,Z){ return cdiv([R/Z-1,X/Z],[R/Z+1,X/Z]); }
+  function GamL(){ return gamOf(RL,XL,Z0); }
+  function rot(G,d){ var ph=-4*PI*d, c=Math.cos(ph), s=Math.sin(ph);
     return [G[0]*c-G[1]*s, G[0]*s+G[1]*c]; }
   function zOf(G){ return cdiv([1+G[0],G[1]],[1-G[0],-G[1]]); }
+  function menos(t){ return String(t).replace(/^-/,'−'); }
+  function neg(G){ return [-G[0],-G[1]]; }
+  function mod05(v){ v=v%0.5; if(v<0)v+=0.5; if(v>=0.5-1e-12)v=0; return v; }
+  // posiciones (en λ) de la carga, del primer máximo y del primer mínimo
+  function wtg(G){ return mod05((PI-Math.atan2(G[1],G[0]))/(4*PI)); }
+  function dMax(G){ return mod05(Math.atan2(G[1],G[0])/(4*PI)); }
+  function dMin(G){ return mod05((Math.atan2(G[1],G[0])+PI)/(4*PI)); }
   function fmtC(z,dec){dec=dec===undefined?2:dec;
     if(!isFinite(z[0])||!isFinite(z[1])||Math.abs(z[0])>1e6||Math.abs(z[1])>1e6) return '∞';
     var re=z[0],im=z[1];
@@ -282,17 +364,35 @@
     if(Math.abs(re)<0.005) return (im>=0?'j':'−j')+Math.abs(im).toFixed(dec);
     return re.toFixed(dec)+(im>=0?' + j':' − j')+Math.abs(im).toFixed(dec);
   }
-  var geo={cx:0,cy:0,R:1};
-  function draw(){
-    var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(300,r.width),H=460;
-    cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
-    var cx=W/2, cy=H/2, R=Math.min(W,H)/2-18; geo={cx:cx,cy:cy,R:R};
-    function PX(g){return cx+g[0]*R;} function PY(g){return cy-g[1]*R;}
+  function marker(x,X,Y,shape,col,r){
+    x.lineWidth=2;x.strokeStyle=C('--panel');
+    if(shape==='sq'){x.fillStyle=C('--panel');x.beginPath();x.rect(X-r,Y-r,2*r,2*r);x.fill();
+      x.strokeStyle=col;x.lineWidth=2.5;x.stroke();return;}
+    if(shape==='dia'){x.fillStyle=col;x.beginPath();x.moveTo(X,Y-r);x.lineTo(X+r,Y);x.lineTo(X,Y+r);x.lineTo(X-r,Y);x.closePath();x.fill();x.stroke();return;}
+    if(shape==='diaH'){x.fillStyle=C('--panel');x.beginPath();x.moveTo(X,Y-r);x.lineTo(X+r,Y);x.lineTo(X,Y+r);x.lineTo(X-r,Y);x.closePath();x.fill();x.strokeStyle=col;x.stroke();return;}
+    x.fillStyle=col;x.beginPath();x.arc(X,Y,r,0,6.2832);x.fill();x.stroke();
+  }
+  // dibuja una carta de Smith en el lienzo c. o: {GL, d, zin, circle, vpts, vmin, yMode, yGrid, pos}
+  function chart(c,o){
+    var dpr=window.devicePixelRatio||1,r=c.getBoundingClientRect(),W=Math.max(280,r.width),H=Math.round(W+44);
+    c.style.height=H+'px';
+    c.width=W*dpr;c.height=H*dpr;var x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+    var cx=W/2, cy=H/2, R=W/2-42, g={cx:cx,cy:cy,R:R};
+    function PX(q){return cx+q[0]*R;} function PY(q){return cy-q[1]*R;}
+    var mono=C('--mono')+',monospace', sans=C('--sans')+',sans-serif';
     x.fillStyle=C('--panel');x.fillRect(0,0,W,H);
-    // recorte al círculo unidad
+    var GL=o.GL, aG=Math.min(1,Math.hypot(GL[0],GL[1])), Gd=rot(GL,o.d||0);
     x.save();x.beginPath();x.arc(cx,cy,R,0,6.2832);x.clip();
-    // círculos r constante: centro (r/(1+r),0), radio 1/(1+r)
     x.lineWidth=1;
+    // rejilla de admitancias (impedancias reflejadas por el centro)
+    if(o.yGrid){
+      x.strokeStyle='rgba(120,170,255,.30)';x.setLineDash([3,3]);
+      [0.2,0.5,1,2,5].forEach(function(gg){x.beginPath();x.arc(cx-R*gg/(1+gg),cy,R/(1+gg),0,6.2832);x.stroke();});
+      [0.2,0.5,1,2,5].forEach(function(bb){[1,-1].forEach(function(sg){
+        x.beginPath();x.arc(cx-R,cy-sg*R/bb,R/bb,0,6.2832);x.stroke();});});
+      x.setLineDash([]);
+    }
+    // círculos r constante: centro (r/(1+r),0), radio 1/(1+r)
     [0.2,0.5,1,2,5].forEach(function(rr){
       x.strokeStyle=rr===1?'rgba(255,255,255,.34)':'rgba(255,255,255,.16)';
       x.beginPath();x.arc(cx+R*rr/(1+rr),cy,R/(1+rr),0,6.2832);x.stroke();});
@@ -301,71 +401,132 @@
       [1,-1].forEach(function(sg){
         x.strokeStyle='rgba(255,255,255,.14)';
         x.beginPath();x.arc(cx+R,cy-sg*R/xx,R/xx,0,6.2832);x.stroke();});});
-    // eje real
     x.strokeStyle='rgba(255,255,255,.34)';x.beginPath();x.moveTo(cx-R,cy);x.lineTo(cx+R,cy);x.stroke();
     x.restore();
-    // borde
     x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=1.5;x.beginPath();x.arc(cx,cy,R,0,6.2832);x.stroke();
     // etiquetas de la rejilla
-    x.fillStyle='rgba(255,255,255,.55)';x.font='10.5px '+C('--mono')+',monospace';x.textAlign='center';
+    x.fillStyle='rgba(255,255,255,.55)';x.font='11px '+mono;x.textAlign='center';x.textBaseline='alphabetic';
     [[0.2,'0.2'],[0.5,'0.5'],[1,'1'],[2,'2'],[5,'5']].forEach(function(p){
-      var rr=p[0];x.fillText(p[1],cx+R*( (rr-1)/(rr+1) )+((rr<1)?-10:10)*0 + 0, cy-5);});
+      x.fillText(p[1],cx+R*((p[0]-1)/(p[0]+1)),cy-5);});
     x.fillText('0',cx-R+9,cy-5);x.fillText('∞',cx+R-9,cy-5);
-    x.fillText('+jx (inductivo)',cx,cy-R+16);
-    x.fillText('−jx (capacitivo)',cx,cy+R-8);
-    x.textAlign='left';
-    // círculo VSWR + puntos
-    var GL=GamL(), aG=Math.min(1,Math.hypot(GL[0],GL[1]));
-    x.strokeStyle=C('--blueSoft');x.lineWidth=2;x.setLineDash([6,4]);
-    x.beginPath();x.arc(cx,cy,aG*R,0,6.2832);x.stroke();x.setLineDash([]);
+    x.fillText('+jx (inductivo)',cx,cy-R+18);
+    x.fillText('−jx (capacitivo)',cx,cy+R-9);
+    // escala exterior: longitudes de onda hacia el generador
+    var rr0=R+4;
+    x.strokeStyle='rgba(255,255,255,.4)';x.lineWidth=1;x.beginPath();x.arc(cx,cy,rr0,0,6.2832);x.stroke();
+    for(var k=0;k<50;k++){
+      var ph=PI-4*PI*k/100, cs=Math.cos(ph), sn=-Math.sin(ph), L=(k%5===0)?8:4;
+      x.strokeStyle=(k%5===0)?'rgba(255,255,255,.6)':'rgba(255,255,255,.35)';
+      x.beginPath();x.moveTo(cx+rr0*cs,cy+rr0*sn);x.lineTo(cx+(rr0+L)*cs,cy+(rr0+L)*sn);x.stroke();
+    }
+    x.fillStyle='rgba(255,255,255,.7)';x.font='11px '+mono;x.textBaseline='middle';
+    for(k=5;k<50;k+=5){
+      var p2=PI-4*PI*k/100, lb=(k/100).toFixed(2), rl=R+17+x.measureText(lb).width/2*Math.abs(Math.cos(p2))+5*Math.abs(Math.sin(p2));
+      x.fillText(lb,cx+rl*Math.cos(p2),cy-rl*Math.sin(p2));
+    }
+    x.fillText('0',cx-R-25,cy-7);x.fillText('0.5',cx-R-25,cy+8);
+    x.textBaseline='alphabetic';
+    x.fillStyle='rgba(255,255,255,.62)';x.font='11px '+sans;
+    x.fillText('longitudes de onda hacia el generador ⟳',cx,15);
+    function tri(q,col){ if(Math.hypot(q[0],q[1])<1e-4)return;
+      var ph=Math.atan2(q[1],q[0]), cs=Math.cos(ph), sn=-Math.sin(ph), tx=-sn, ty=cs;
+      var bx=cx+(rr0+9)*cs, by=cy+(rr0+9)*sn;
+      x.fillStyle=col;x.beginPath();x.moveTo(cx+(rr0+1)*cs,cy+(rr0+1)*sn);
+      x.lineTo(bx+4.5*tx,by+4.5*ty);x.lineTo(bx-4.5*tx,by-4.5*ty);x.closePath();x.fill();}
+    if(o.pos){ tri(GL,C('--accent')); if(o.zin&&o.d>1e-4) tri(Gd,C('--greenSoft')); }
+    // círculo de VSWR
+    if(o.circle&&aG>1e-3){
+      x.strokeStyle=C('--blueSoft');x.lineWidth=2;x.setLineDash([6,4]);
+      x.beginPath();x.arc(cx,cy,aG*R,0,6.2832);x.stroke();x.setLineDash([]);
+    }
     // arco recorrido (de GL hacia Gd, horario)
-    var Gd=rot(GL,dLam);
-    if(dLam>1e-4&&aG>1e-3){
-      var a0=Math.atan2(-( -GL[1]),GL[0]); // ángulo pantalla: y invertida
-      var thL=Math.atan2(GL[1],GL[0]), thD=thL-4*Math.PI*dLam;
+    if(o.zin&&o.d>1e-4&&aG>1e-3){
+      var thL=Math.atan2(GL[1],GL[0]), thD=thL-4*PI*o.d;
       x.strokeStyle=C('--greenSoft');x.lineWidth=2.5;
       x.beginPath();x.arc(cx,cy,aG*R,-thL,-thD,false);x.stroke();
-      // flecha de sentido en el punto final
     }
-    // radios
+    // V máx (Γ real positivo) y V mín (Γ real negativo)
+    x.font='600 12px '+sans;
+    if((o.vpts||o.vmin)&&aG>1e-3){
+      if(o.vpts){marker(x,cx+aG*R,cy,'dia',C('--redSoft'),6);
+        x.fillStyle=C('--redSoft');x.textAlign='left';x.fillText('V_máx',cx+aG*R+3,cy+19);}
+      marker(x,cx-aG*R,cy,'diaH',C('--blueSoft'),6);
+      x.fillStyle=C('--blueSoft');x.textAlign='right';x.fillText('V_mín',cx-aG*R-3,cy+19);
+      x.textAlign='center';
+    }
+    if(o.yMode){
+      var yL=neg(GL);
+      x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=1;x.setLineDash([4,4]);
+      x.beginPath();x.moveTo(PX(GL),PY(GL));x.lineTo(PX(yL),PY(yL));x.stroke();x.setLineDash([]);
+    }
     x.strokeStyle='rgba(255,255,255,.25)';x.lineWidth=1;
     x.beginPath();x.moveTo(cx,cy);x.lineTo(PX(GL),PY(GL));x.stroke();
     // puntos
-    x.fillStyle=C('--greenSoft');x.beginPath();x.arc(PX(Gd),PY(Gd),7,0,6.2832);x.fill();
-    x.strokeStyle=C('--panel');x.lineWidth=2;x.stroke();
-    x.fillStyle=C('--accent');x.beginPath();x.arc(PX(GL),PY(GL),8,0,6.2832);x.fill();
-    x.strokeStyle=C('--panel');x.lineWidth=2;x.stroke();
-    x.fillStyle=C('--accent');x.font='600 12px '+C('--sans')+',sans-serif';
+    x.textAlign='left';
+    // etiqueta en dirección radial (hacia afuera del centro), para no chocar con V_máx y V_mín
+    function rad(t,q){var m=Math.hypot(q[0],q[1]), ux=m>1e-3?q[0]/m:0.7, uy=m>1e-3?q[1]/m:0.7, w=x.measureText(t).width;
+      x.textAlign='center';x.textBaseline='middle';
+      x.fillText(t,PX(q)+ux*(13+w/2),PY(q)-uy*19);x.textBaseline='alphabetic';x.textAlign='left';}
+    if(o.zin&&o.d>1e-4){ marker(x,PX(Gd),PY(Gd),'c',C('--greenSoft'),7); }
+    if(o.yMode){
+      var yL2=neg(GL), yD=neg(Gd);
+      if(o.zin&&o.d>1e-4){ marker(x,PX(yD),PY(yD),'sq',C('--greenSoft'),6);
+        x.fillStyle=C('--greenSoft');rad('y_in',yD); }
+      marker(x,PX(yL2),PY(yL2),'sq',C('--blueSoft'),6.5);
+      x.fillStyle=C('--blueSoft');x.font='600 12px '+sans;rad('y_L',yL2);
+      x.textAlign='left';
+    }
+    marker(x,PX(GL),PY(GL),'c',C('--accent'),8);
+    x.fillStyle=C('--accent');x.font='600 12px '+sans;
     x.fillText('z_L',PX(GL)+11,PY(GL)-8);
-    if(dLam>1e-4){x.fillStyle=C('--greenSoft');x.fillText('z_in',PX(Gd)+11,PY(Gd)+14);}
-    // sentido horario
-    x.fillStyle='rgba(255,255,255,.55)';x.font='11px '+C('--sans')+',sans-serif';
-    x.fillText('hacia el generador ⟳',10,18);
+    if(o.zin&&o.d>1e-4){x.fillStyle=C('--greenSoft');x.fillText('z_in',PX(Gd)+11,PY(Gd)+14);}
+    // posición actual en la escala exterior
+    if(o.pos){
+      x.font='11px '+sans;x.textAlign='center';x.fillStyle='rgba(255,255,255,.75)';
+      var t=aG<1e-4?'escala exterior: …':'escala exterior: z_L en '+wtg(GL).toFixed(3)+' λ'+(o.zin&&o.d>1e-4?' · z_in en '+wtg(Gd).toFixed(3)+' λ':'');
+      x.fillText(t,cx,H-9);
+    }
+    x.textAlign='left';
+    return g;
+  }
+  var geo={cx:0,cy:0,R:1};
+  function draw(){
+    geo=chart(cv,{GL:GamL(),d:dLam,zin:true,circle:true,vpts:true,yMode:yMode,yGrid:yGrid,pos:true});
   }
   var IN={Z0:document.getElementById('inZ0'),RL:document.getElementById('inRL'),XL:document.getElementById('inXL')};
   function ponSiLibre(el,v){if(document.activeElement!==el)el.value=v;}
+  function $(id){return document.getElementById(id);}
   function labels(){
     var GL=GamL(), aG=Math.min(1,Math.hypot(GL[0],GL[1]));
     var S=aG>=0.9999?Infinity:(1+aG)/(1-aG);
-    var Gd=rot(GL,dLam), zin=zOf(Gd);
-    document.getElementById('ozl').textContent=fmtC([RL/Z0,XL/Z0]);
-    document.getElementById('og').textContent=aG.toFixed(3)+' ∠ '+(Math.atan2(GL[1],GL[0])*180/Math.PI).toFixed(1)+'°';
-    document.getElementById('os').textContent=isFinite(S)?S.toFixed(2):'∞';
-    var th=Math.atan2(GL[1],GL[0]), dm=(th+Math.PI)/(4*Math.PI);
-    while(dm<0)dm+=0.5; while(dm>=0.5)dm-=0.5;
-    document.getElementById('odm').textContent=aG<1e-4?'…':dm.toFixed(3);
-    document.getElementById('ozin').textContent=(isFinite(zin[0])?fmtC([zin[0]*Z0,zin[1]*Z0],1):'∞');
-    document.getElementById('dv').textContent=dLam.toFixed(3);
-    document.getElementById('dr').value=dLam;
+    var Gd=rot(GL,dLam), zin=zOf(Gd), yl=zOf(neg(GL)), yin=zOf(neg(Gd));
+    $('ozl').textContent=fmtC([RL/Z0,XL/Z0]);
+    $('og').textContent=aG.toFixed(3)+' ∠ '+menos((Math.atan2(GL[1],GL[0])*180/PI).toFixed(1))+'°';
+    $('os').textContent=isFinite(S)?S.toFixed(2):'∞';
+    $('odx').textContent=aG<1e-4?'…':dMax(GL).toFixed(3);
+    $('odm').textContent=aG<1e-4?'…':dMin(GL).toFixed(3);
+    $('oyl').textContent=fmtC(yl);
+    $('ozin').textContent=(isFinite(zin[0])?fmtC([zin[0]*Z0,zin[1]*Z0],1):'∞');
+    $('oyin').textContent=(isFinite(yin[0])?fmtC([yin[0]*1000/Z0,yin[1]*1000/Z0],2):'∞');
+    $('dv').textContent=dLam.toFixed(3);
+    $('dr').value=dLam;
     ponSiLibre(IN.Z0,+Z0.toFixed(1));ponSiLibre(IN.RL,+RL.toFixed(1));ponSiLibre(IN.XL,+XL.toFixed(1));
+    cv.setAttribute('aria-label','Carta de Smith: carga z_L = '+fmtC([RL/Z0,XL/Z0]).replace(/_/g,'')+', |Γ| = '+aG.toFixed(3)+', VSWR = '+(isFinite(S)?S.toFixed(2):'infinito')+'; punto arrastrable');
   }
   function upd(){labels();draw();}
-  document.getElementById('dr').addEventListener('input',function(e){dLam=+e.target.value;upd();});
+  $('dr').addEventListener('input',function(e){dLam=+e.target.value;upd();});
   document.querySelectorAll('[data-zl]').forEach(function(b){b.addEventListener('click',function(){
     var p=b.getAttribute('data-zl').split(',');RL=parseFloat(p[0]);XL=parseFloat(p[1]);upd();});});
   IN.Z0.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;Z0=v;upd();});
   IN.RL.addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;RL=v;upd();});
   IN.XL.addEventListener('input',function(){var v=parseFloat(this.value);if(isNaN(v))return;XL=v;upd();});
+  function setMode(y){yMode=y;$('mZ').setAttribute('aria-pressed',String(!y));$('mY').setAttribute('aria-pressed',String(y));
+    $('legY').hidden=!y;draw();}
+  $('mZ').addEventListener('click',function(){setMode(false);});
+  $('mY').addEventListener('click',function(){setMode(true);});
+  $('gY').addEventListener('change',function(){yGrid=this.checked;draw();});
+  $('cargaEj').addEventListener('click',function(){Z0=50;RL=100;XL=50;dLam=0.125;upd();
+    cv.scrollIntoView({behavior:'smooth',block:'center'});});
   // arrastre del punto de carga: Γ → z_L
   function setFromEvent(e){
     var r=cv.getBoundingClientRect();
@@ -379,8 +540,56 @@
   cv.addEventListener('pointermove',function(e){if(dragging){setFromEvent(e);e.preventDefault();}});
   cv.addEventListener('pointerup',function(){dragging=false;});
   cv.addEventListener('pointercancel',function(){dragging=false;});
-  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',upd);
-  window.addEventListener('resize',upd);
+
+  // ---- modo práctica: carga al azar en su propio lienzo, sin tocar las teselas del explorador ----
+  var P={R:100,X:0,G:[0,0],a:0,S:1,dm:0,tr:{g:0,s:0,d:0},shown:false};
+  function pdraw(){ chart(pc,{GL:P.G,d:0,zin:false,circle:P.shown,vmin:P.shown,vpts:false,yMode:false,yGrid:false,pos:false}); }
+  function nueva(){
+    do{ P.R=Math.round(5+195*Math.random()); P.X=Math.round(-150+300*Math.random());
+      P.G=gamOf(P.R,P.X,50); P.a=Math.hypot(P.G[0],P.G[1]); }while(P.a<0.15||P.a>0.95);
+    P.S=(1+P.a)/(1-P.a); P.dm=dMin(P.G); P.tr={g:0,s:0,d:0}; P.shown=false;
+    ['pG','pS','pD'].forEach(function(id){$(id).value='';});
+    $('pReto').innerHTML='Carga Z<sub>L</sub> = '+P.R+(P.X<0?' − j':' + j')+Math.abs(P.X)+' Ω sobre Z<sub>0</sub> = 50 Ω. ¿Cuánto valen |Γ|, S y d<sub>mín</sub>/λ?';
+    $('pFb').innerHTML=''; pdraw();
+  }
+  function num(id){var s=String($(id).value).replace(',','.').trim(); return s===''?NaN:parseFloat(s);}
+  function circ(a,b){var d=Math.abs(mod05(a)-mod05(b)); return Math.min(d,0.5-d);}
+  function linea(ok,txt){return '<p class="'+(ok?'ok':'no')+'">'+(ok?'✔ ':'✘ ')+txt+'</p>';}
+  function comprobar(){
+    var vg=num('pG'), vs=num('pS'), vd=num('pD'), h='';
+    var okG=Math.abs(vg-P.a)<=0.05*P.a, okS=Math.abs(vs-P.S)<=0.05*P.S, okD=!isNaN(vd)&&circ(vd,P.dm)<=0.01;
+    if(isNaN(vg)) h+=linea(false,'|Γ|: escribe un valor.');
+    else if(okG) h+=linea(true,'|Γ| = '+P.a.toFixed(3)+'.');
+    else { P.tr.g++; h+=linea(false,'|Γ|: calcula Γ<sub>L</sub> = (z<sub>L</sub> − 1)/(z<sub>L</sub> + 1) o mide la distancia del punto al centro (el borde vale 1).'+(P.tr.g>=2?' Valor correcto: '+P.a.toFixed(3)+'.':'')); }
+    if(isNaN(vs)) h+=linea(false,'S: escribe un valor.');
+    else if(okS) h+=linea(true,'S = '+P.S.toFixed(2)+'.');
+    else { P.tr.s++; var hint=(vs<1)?' S nunca es menor que 1: quizá leíste 1/S en el eje izquierdo.':'';
+      h+=linea(false,'S = (1 + |Γ|)/(1 − |Γ|): es el valor de <var>r</var> donde el círculo de VSWR corta el eje real a la derecha.'+hint+(P.tr.s>=2?' Valor correcto: '+P.S.toFixed(2)+'.':'')); }
+    if(isNaN(vd)) h+=linea(false,'d<sub>mín</sub>/λ: escribe un valor.');
+    else if(okD) h+=linea(true,'d<sub>mín</sub>/λ = '+P.dm.toFixed(3)+'.');
+    else { P.tr.d++; var hd='';
+      if(circ(vd,dMax(P.G))<=0.01) hd=' Ese es el primer <b>máximo</b> (eje real derecho); el mínimo está λ/4 después.';
+      else if(circ(vd,wtg(P.G))<=0.01) hd=' Esa es la posición de la carga en la escala exterior; d<sub>mín</sub> es lo que hay que girar desde ahí hasta 0.5 λ (eje izquierdo).';
+      h+=linea(false,'d<sub>mín</sub>/λ: gira en sentido horario desde la carga hasta cruzar el eje real izquierdo y mide el giro en la escala exterior, o usa (θ<sub>Γ</sub> + π)/(4π).'+hd+(P.tr.d>=2?' Valor correcto: '+P.dm.toFixed(3)+'.':'')); }
+    if(okG&&okS&&okD){ h+='<p class="ok"><b>Todo correcto.</b> Prueba con otra carga.</p>'; P.shown=true; pdraw(); }
+    $('pFb').innerHTML=h;
+  }
+  function solucion(){
+    P.shown=true; pdraw();
+    var z=[P.R/50,P.X/50], th=Math.atan2(P.G[1],P.G[0])*180/PI;
+    $('pFb').innerHTML='<p>z<sub>L</sub> = '+fmtC(z)+', Γ<sub>L</sub> = '+P.a.toFixed(3)+' ∠ '+menos(th.toFixed(1))+'°.</p>'+
+      '<p>|Γ| = '+P.a.toFixed(3)+', S = '+P.S.toFixed(2)+' (V<sub>mín</sub> en <var>r</var> = '+(1/P.S).toFixed(3)+').</p>'+
+      '<p>La carga está en '+wtg(P.G).toFixed(3)+' λ de la escala exterior: d<sub>mín</sub>/λ = '+P.dm.toFixed(3)+' y d<sub>máx</sub>/λ = '+dMax(P.G).toFixed(3)+'.</p>';
+  }
+  $('pNew').addEventListener('click',nueva);
+  $('pChk').addEventListener('click',comprobar);
+  $('pSol').addEventListener('click',solucion);
+
+  function todo(){upd();pdraw();}
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',todo);
+  new MutationObserver(todo).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  window.addEventListener('resize',todo);
+  nueva();
   upd();
 })();
 </script>
@@ -494,12 +703,14 @@
 <a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
 <a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
 <a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
-<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10, P11</small></a>
-<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8 · P11</small></a>
 <div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
 <a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
-<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7–4.8</small></a>
-<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12</small></a>
+<a href="ImpedanciaEntrada_explorador.html" data-nv="ImpedanciaEntrada_explorador.html">Líneas cortas como reactancias<small>4.5–4.6 · P14</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7 · P15</small></a>
+<a href="Acoplamiento_explorador.html" data-nv="Acoplamiento_explorador.html">Acoplamiento λ/4 y stub<small>4.8–4.9 · P15</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12 · P16</small></a>
 <div class="nv-grp">Transversales</div>
 <a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
 <a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>

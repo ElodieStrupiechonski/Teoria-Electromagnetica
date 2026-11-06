@@ -34,8 +34,10 @@ Para que los enlaces de la portada funcionen, **mantén todos los archivos en la
 | `Snell_explorador.html` | Ley de Snell, reflexión total interna y ángulo de Brewster | U3 · 3.5 · P10, P11 |
 | `Fresnel_explorador.html` | Coeficientes de Fresnel: R⊥ y R∥ contra el ángulo, Brewster y reflexión total | U3 · 3.6–3.8 |
 | `LineaTransmision_interactivo.html` | Línea de transmisión: Γ, onda estacionaria de voltaje, VSWR y Z_in(d) | U4 · 4.3–4.4 |
-| `Smith_explorador.html` | Carta de Smith: la carga como punto, giro hacia el generador, VSWR | U4 · 4.7–4.8 |
-| `GuiaOnda_explorador.html` | Guía de onda rectangular: cortes TE/TM, banda monomodo, λ_g, v_p, v_g | U4 · 4.10–4.12 |
+| `ImpedanciaEntrada_explorador.html` | Líneas cortas como reactancias: Z_in contra la longitud, stubs en corto y abierto, Z₀ = √(Z_sc Z_oc), pérdidas y condición de Heaviside | U4 · 4.5–4.6 · P14 |
+| `Smith_explorador.html` | Carta de Smith: la carga como punto, giro hacia el generador, VSWR, admitancias, V_máx/V_mín, escala en λ y modo práctica | U4 · 4.7 · P15 |
+| `Acoplamiento_explorador.html` | Acoplamiento de impedancias: transformador λ/4 y stub en paralelo, recorrido en la carta de Smith y ancho de banda | U4 · 4.8–4.9 · P15 |
+| `GuiaOnda_explorador.html` | Guía de onda rectangular: cortes TE/TM, tabla de modos, Z_TE y Z_TM, atenuación bajo el corte, diagrama de dispersión, patrones de campo | U4 · 4.10–4.12 · P16 |
 | `Espectro_explorador.html` | Espectro electromagnético: cuatro ejes (λ, f, energía, número de onda), zoom del visible | transversal |
 | `AnatomiaGrafica_explorador.html` | Anatomía de una gráfica científica, con el código matplotlib equivalente | transversal · P6 |
 

@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<!-- tipografia:inicio -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root:root{
+    --f-tit:"Century Gothic","Questrial","URW Gothic","Avant Garde",sans-serif;
+    --sans:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",Calibri,sans-serif;
+    --serif:Cambria,"STIX Two Text","Times New Roman",serif;
+    --mono:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",sans-serif;
+  }
+  body,button,input,select,textarea{font-family:var(--sans)}
+  body{font-variant-numeric:tabular-nums}
+  h1,h2,h3,.ct,.eyebrow,header .sub{font-family:var(--f-tit)!important;letter-spacing:0}
+  sub,sup{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}
+  sub{bottom:-.25em} sup{top:-.45em}
+</style>
+<script>
+(function(){
+  // ---- lienzos: subíndices y superíndices escritos como Z_L, V_inc, e^(−z/δ) ----
+  var RX=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})/g;
+  var P=CanvasRenderingContext2D.prototype, F=P.fillText;
+  P.fillText=function(t,x,y,mw){
+    t=String(t);
+    if((t.indexOf('_')<0&&t.indexOf('^')<0)||/\.(html|py|png|csv|txt|svg|jpg|pdf)\b/i.test(t)) return F.call(this,t,x,y,mw);
+    var sg=[],last=0,m; RX.lastIndex=0;
+    while((m=RX.exec(t))){
+      if(m[1]){sg.push([t.slice(last,m.index)+m[1],0]);sg.push([m[2].replace(/[{}]/g,''),1]);}
+      else{sg.push([t.slice(last,m.index),0]);sg.push([m[3].replace(/[{}()]/g,''),2]);}
+      last=RX.lastIndex;
+    }
+    if(!sg.length) return F.call(this,t,x,y,mw);
+    sg.push([t.slice(last),0]);
+    var f0=this.font, mm=/(\d+(?:\.\d+)?)px/.exec(f0), px=mm?+mm[1]:12,
+        fs=mm?f0.replace(mm[0],(px*0.72).toFixed(1)+'px'):f0, W=0,i;
+    for(i=0;i<sg.length;i++){this.font=sg[i][1]?fs:f0;sg[i][2]=this.measureText(sg[i][0]).width;W+=sg[i][2];}
+    var a=this.textAlign, x0=x;
+    if(a==='center') x0=x-W/2; else if(a==='right'||a==='end') x0=x-W;
+    this.textAlign='left';
+    for(i=0;i<sg.length;i++){
+      this.font=sg[i][1]?fs:f0;
+      F.call(this,sg[i][0],x0,y+(sg[i][1]===1?0.28*px:sg[i][1]===2?-0.38*px:0));
+      x0+=sg[i][2];
+    }
+    this.font=f0; this.textAlign=a;
+  };
+  // ---- texto generado por los scripts: misma notación en <sub>/<sup> ----
+  if(/AnatomiaGrafica/.test(location.pathname)) return;
+  var US=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})|([₀-₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ]+)/g;
+  var UNI="₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ", ASC="0123456789aeoxhklmnpstiruvj";
+  var SALTA={SCRIPT:1,STYLE:1,TEXTAREA:1,OPTION:1,PRE:1,CODE:1,TITLE:1,INPUT:1,SELECT:1};
+  function arreglar(n){
+    var p=n.parentNode; if(!p||SALTA[p.nodeName]||p.namespaceURI==='http://www.w3.org/2000/svg') return;
+    var t=n.nodeValue; US.lastIndex=0; if(!US.test(t)||/\.(html|py|png|csv)\b/.test(t)) return;
+    US.lastIndex=0; var fr=document.createDocumentFragment(), last=0, m, e;
+    while((m=US.exec(t))){
+      var antes=t.slice(last,m.index);
+      if(m[1]){fr.appendChild(document.createTextNode(antes+m[1]));e=document.createElement('sub');e.textContent=m[2].replace(/[{}]/g,'');}
+      else if(m[3]){fr.appendChild(document.createTextNode(antes));e=document.createElement('sup');e.textContent=m[3].replace(/[{}()]/g,'');}
+      else{fr.appendChild(document.createTextNode(antes));e=document.createElement('sub');
+        e.textContent=m[4].split('').map(function(c){return ASC[UNI.indexOf(c)];}).join('');}
+      fr.appendChild(e); last=US.lastIndex;
+    }
+    fr.appendChild(document.createTextNode(t.slice(last)));
+    p.replaceChild(fr,n);
+  }
+  function recorrer(r){
+    if(r.nodeType===3){arreglar(r);return;}
+    if(r.nodeType!==1||SALTA[r.nodeName]) return;
+    var w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT,null), l=[], n;
+    while((n=w.nextNode())) l.push(n);
+    l.forEach(arreglar);
+  }
+  function inicio(){
+    recorrer(document.body);
+    new MutationObserver(function(ms){ms.forEach(function(m){
+      if(m.type==='characterData') arreglar(m.target); else m.addedNodes.forEach(recorrer);
+    });}).observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',inicio); else inicio();
+})();
+</script>
+<!-- tipografia:fin -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
+<title>Líneas cortas como reactancias: impedancia de entrada y stubs</title>
+<!-- seo:inicio -->
+<meta name="description" content="Un tramo de coaxial en corto o abierto como inductor o capacitor: R y X de entrada contra la longitud, medir Z₀ con dos mediciones, pérdidas y Heaviside.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/ImpedanciaEntrada_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Líneas cortas como reactancias: impedancia de entrada y stubs">
+<meta property="og:description" content="Un tramo de coaxial en corto o abierto como inductor o capacitor: R y X de entrada contra la longitud, medir Z₀ con dos mediciones, pérdidas y Heaviside.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/ImpedanciaEntrada_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Líneas cortas como reactancias: impedancia de entrada y stubs",
+ "description": "Un tramo de coaxial en corto o abierto como inductor o capacitor: R y X de entrada contra la longitud, medir Z₀ con dos mediciones, pérdidas y Heaviside.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/ImpedanciaEntrada_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "impedancia de entrada",
+  "stub",
+  "condición de Heaviside"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética: exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México, ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
+<style>
+  :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
+    --blue:#2456a6;--blueSoft:#4a7fd0;--red:#c0392b;--redSoft:#d9635a;--accent:#c96a1e;--green:#2f7d46;--greenSoft:#5aa871;--panel:#10141d;
+    --serif:"Spectral",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}}
+  :root[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:940px;margin:0 auto;padding-block:32px 40px;padding-left:16px;padding-right:16px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.6vw,40px);line-height:1.08;margin:.04em 0 .18em;text-wrap:balance}
+  h2{font-family:var(--serif);font-weight:600;font-size:21px;margin:0 0 6px}
+  .lede{font-size:17px;color:var(--muted);max-width:64ch;margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:22px;box-shadow:0 1px 3px rgba(20,20,40,.05);min-width:0}
+  .sec-tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+  .note{font-size:14.5px;color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px}
+  .plotcanvas{background:var(--card);border:1px solid var(--line)}
+  .grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:22px;align-items:start}
+  .grid2>*{min-width:0}
+  @media (max-width:680px){.grid2{grid-template-columns:1fr}}
+  .ctrl label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin:12px 0 6px}
+  .ctrl label b{font-family:var(--mono);color:var(--accent);font-weight:500}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:7px 12px;cursor:pointer}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .tiles.t4{grid-template-columns:repeat(4,1fr)}
+  .tiles.t3{grid-template-columns:repeat(3,1fr)}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
+  .tile .k{font-size:12px;color:var(--muted)} .tile .v{font-family:var(--mono);font-size:16.5px;font-weight:500;color:var(--ink);overflow-wrap:anywhere}
+  .tile .s{font-size:12px;color:var(--faint);margin-top:2px}
+  .tile.key{border-color:var(--accent)} .tile.key .v{color:var(--accent)}
+  .legend{display:flex;gap:16px;font-size:13px;flex-wrap:wrap;margin-top:10px;color:var(--muted)}
+  .legend i{display:inline-block;width:15px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic;color:var(--accent)}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:var(--mono);font-size:15px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
+  @media (max-width:560px){.tiles,.tiles.t4,.tiles.t3{grid-template-columns:1fr 1fr!important;gap:8px}h1{font-size:26px}.card{padding:18px 16px}}
+  .seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:4px}
+  .seg .btn{border:0;border-radius:0;margin:0}
+  .seg .btn+.btn{border-left:1px solid var(--line)}
+  .seg .btn[aria-pressed="true"]{background:var(--accent);color:#fff}
+  .ctrl label.chk,label.chk{display:flex;justify-content:flex-start;gap:8px;align-items:center;font-size:13.5px;font-weight:400;color:var(--muted);margin:10px 0 0;cursor:pointer}
+  .chk input{accent-color:var(--accent);margin:0}
+  .btnx{border-color:var(--accent);color:var(--accent)}
+  .fb{margin-top:10px;font-size:14.5px;line-height:1.55}
+  .fb p{margin:4px 0}
+  .fb .ok{color:var(--green)} .fb .no{color:var(--red)}
+  ol.pasos{padding-left:22px;margin:12px 0 0}
+  ol.pasos li{margin:7px 0}
+  .gt{font-size:13px;font-weight:600;color:var(--ink);margin:16px 0 2px}
+  .tw{overflow-x:auto;max-width:100%;margin-top:10px}
+  table.pt{border-collapse:collapse;width:100%;font-size:13.5px;min-width:0}
+  table.pt th,table.pt td{border-bottom:1px solid var(--line);padding:6px 7px;text-align:right;white-space:nowrap}
+  table.pt th{font-weight:600;color:var(--muted);font-size:12.5px}
+  table.pt td{font-family:var(--mono)}
+  table.pt td.c{font-family:var(--sans);text-align:left}
+  table.pt caption{text-align:left;font-weight:600;font-size:14px;padding:4px 0}
+  @media (max-width:480px){table.pt th:nth-child(2),table.pt td:nth-child(2){display:none}table.pt th,table.pt td{padding:6px 4px;font-size:12.5px}}
+  .ind{color:var(--accent)} .cap{color:var(--blue)}
+  .q{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 13px;margin-top:10px;font-size:14.5px}
+  .q .ans{margin-top:8px;color:var(--muted)}
+  pre{overflow-x:auto;max-width:100%;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:12.5px;line-height:1.5}
+  code{font-family:var(--mono)}
+  .warn{font-size:13px;color:var(--red);margin-top:6px}
+  .refs{font-style:italic;font-size:13.5px;color:var(--muted);margin-top:14px}
+</style>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 4 · temas 4.5–4.6 · P14</p>
+    <h1>Líneas cortas como reactancias: impedancia de entrada, stubs y pérdidas</h1>
+    <p class="lede">Un tramo de cable coaxial terminado en corto o en abierto no disipa energía: solo la guarda y la devuelve. Visto desde su entrada se comporta como una <b>bobina</b> o como un <b>capacitor</b>, según su longitud comparada con la longitud de onda. Así se fabrican elementos reactivos en circuitos de radiofrecuencia sin soldar una sola bobina; a esos tramos se les llama <i>stubs</i>.</p>
+  </header>
+
+  <section class="card">
+    <p class="sec-tag">Antes de empezar · tres ideas de circuitos</p>
+    <p class="note" style="margin-top:0">Trabajamos con señales senoidales de frecuencia <var>f</var> y frecuencia angular ω = 2π<var>f</var>. Un elemento lineal se describe por su impedancia <var>Z</var> = <var>R</var> + j<var>X</var> (en Ω): la parte real <var>R</var> disipa energía y la reactancia <var>X</var> la almacena y la devuelve en cada ciclo. Una bobina ideal tiene <var>X</var> = ω<var>L</var> &gt; 0 (decimos que es <b>inductiva</b>) y un capacitor ideal <var>X</var> = −1/(ω<var>C</var>) &lt; 0 (<b>capacitivo</b>).</p>
+    <p class="note">Un cable coaxial tiene, por cada metro, una inductancia <var>L</var>′ (el campo magnético que rodea al conductor central) y una capacitancia <var>C</var>′ (el campo eléctrico entre el conductor central y la malla). Con ellas obtenemos su impedancia característica <var>Z</var><sub>0</sub> = √(<var>L</var>′/<var>C</var>′) y la rapidez de las ondas <var>v</var><sub>p</sub> = 1/√(<var>L</var>′<var>C</var>′). Ponemos la carga en <var>z</var> = 0, la línea se extiende hacia el generador por <var>z</var> &lt; 0 y medimos <var>d</var> ≥ 0 desde la carga hacia el generador; un stub de longitud ℓ se ve desde <var>d</var> = ℓ.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Explorador · Z<sub>in</sub> de un tramo de línea en función de ℓ/λ</p>
+    <div class="grid2">
+      <div>
+        <canvas id="cvZ" role="img" aria-label="Resistencia y reactancia de entrada contra longitud en longitudes de onda" class="plotcanvas" height="320"></canvas>
+        <div class="legend">
+          <span><i style="background:var(--blue)"></i><var>X</var><sub>in</sub> (reactancia)</span>
+          <span><i style="background:var(--green)"></i><var>R</var><sub>in</sub> (resistencia)</span>
+          <span><i style="background:var(--accent)"></i>longitud actual ℓ/λ</span>
+        </div>
+        <p class="note" style="margin:6px 0 0;font-size:13px">Escala vertical recortada a ±5 <var>Z</var><sub>0</sub>; las flechas indican que la curva sigue hacia ±∞ (polo de la tangente).</p>
+        <canvas id="cvE" role="img" aria-label="Esquema del tramo coaxial con su terminación y el elemento equivalente" class="plotcanvas" height="130" style="margin-top:12px"></canvas>
+      </div>
+      <div class="ctrl">
+        <p class="gt" style="margin-top:0">Terminación en <var>z</var> = 0</p>
+        <div class="seg" role="group" aria-label="Terminación de la línea">
+          <button class="btn" type="button" data-term="sc" aria-pressed="true">corto</button>
+          <button class="btn" type="button" data-term="oc" aria-pressed="false">abierto</button>
+          <button class="btn" type="button" data-term="ld" aria-pressed="false">carga <var>R</var> + j<var>X</var></button>
+        </div>
+        <div class="inrow" id="ldBox" hidden>
+          <div class="inbox"><label for="inRL"><span class="vinc">R</span><sub>L</sub> (Ω)</label><input id="inRL" type="number" step="any" min="0" value="25" inputmode="decimal"></div>
+          <div class="inbox"><label for="inXL"><span class="vinc">X</span><sub>L</sub> (Ω)</label><input id="inXL" type="number" step="any" value="0" inputmode="decimal"></div>
+        </div>
+        <p class="gt">Cable (por unidad de longitud)</p>
+        <div class="row" style="margin-top:4px">
+          <button class="btn" type="button" data-cab="253,101">RG-58 (50 Ω)</button>
+          <button class="btn" type="button" data-cab="370,67">RG-59 (75 Ω)</button>
+        </div>
+        <div class="inrow">
+          <div class="inbox"><label for="inLp"><span class="vinc">L</span>′ (nH/m)</label><input id="inLp" type="number" step="any" min="1" value="253" inputmode="decimal"></div>
+          <div class="inbox"><label for="inCp"><span class="vinc">C</span>′ (pF/m)</label><input id="inCp" type="number" step="any" min="1" value="101" inputmode="decimal"></div>
+        </div>
+        <div class="tiles t3">
+          <div class="tile"><div class="k"><var>Z</var><sub>0</sub> = √(<var>L</var>′/<var>C</var>′)</div><div class="v" id="oZ0">…</div></div>
+          <div class="tile"><div class="k"><var>v</var><sub>p</sub> = 1/√(<var>L</var>′<var>C</var>′)</div><div class="v" id="ovp">…</div></div>
+          <div class="tile"><div class="k">ε<sub>r</sub> = (<span class="cnat">c</span>/<var>v</var><sub>p</sub>)²</div><div class="v" id="oer">…</div></div>
+        </div>
+        <label for="fr"><span>Frecuencia <var>f</var></span> <b id="fv">…</b></label>
+        <input id="fr" type="range" min="0" max="1000" step="1" value="0">
+        <div class="inrow">
+          <div class="inbox"><label for="inF"><span class="vinc">f</span> (MHz, de 1 a 3000)</label><input id="inF" type="number" step="any" min="1" max="3000" value="100" inputmode="decimal"></div>
+          <div class="inbox"><label for="inL">ℓ (cm)</label><input id="inL" type="number" step="any" min="0.1" value="25" inputmode="decimal"></div>
+        </div>
+        <label for="lr"><span>Longitud física ℓ</span> <b id="lv">…</b></label>
+        <input id="lr" type="range" min="0.5" max="200" step="0.5" value="25">
+        <div class="tiles t3">
+          <div class="tile"><div class="k">λ en el cable</div><div class="v" id="olam">…</div></div>
+          <div class="tile"><div class="k">βℓ</div><div class="v" id="obl">…</div></div>
+          <div class="tile"><div class="k">ℓ/λ</div><div class="v" id="olr">…</div></div>
+        </div>
+        <label class="chk" for="chkLoss"><input type="checkbox" id="chkLoss"><span>incluir pérdidas (<var>R</var>′, <var>G</var>′ de la tarjeta de pérdidas)</span></label>
+      </div>
+    </div>
+    <div class="tiles t4">
+      <div class="tile key"><div class="k"><var>Z</var><sub>in</sub> en <var>d</var> = ℓ (Ω)</div><div class="v" id="oZin">…</div></div>
+      <div class="tile"><div class="k">carácter</div><div class="v" id="ochar" style="font-size:15px">…</div></div>
+      <div class="tile"><div class="k" id="kEq">elemento equivalente</div><div class="v" id="oEq">…</div><div class="s" id="sEq"></div></div>
+      <div class="tile"><div class="k" id="kAp">aproximación de línea corta</div><div class="v" id="oAp">…</div><div class="s" id="sAp"></div></div>
+    </div>
+    <p class="note" style="margin-top:12px">Qué observar: un corto de longitud menor que λ/4 es inductivo; en ℓ = λ/4 la reactancia diverge (resonancia paralelo: el corto se ve como abierto); entre λ/4 y λ/2 el mismo corto es capacitivo, y en λ/2 vuelve a verse como corto (resonancia serie). El abierto hace lo mismo desplazado λ/4. Como la impedancia se repite cada λ/2, si ℓ &gt; λ mostramos la ventana de una longitud de onda que contiene a ℓ. Compara con el explorador de <a href="LineaTransmision_interactivo.html">línea de transmisión</a> y con la <a href="Smith_explorador.html">carta de Smith</a>, donde un stub sin pérdidas recorre el borde del círculo.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Tarjeta · medir Z<sub>0</sub> con dos mediciones</p>
+    <h2>Medir <var>Z</var><sub>0</sub> y <var>v</var><sub>p</sub> con un corto y un abierto</h2>
+    <p class="note" style="margin-top:0">Si medimos la impedancia de entrada del mismo tramo una vez en corto y otra en abierto, su producto no depende de la longitud: <var>Z</var><sub>sc</sub><var>Z</var><sub>oc</sub> = (j<var>Z</var><sub>0</sub> tan βℓ)(−j<var>Z</var><sub>0</sub> cot βℓ) = <var>Z</var><sub>0</sub>². Y su cociente da la fase eléctrica: −<var>Z</var><sub>sc</sub>/<var>Z</var><sub>oc</sub> = tan²βℓ.</p>
+    <p class="gt">A. Con el cable, la frecuencia y la longitud del explorador (sin pérdidas)</p>
+    <div class="tiles t4">
+      <div class="tile"><div class="k"><var>Z</var><sub>sc</sub> (Ω)</div><div class="v" id="mZsc">…</div></div>
+      <div class="tile"><div class="k"><var>Z</var><sub>oc</sub> (Ω)</div><div class="v" id="mZoc">…</div></div>
+      <div class="tile key"><div class="k">√(<var>Z</var><sub>sc</sub><var>Z</var><sub>oc</sub>) = <var>Z</var><sub>0</sub></div><div class="v" id="mZ0">…</div></div>
+      <div class="tile"><div class="k">tan βℓ = √(−<var>Z</var><sub>sc</sub>/<var>Z</var><sub>oc</sub>) ⇒ <var>v</var><sub>p</sub> = ωℓ/βℓ</div><div class="v" id="mvp">…</div><div class="s" id="mvpS"></div></div>
+    </div>
+    <p class="gt">B. Con un medidor LCR (mediciones a baja frecuencia)</p>
+    <p class="note" style="margin-top:2px">A baja frecuencia (βℓ ≪ 1) el medidor reporta una inductancia <var>L</var> con el extremo en corto y una capacitancia <var>C</var> con el extremo abierto. Entonces <var>Z</var><sub>0</sub> = √(<var>L</var>/<var>C</var>) y <var>v</var><sub>p</sub> = ℓ/√(<var>LC</var>). La corrección exacta usa tan βℓ = ω√(<var>LC</var>), que a 100 kHz cambia el resultado en menos de una parte por millón.</p>
+    <div class="inrow">
+      <div class="inbox"><label for="mL"><span class="vinc">L</span> medida en corto (nH)</label><input id="mL" type="number" step="any" min="0" value="126.5" inputmode="decimal"></div>
+      <div class="inbox"><label for="mC"><span class="vinc">C</span> medida en abierto (pF)</label><input id="mC" type="number" step="any" min="0" value="50.5" inputmode="decimal"></div>
+      <div class="inbox"><label for="mLen">ℓ del tramo (cm)</label><input id="mLen" type="number" step="any" min="0" value="50" inputmode="decimal"></div>
+      <div class="inbox"><label for="mF"><span class="vinc">f</span> del medidor (kHz)</label><input id="mF" type="number" step="any" min="0" value="100" inputmode="decimal"></div>
+    </div>
+    <div class="row"><button class="btn btnx" type="button" id="mEj">Ejemplo: RG-58 de 50 cm a 100 kHz</button></div>
+    <div class="tiles t4">
+      <div class="tile key"><div class="k"><var>Z</var><sub>0</sub> = √(<var>L</var>/<var>C</var>)</div><div class="v" id="bZ0">…</div></div>
+      <div class="tile"><div class="k"><var>v</var><sub>p</sub> ≈ ℓ/√(<var>LC</var>)</div><div class="v" id="bvp">…</div></div>
+      <div class="tile"><div class="k"><var>v</var><sub>p</sub> exacta = ωℓ/arctan(ω√(<var>LC</var>))</div><div class="v" id="bvx">…</div></div>
+      <div class="tile"><div class="k"><var>L</var>′ = <var>L</var>/ℓ, <var>C</var>′ = <var>C</var>/ℓ</div><div class="v" id="bLC">…</div></div>
+    </div>
+    <p class="note" style="margin-top:12px">Ejemplo verificado: un RG-58 de 50 cm tiene <var>L</var>′ℓ = 253 nH/m × 0.5 m = 126.5 nH y <var>C</var>′ℓ = 101 pF/m × 0.5 m = 50.5 pF; a 100 kHz, βℓ = 1.59 × 10<sup>−3</sup> rad, de modo que el medidor lee esos mismos valores. De ahí <var>Z</var><sub>0</sub> = √(126.5 nH/50.5 pF) = 50.0 Ω y <var>v</var><sub>p</sub> = 0.5 m/√(126.5 nH × 50.5 pF) = 1.98 × 10<sup>8</sup> m/s = 0.660 <span class="cnat">c</span>. ¿Por qué no medir a 100 MHz? Porque ahí βℓ ≈ 91° y la rama de la tangente se vuelve ambigua: el corto ya parece capacitor.</p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Tarjeta · pérdidas y condición de Heaviside</p>
+    <h2>Pérdidas y la condición de Heaviside</h2>
+    <p class="note" style="margin-top:0">Un cable real tiene una resistencia en serie <var>R</var>′ (Ω/m), que crece como √<var>f</var> porque la corriente se concentra en la superficie del conductor (<a href="EfectoPiel_explorador.html">efecto piel</a>), y una conductancia en paralelo <var>G</var>′ (S/m) debida a las pérdidas del dieléctrico, que crece aproximadamente como <var>f</var>. La constante de propagación deja de ser imaginaria pura: γ = √((<var>R</var>′ + jω<var>L</var>′)(<var>G</var>′ + jω<var>C</var>′)) = α + jβ, donde α (Np/m) mide cuánto se atenúa la onda por metro.</p>
+    <div class="inrow">
+      <div class="inbox"><label for="inR"><span class="vinc">R</span>′ a 100 MHz (Ω/m)</label><input id="inR" type="number" step="any" min="0" value="1.84" inputmode="decimal"></div>
+      <div class="inbox"><label for="inG"><span class="vinc">G</span>′ a 100 MHz (S/m)</label><input id="inG" type="number" step="any" min="0" value="1.3e-5" inputmode="decimal"></div>
+    </div>
+    <p class="note" style="font-size:13px;margin:6px 0 0">Escalamos <var>R</var>′(<var>f</var>) = <var>R</var>′<sub>100</sub>√(<var>f</var>/100 MHz) y <var>G</var>′(<var>f</var>) = <var>G</var>′<sub>100</sub>(<var>f</var>/100 MHz). El valor de <var>G</var>′ corresponde a polietileno con tan δ ≈ 2 × 10<sup>−4</sup>. El valor por omisión, <var>R</var>′ = 1.84 Ω/m a 100 MHz, es el mismo que usa el <a href="TDR_explorador.html">explorador de TDR</a> y da unos 16 dB/100 m, del orden de lo que reportan las hojas de datos del RG-58 (la malla trenzada aumenta <var>R</var>′ respecto a un conductor liso).</p>
+    <p class="gt">A la frecuencia del explorador: <span id="lf">…</span></p>
+    <div class="tiles t4">
+      <div class="tile"><div class="k"><var>R</var>′(<var>f</var>), <var>G</var>′(<var>f</var>)</div><div class="v" id="lRG" style="font-size:15px">…</div></div>
+      <div class="tile key"><div class="k">α (dB/100 m)</div><div class="v" id="la">…</div><div class="s" id="laN"></div></div>
+      <div class="tile"><div class="k">β (rad/m) y <var>v</var><sub>p</sub> = ω/β</div><div class="v" id="lb" style="font-size:15px">…</div></div>
+      <div class="tile"><div class="k"><var>Z</var><sub>0</sub> complejo (Ω)</div><div class="v" id="lZ0">…</div></div>
+    </div>
+    <div class="tiles t3" style="margin-top:10px">
+      <div class="tile"><div class="k"><var>R</var>′/<var>L</var>′ y <var>G</var>′/<var>C</var>′ (1/s)</div><div class="v" id="lH1" style="font-size:15px">…</div></div>
+      <div class="tile"><div class="k"><var>G</var>′ de Heaviside = <var>R</var>′<var>C</var>′/<var>L</var>′</div><div class="v" id="lH2">…</div></div>
+      <div class="tile"><div class="k">α de Heaviside = √(<var>R</var>′<var>G</var>′)</div><div class="v" id="lH3">…</div></div>
+    </div>
+    <canvas id="cvL" role="img" aria-label="Atenuación y velocidad de fase contra frecuencia para el cable real y para la línea de Heaviside" class="plotcanvas" height="380" style="margin-top:14px"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--blue)"></i>cable real (<var>R</var>′ ∝ √<var>f</var>, <var>G</var>′ ∝ <var>f</var>)</span>
+      <span><i style="background:var(--accent)"></i>línea de Heaviside (<var>G</var>′/<var>C</var>′ = <var>R</var>′/<var>L</var>′)</span>
+    </div>
+    <p class="note" style="margin-top:12px"><b>Qué es la distorsión.</b> Un pulso (un bit, una sílaba en el teléfono) es una suma de senoidales de muchas frecuencias. Si cada frecuencia viaja con rapidez distinta, las componentes llegan desfasadas y el pulso se ensancha y se deforma: eso es la <b>dispersión</b>. En el cable real <var>v</var><sub>p</sub> cae a bajas frecuencias, donde <var>R</var>′ deja de ser pequeña frente a ω<var>L</var>′. Si se cumple <var>R</var>′/<var>L</var>′ = <var>G</var>′/<var>C</var>′, entonces γ = √(<var>C</var>′/<var>L</var>′)(<var>R</var>′ + jω<var>L</var>′): β = ω√(<var>L</var>′<var>C</var>′) es exactamente proporcional a ω, <var>v</var><sub>p</sub> es la misma para todas las frecuencias, α = √(<var>R</var>′<var>G</var>′) y <var>Z</var><sub>0</sub> = √(<var>L</var>′/<var>C</var>′) es real. La línea no distorsiona.</p>
+    <p class="note">Oliver Heaviside propuso en 1887 cumplir esa condición en las líneas telefónicas, donde a frecuencias de voz <var>R</var>′ es decenas de veces mayor que ω<var>L</var>′. Agregar <var>G</var>′ funciona pero aumenta la atenuación (en la gráfica la curva naranja queda por encima de la azul); su propuesta práctica fue aumentar <var>L</var>′ con <b>bobinas de carga</b> intercaladas a lo largo de la línea, lo que acerca <var>R</var>′/<var>L</var>′ a <var>G</var>′/<var>C</var>′ y además reduce α.</p>
+  </section>
+
+  <details class="card" open>
+    <summary>Paso a paso: del <var>Z</var><sub>in</sub>(<var>d</var>) general al stub de 2 cm a 1 GHz</summary>
+    <ol class="pasos">
+      <li><b>Partimos de la línea sin pérdidas.</b> <var>Z</var><sub>in</sub>(<var>d</var>) = <var>Z</var><sub>0</sub>(<var>Z</var><sub>L</sub> + j<var>Z</var><sub>0</sub> tan β<var>d</var>)/(<var>Z</var><sub>0</sub> + j<var>Z</var><sub>L</sub> tan β<var>d</var>), con <var>d</var> medida desde la carga hacia el generador.</li>
+      <li><b>Corto: <var>Z</var><sub>L</sub> = 0.</b> Sobrevive un término arriba y uno abajo: <var>Z</var><sub>sc</sub> = <var>Z</var><sub>0</sub>(j<var>Z</var><sub>0</sub> tan β<var>d</var>)/<var>Z</var><sub>0</sub> = j<var>Z</var><sub>0</sub> tan β<var>d</var>.</li>
+      <li><b>Abierto: dividimos entre <var>Z</var><sub>L</sub>.</b> <var>Z</var><sub>in</sub> = <var>Z</var><sub>0</sub>(1 + j(<var>Z</var><sub>0</sub>/<var>Z</var><sub>L</sub>) tan β<var>d</var>)/(<var>Z</var><sub>0</sub>/<var>Z</var><sub>L</sub> + j tan β<var>d</var>).</li>
+      <li><b>Tomamos <var>Z</var><sub>L</sub> → ∞.</b> Los cocientes <var>Z</var><sub>0</sub>/<var>Z</var><sub>L</sub> se anulan: <var>Z</var><sub>oc</sub> = <var>Z</var><sub>0</sub>/(j tan β<var>d</var>) = −j<var>Z</var><sub>0</sub> cot β<var>d</var>.</li>
+      <li><b>Línea corta: tan <var>x</var> ≈ <var>x</var> si <var>x</var> ≪ 1.</b> Como <var>Z</var><sub>0</sub>β = √(<var>L</var>′/<var>C</var>′) · ω√(<var>L</var>′<var>C</var>′) = ω<var>L</var>′, queda <var>Z</var><sub>sc</sub> ≈ jω(<var>L</var>′<var>d</var>): una bobina de inductancia <var>L</var>′<var>d</var>.</li>
+      <li><b>Lo mismo para el abierto.</b> β/<var>Z</var><sub>0</sub> = ω<var>C</var>′, así que <var>Z</var><sub>oc</sub> ≈ −j<var>Z</var><sub>0</sub>/(β<var>d</var>) = 1/(jω<var>C</var>′<var>d</var>): un capacitor de capacitancia <var>C</var>′<var>d</var>.</li>
+      <li><b>Stub de 2 cm de RG-58 a 1 GHz: la fase.</b> λ = <var>v</var><sub>p</sub>/<var>f</var> = 1.978 × 10<sup>8</sup>/10<sup>9</sup> m = 19.78 cm, así que β<var>d</var> = 2π(2/19.78) = 0.635 rad = 36.4°; ya no es ≪ 1.</li>
+      <li><b>El corto exacto.</b> tan 0.635 = 0.737, <var>Z</var><sub>sc</sub> = j(50.05)(0.737) = j36.9 Ω y <var>L</var><sub>eq</sub> = 36.9/(2π × 10<sup>9</sup>) = 5.87 nH.</li>
+      <li><b>El corto aproximado.</b> <var>L</var>′<var>d</var> = 253 nH/m × 0.02 m = 5.06 nH: subestima en 13.8 %.</li>
+      <li><b>El abierto.</b> <var>Z</var><sub>oc</sub> = −j50.05/0.737 = −j67.9 Ω, <var>C</var><sub>eq</sub> = 1/(2π × 10<sup>9</sup> × 67.9) = 2.34 pF, contra <var>C</var>′<var>d</var> = 2.02 pF: el mismo 13.8 %, porque en ambos casos el cociente es β<var>d</var>/tan β<var>d</var> = 0.862.</li>
+    </ol>
+    <p class="note">Regla práctica: la aproximación de elementos concentrados tiene error menor que 5 % si β<var>d</var> &lt; 0.38 rad, es decir, si <var>d</var> &lt; 0.06 λ (un poco menos que λ/16).</p>
+    <div class="row"><button class="btn btnx" id="cargaEj" type="button">Cargar el stub de 2 cm a 1 GHz en el explorador</button></div>
+  </details>
+
+  <section class="card">
+    <p class="sec-tag">Laboratorio · P14</p>
+    <h2>Para la práctica P14 (elementos reactivos con líneas cortas)</h2>
+    <p class="note" style="margin-top:0">Predicciones para stubs de RG-58 sin pérdidas (<var>L</var>′ = 253 nH/m, <var>C</var>′ = 101 pF/m) a la frecuencia que elijas. Llena tu bitácora con estas predicciones antes de medir con el analizador o el medidor LCR.</p>
+    <div class="inrow" style="max-width:300px">
+      <div class="inbox"><label for="pF"><span class="vinc">f</span> de la práctica (MHz)</label><input id="pF" type="number" step="any" min="0.001" value="100" inputmode="decimal"></div>
+    </div>
+    <p class="note" id="pLam" style="margin:8px 0 0">…</p>
+    <div class="tw"><table class="pt" id="tSc"><caption>Stub en corto</caption><thead><tr><th>ℓ (cm)</th><th>ℓ/λ</th><th>βℓ (°)</th><th><var>X</var><sub>in</sub> (Ω)</th><th style="text-align:left">carácter</th><th>equivalente</th></tr></thead><tbody></tbody></table></div>
+    <div class="tw"><table class="pt" id="tOc"><caption>Stub en abierto</caption><thead><tr><th>ℓ (cm)</th><th>ℓ/λ</th><th>βℓ (°)</th><th><var>X</var><sub>in</sub> (Ω)</th><th style="text-align:left">carácter</th><th>equivalente</th></tr></thead><tbody></tbody></table></div>
+
+    <div class="q"><b>C1.</b> Un corto de longitud menor que λ/4, ¿es inductivo o capacitivo? ¿Por qué tiene sentido físicamente?
+      <div class="row" style="margin-top:6px"><button class="btn" type="button" data-ans="a1" aria-expanded="false">Ver respuesta</button></div>
+      <div class="ans" id="a1" hidden>Inductivo: para 0 &lt; βℓ &lt; π/2, tan βℓ &gt; 0 y <var>X</var><sub>in</sub> = <var>Z</var><sub>0</sub> tan βℓ &gt; 0. Físicamente, la corriente recorre el conductor central, da la vuelta por el corto y regresa por la malla: es una espira muy delgada que guarda energía en el campo magnético, y para ℓ pequeña <var>L</var><sub>eq</sub> ≈ <var>L</var>′ℓ.</div></div>
+    <div class="q"><b>C2.</b> A 100 MHz el corto de 50 cm da <var>X</var><sub>in</sub> ≈ −2.9 kΩ y el de 75 cm ≈ −47.5 Ω. ¿Cómo puede un corto comportarse como capacitor? ¿Qué longitud lo convierte en resonador paralelo?
+      <div class="row" style="margin-top:6px"><button class="btn" type="button" data-ans="a2" aria-expanded="false">Ver respuesta</button></div>
+      <div class="ans" id="a2" hidden>A 100 MHz, λ = 1.978 m y λ/4 = 49.5 cm. Los tramos de 50 y 75 cm están entre λ/4 y λ/2, donde tan βℓ &lt; 0: la onda reflejada en el corto regresa a la entrada con un desfase tal que la corriente adelanta al voltaje, como en un capacitor. Justo en ℓ = λ/4 = 49.5 cm, <var>X</var><sub>in</sub> → ∞ y el corto se ve como abierto (resonancia paralelo); el de 50 cm está a 0.5 cm de esa resonancia, por eso su reactancia es tan grande. Ojo: en un tramo real las pérdidas limitan ese máximo y aparece <var>R</var><sub>in</sub> &gt; 0 (activa las pérdidas en el explorador).</div></div>
+    <div class="q"><b>C3.</b> Si una línea cumple <var>R</var>′/<var>L</var>′ = <var>G</var>′/<var>C</var>′, ¿cómo dependen <var>v</var><sub>p</sub> y α de la frecuencia? ¿Qué le pasa a un pulso que la recorre?
+      <div class="row" style="margin-top:6px"><button class="btn" type="button" data-ans="a3" aria-expanded="false">Ver respuesta</button></div>
+      <div class="ans" id="a3" hidden>Factorizando, γ = √(<var>C</var>′/<var>L</var>′)(<var>R</var>′ + jω<var>L</var>′), así que β = ω√(<var>L</var>′<var>C</var>′) y <var>v</var><sub>p</sub> = 1/√(<var>L</var>′<var>C</var>′) no depende de <var>f</var>; α = <var>R</var>′√(<var>C</var>′/<var>L</var>′) = √(<var>R</var>′<var>G</var>′) tampoco depende de <var>f</var> si <var>R</var>′ y <var>G</var>′ son constantes. Todas las componentes del pulso viajan igual de rápido y se atenúan por igual: el pulso llega más pequeño pero con la misma forma (sin distorsión).</div></div>
+
+    <p class="note" style="margin-top:16px">Herramienta libre: <b>scikit-rf</b> (Python, <code>pip install scikit-rf</code>) modela líneas, stubs y redes de dos puertos, y lee los archivos Touchstone que exportan los analizadores vectoriales. Para comprobar esta tabla basta numpy:</p>
+<pre><code>import numpy as np
+Lp, Cp = 253e-9, 101e-12            # RG-58: H/m, F/m
+Z0, vp = np.sqrt(Lp/Cp), 1/np.sqrt(Lp*Cp)
+f = 100e6; l = np.array([0.10, 0.25, 0.50, 0.75])
+bl = 2*np.pi*f*l/vp                 # beta*l en rad
+Zsc = 1j*Z0*np.tan(bl)              # stub en corto
+Zoc = -1j*Z0/np.tan(bl)             # stub en abierto
+print(np.round(Zsc.imag, 1), np.round(Zoc.imag, 1))</code></pre>
+  </section>
+
+  <details class="card" open>
+    <summary>Formulario</summary>
+    <div class="eq"><var>Z</var><sub>0</sub> <span class="op">=</span> √(<var>L</var>′/<var>C</var>′)<span class="op">,</span>&emsp;<var>v</var><sub>p</sub> <span class="op">=</span> 1/√(<var>L</var>′<var>C</var>′) <span class="op">=</span> <span class="cnat">c</span>/√ε<sub>r</sub><span class="op">,</span>&emsp;λ <span class="op">=</span> <var>v</var><sub>p</sub>/<var>f</var><span class="op">,</span>&emsp;β <span class="op">=</span> 2π/λ <span class="op">=</span> ω√(<var>L</var>′<var>C</var>′)</div>
+    <div class="eq"><var>Z</var><sub>in</sub>(<var>d</var>) <span class="op">=</span> <var>Z</var><sub>0</sub> (<var>Z</var><sub>L</sub> + j<var>Z</var><sub>0</sub> tan β<var>d</var>)/(<var>Z</var><sub>0</sub> + j<var>Z</var><sub>L</sub> tan β<var>d</var>)&emsp;(sin pérdidas, <var>d</var> ≥ 0 desde la carga)</div>
+    <div class="eq"><var>Z</var><sub>sc</sub> <span class="op">=</span> j<var>Z</var><sub>0</sub> tan β<var>d</var><span class="op">,</span>&emsp;<var>Z</var><sub>oc</sub> <span class="op">=</span> −j<var>Z</var><sub>0</sub> cot β<var>d</var><span class="op">;</span>&emsp;β<var>d</var> ≪ 1: <var>Z</var><sub>sc</sub> ≈ jω(<var>L</var>′<var>d</var>)<span class="op">,</span>&emsp;<var>Z</var><sub>oc</sub> ≈ 1/(jω<var>C</var>′<var>d</var>)</div>
+    <div class="eq"><var>X</var> &gt; 0: <var>L</var><sub>eq</sub> <span class="op">=</span> <var>X</var>/ω<span class="op">;</span>&emsp;<var>X</var> &lt; 0: <var>C</var><sub>eq</sub> <span class="op">=</span> −1/(ω<var>X</var>)</div>
+    <div class="eq"><var>Z</var><sub>0</sub> <span class="op">=</span> √(<var>Z</var><sub>sc</sub><var>Z</var><sub>oc</sub>)<span class="op">,</span>&emsp;tan βℓ <span class="op">=</span> √(−<var>Z</var><sub>sc</sub>/<var>Z</var><sub>oc</sub>)<span class="op">;</span>&emsp;medidor LCR: <var>Z</var><sub>0</sub> <span class="op">=</span> √(<var>L</var>/<var>C</var>)<span class="op">,</span>&emsp;<var>v</var><sub>p</sub> <span class="op">≈</span> ℓ/√(<var>LC</var>)</div>
+    <div class="eq">γ <span class="op">=</span> α + jβ <span class="op">=</span> √((<var>R</var>′ + jω<var>L</var>′)(<var>G</var>′ + jω<var>C</var>′))<span class="op">,</span>&emsp;<var>Z</var><sub>0</sub> <span class="op">=</span> √((<var>R</var>′ + jω<var>L</var>′)/(<var>G</var>′ + jω<var>C</var>′))<span class="op">,</span>&emsp;α[dB] <span class="op">=</span> 8.686 α[Np]</div>
+    <div class="eq"><var>Z</var><sub>in</sub>(<var>d</var>) <span class="op">=</span> <var>Z</var><sub>0</sub> (<var>Z</var><sub>L</sub> + <var>Z</var><sub>0</sub> tanh γ<var>d</var>)/(<var>Z</var><sub>0</sub> + <var>Z</var><sub>L</sub> tanh γ<var>d</var>)&emsp;(con pérdidas)</div>
+    <div class="eq">Heaviside: <var>R</var>′/<var>L</var>′ <span class="op">=</span> <var>G</var>′/<var>C</var>′ ⇒ α <span class="op">=</span> √(<var>R</var>′<var>G</var>′)<span class="op">,</span>&emsp;<var>v</var><sub>p</sub> <span class="op">=</span> 1/√(<var>L</var>′<var>C</var>′)<span class="op">,</span>&emsp;<var>Z</var><sub>0</sub> <span class="op">=</span> √(<var>L</var>′/<var>C</var>′) real</div>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span>. Aquí la única constante es <span class="cnat">c</span> = 2.998 × 10<sup>8</sup> m/s.</p>
+    <p class="note">Exploradores relacionados: <a href="LineaTransmision_interactivo.html">línea de transmisión</a> · <a href="Smith_explorador.html">carta de Smith</a> · <a href="Acoplamiento_explorador.html">acoplamiento con stubs</a>.</p>
+    <p class="refs">Ulaby, F. T., &amp; Ravaioli, U. (2015). Fundamentals of Applied Electromagnetics (7.ª ed.), §2.6–2.9. Pozar, D. M. (2012). Microwave Engineering (4.ª ed.), §2.1–2.3 y §2.7.</p>
+  </details>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Líneas cortas como reactancias: explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+    <p>Nota histórica: la condición de línea sin distorsión se debe a Oliver Heaviside (década de 1880); su desarrollo moderno está en Pozar (2012), §2.7.</p>
+  </div>
+</div>
+<script>
+(function(){
+  var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  var PI=Math.PI, CL=299792458, FMIN=1e6, FMAX=3e9;
+  var S={term:'sc',RL:25,XL:0,Lp:253e-9,Cp:101e-12,f:100e6,ell:0.25,loss:false,R100:1.84,G100:1.3e-5};
+  function $(id){return document.getElementById(id);}
+  // ---- aritmética compleja [re, im] ----
+  function add(a,b){return [a[0]+b[0],a[1]+b[1]];}
+  function mul(a,b){return [a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]];}
+  function div(a,b){var d=b[0]*b[0]+b[1]*b[1];return [(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d];}
+  function csqrt(a){var m=Math.hypot(a[0],a[1]),re=Math.sqrt((m+a[0])/2),im=Math.sqrt(Math.max(0,(m-a[0])/2));return [re,a[1]<0?-im:im];}
+  function ctanh(z){var a=2*z[0],b=2*z[1];if(a>40)return [1,0];var den=Math.cosh(a)+Math.cos(b);return [Math.sinh(a)/den,Math.sin(b)/den];}
+  function menos(t){return String(t).replace(/-/g,'−');}
+  function fx(v,d){return menos(v.toFixed(d));}
+  function sig(v,n){ // n cifras significativas sin notación e
+    if(!isFinite(v))return '∞'; if(v===0)return '0';
+    var e=Math.floor(Math.log10(Math.abs(v))), d=Math.max(0,n-1-e); return fx(v,d);}
+  function sci(v,n){ if(v===0)return '0'; var e=Math.floor(Math.log10(Math.abs(v))), m=v/Math.pow(10,e);
+    if(+m.toFixed(n-1)>=10){m/=10;e++;}
+    if(e>=-2&&e<=3) return sig(v,n);
+    return fx(m,n-1)+' × 10<sup>'+menos(String(e))+'</sup>';}
+  function fmtZ(z,dec){
+    if(!isFinite(z[0])||!isFinite(z[1])||Math.hypot(z[0],z[1])>1e7) return '∞';
+    var re=z[0],im=z[1],m=Math.hypot(re,im);
+    if(Math.abs(im)<5e-4*Math.max(1,m)) return fx(re,dec);
+    if(Math.abs(re)<5e-4*Math.max(1,m)) return (im>=0?'j':'−j')+Math.abs(im).toFixed(dec);
+    return fx(re,dec)+(im>=0?' + j':' − j')+Math.abs(im).toFixed(dec);}
+  function fHz(f){ return f>=1e9?sig(f/1e9,3)+' GHz':f>=1e6?sig(f/1e6,3)+' MHz':f>=1e3?sig(f/1e3,3)+' kHz':sig(f,3)+' Hz'; }
+  function fLen(m){ return m>=1?sig(m,4)+' m':sig(m*100,4)+' cm'; }
+  // ---- física de la línea ----
+  function Z0r(){return Math.sqrt(S.Lp/S.Cp);}
+  function vp0(){return 1/Math.sqrt(S.Lp*S.Cp);}
+  function RGf(f){return [S.R100*Math.sqrt(f/1e8), S.G100*f/1e8];}
+  // devuelve {g:γ, Z0:Z0 complejo}
+  function prop(f,loss,Gover){
+    var w=2*PI*f;
+    if(!loss) return {g:[0,w*Math.sqrt(S.Lp*S.Cp)],Z0:[Z0r(),0]};
+    var rg=RGf(f), R=rg[0], G=Gover===undefined?rg[1]:Gover;
+    var a=[R,w*S.Lp], b=[G,w*S.Cp];
+    return {g:csqrt(mul(a,b)),Z0:csqrt(div(a,b)),R:R,G:G};}
+  function zin(term,ZL,P,d){
+    var t=ctanh([P.g[0]*d,P.g[1]*d]);
+    if(term==='sc') return mul(P.Z0,t);
+    if(term==='oc') return div(P.Z0,t);
+    return mul(P.Z0,div(add(ZL,mul(P.Z0,t)),add(P.Z0,mul(ZL,t))));}
+  function caracter(z,Zr){
+    var m=Math.hypot(z[0],z[1]);
+    if(!isFinite(m)||m>200*Zr) return ['resonante paralelo','pa'];
+    if(m<0.005*Zr) return ['resonante serie','se'];
+    if(Math.abs(z[1])<0.02*m) return ['resistivo','re'];
+    return z[1]>0?['inductivo','in']:['capacitivo','ca'];}
+  function eqStr(X,w){ if(!isFinite(X)) return '…';
+    return X>0? sig(X/w*1e9,4)+' nH' : sig(-1/(w*X)*1e12,4)+' pF'; }
+
+  // ---- lienzos ----
+  function setup(c,H){var dpr=window.devicePixelRatio||1,W=Math.max(260,c.getBoundingClientRect().width);
+    c.style.height=H+'px';c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);var x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+    return {x:x,W:W,H:H};}
+  function font(px,w){return (w?w+' ':'')+px+'px '+C('--sans')+',sans-serif';}
+  function arrowV(x,X,Y,up,col){x.fillStyle=col;x.beginPath();
+    if(up){x.moveTo(X,Y-1);x.lineTo(X-5,Y+8);x.lineTo(X+5,Y+8);}else{x.moveTo(X,Y+1);x.lineTo(X-5,Y-8);x.lineTo(X+5,Y-8);}
+    x.closePath();x.fill();}
+  function lam(){var P=prop(S.f,S.loss);return 2*PI/P.g[1];}
+
+  function drawZ(){
+    var c=$('cvZ'), W0=c.getBoundingClientRect().width, H=Math.round(Math.max(260,Math.min(360,W0*0.7)));
+    var o=setup(c,H), x=o.x, W=o.W;
+    var mL=48,mR=12,mT=26,mB=38, pw=W-mL-mR, ph=H-mT-mB;
+    var Zr=Z0r(), ym=5*Zr, P=prop(S.f,S.loss), lm=2*PI/P.g[1], r=S.ell/lm, n=Math.floor(r);
+    if(r-n<1e-9&&n>0) n--; // ℓ = kλ exacto: mostrar la ventana que termina en ℓ
+    var ink=C('--ink'),mut=C('--muted'),fnt=C('--faint'),ln=C('--line'),bl=C('--blue'),gr=C('--green'),ac=C('--accent');
+    function X(u){return mL+(u-n)*pw;} function Y(v){return mT+ph/2-v/ym*ph/2;}
+    x.fillStyle=C('--card');x.fillRect(0,0,W,H);
+    // bandas
+    x.globalAlpha=0.09;x.fillStyle=ac;x.fillRect(mL,mT,pw,ph/2);x.fillStyle=bl;x.fillRect(mL,mT+ph/2,pw,ph/2);x.globalAlpha=1;
+    x.font=font(11,'600');x.textAlign='left';x.textBaseline='alphabetic';
+    function pill(t,X0,Y0,col){var tw=x.measureText(t).width;x.fillStyle=C('--card');x.globalAlpha=0.85;x.fillRect(X0-3,Y0-11,tw+6,15);x.globalAlpha=1;x.fillStyle=col;x.fillText(t,X0,Y0);}
+    var lbX=mL+pw*(S.term==='oc'?0.53:0.03)+4;
+    pill('inductivo (X > 0)',lbX,mT+15,ac); pill('capacitivo (X < 0)',lbX,mT+ph-6,bl);
+    // rejilla horizontal
+    x.font=font(11);x.textBaseline='middle';
+    for(var k=-4;k<=4;k+=2){var yy=Y(k*Zr);x.strokeStyle=k===0?mut:ln;x.lineWidth=1;x.beginPath();x.moveTo(mL,yy);x.lineTo(mL+pw,yy);x.stroke();
+      x.fillStyle=mut;x.textAlign='right';x.fillText(k===0?'0':menos(String(Math.round(k*Zr))),mL-5,yy);}
+    x.save();x.translate(12,mT+ph/2);x.rotate(-PI/2);x.textAlign='center';x.fillStyle=mut;x.fillText('Ω',0,0);x.restore();
+    // verticales λ/4, λ/2, 3λ/4
+    x.textBaseline='alphabetic';
+    var tags=['','λ/4','λ/2','3λ/4',''];
+    for(k=0;k<=4;k++){var xx=X(n+k/4);x.strokeStyle=ln;x.setLineDash(k%4?[4,4]:[]);x.beginPath();x.moveTo(xx,mT);x.lineTo(xx,mT+ph);x.stroke();x.setLineDash([]);
+      x.fillStyle=mut;x.textAlign='center';x.font=font(11);x.fillText(sig(n+k/4,3).replace(/\.?0+$/,'')||'0',xx,mT+ph+14);
+      if(tags[k]){x.fillStyle=fnt;x.font=font(11,'600');x.fillText((n?n+'λ + ':'')+tags[k],xx,mT-8);}}
+    x.fillStyle=mut;x.font=font(11);x.textAlign='center';x.fillText('ℓ/λ',mL+pw/2,H-6);
+    x.strokeStyle=mut;x.strokeRect(mL+0.5,mT+0.5,pw-1,ph-1);
+    // curvas
+    var N=900, ZL=[S.RL,S.XL], Rs=[], Xs=[], us=[];
+    for(var i=0;i<=N;i++){var u=n+Math.min(i+0.013,N)/N, z=zin(S.term,ZL,P,u*lm); us.push(u); Rs.push(z[0]); Xs.push(z[1]);}
+    function curve(vs,col){
+      x.save();x.beginPath();x.rect(mL,mT,pw,ph);x.clip();
+      x.strokeStyle=col;x.lineWidth=2.2;x.beginPath();var pen=false,arr=[];
+      for(var i=0;i<=N;i++){var v=vs[i];
+        if(!isFinite(v)){pen=false;continue;}
+        var ok=Math.abs(v)<=ym, vc=Math.max(-1.1*ym,Math.min(1.1*ym,v));
+        if(i>0&&isFinite(vs[i-1])){var p=vs[i-1],pok=Math.abs(p)<=ym;
+          if(pok&&!ok) arr.push([us[i],v>0]);
+          if(!pok&&ok) arr.push([us[i-1],p>0]);
+          if(!pok&&!ok&&(p>0)!==(v>0)) pen=false;}
+        if(!pen){x.moveTo(X(us[i]),Y(vc));pen=true;}else x.lineTo(X(us[i]),Y(vc));}
+      x.stroke();x.restore();
+      arr.forEach(function(a){arrowV(x,X(a[0]),a[1]?mT:mT+ph,a[1],col);});}
+    curve(Rs,gr); curve(Xs,bl);
+    // marcador
+    var zc=zin(S.term,ZL,P,S.ell), xm=X(r);
+    x.strokeStyle=ac;x.lineWidth=2;x.beginPath();x.moveTo(xm,mT);x.lineTo(xm,mT+ph);x.stroke();
+    [[zc[0],gr],[zc[1],bl]].forEach(function(p){ if(isFinite(p[0])&&Math.abs(p[0])<=ym){
+      x.fillStyle=p[1];x.strokeStyle=C('--card');x.lineWidth=2;x.beginPath();x.arc(xm,Y(p[0]),5,0,6.2832);x.fill();x.stroke();}});
+    c.setAttribute('aria-label','Gráfica de R y X de entrada contra ℓ/λ; en la longitud actual ℓ/λ = '+r.toFixed(3)+', Z de entrada = '+fmtZ(zc,1).replace(/−/g,'menos ')+' ohm');
+  }
+
+  function drawE(){
+    var c=$('cvE'), W0=c.getBoundingClientRect().width, stack=W0<480, H=stack?200:130;
+    var o=setup(c,H), x=o.x, W=o.W;
+    var ink=C('--ink'),mut=C('--muted'),ln=C('--line'),ac=C('--accent'),bl=C('--blue'),gr=C('--green');
+    x.fillStyle=C('--card');x.fillRect(0,0,W,H);
+    var P=prop(S.f,S.loss), z=zin(S.term,[S.RL,S.XL],P,S.ell), w=2*PI*S.f, ch=caracter(z,Z0r());
+    // coaxial
+    var x0=44, x1=stack?W-40:W*0.58, yc=stack?52:56, hh=13;
+    x.fillStyle=ln;x.fillRect(x0,yc-hh,x1-x0,2*hh);
+    x.strokeStyle=mut;x.lineWidth=3;x.beginPath();x.moveTo(x0,yc-hh);x.lineTo(x1,yc-hh);x.moveTo(x0,yc+hh);x.lineTo(x1,yc+hh);x.stroke();
+    x.strokeStyle=ac;x.lineWidth=2.5;var xin=S.term==='oc'?x1-10:x1;x.beginPath();x.moveTo(x0,yc);x.lineTo(xin,yc);x.stroke();
+    // terminales de entrada
+    x.strokeStyle=ink;x.lineWidth=1.5;x.beginPath();x.moveTo(x0-16,yc);x.lineTo(x0,yc);x.moveTo(x0-16,yc+hh);x.lineTo(x0,yc+hh);x.stroke();
+    [[x0-16,yc],[x0-16,yc+hh]].forEach(function(p){x.fillStyle=C('--card');x.beginPath();x.arc(p[0],p[1],3.5,0,6.2832);x.fill();x.stroke();});
+    x.fillStyle=ink;x.font=font(12,'600');x.textAlign='center';x.textBaseline='alphabetic';x.fillText('Z_in',x0-14,yc-hh-6);
+    // terminación
+    x.lineWidth=3;
+    if(S.term==='sc'){x.strokeStyle=ink;x.beginPath();x.moveTo(x1,yc-hh);x.lineTo(x1,yc+hh);x.stroke();}
+    else if(S.term==='ld'){x.strokeStyle=ink;x.lineWidth=1.5;x.fillStyle=C('--card');x.fillRect(x1+2,yc-6,24,12);x.strokeRect(x1+2,yc-6,24,12);
+      x.beginPath();x.moveTo(x1,yc);x.lineTo(x1+2,yc);x.moveTo(x1+14,yc+6);x.lineTo(x1+14,yc+hh);x.lineTo(x1,yc+hh);x.stroke();}
+    x.font=font(11);x.fillStyle=mut;
+    x.textAlign='center';
+    x.fillText(S.term==='sc'?'corto':S.term==='oc'?'abierto':'Z_L',S.term==='ld'?x1+14:x1,yc-hh-6);
+    // cota de longitud
+    var yd=yc+hh+16;x.strokeStyle=mut;x.lineWidth=1;x.beginPath();x.moveTo(x0,yd);x.lineTo(x1,yd);x.stroke();
+    arrowH(x0,yd,false);arrowH(x1,yd,true);
+    function arrowH(X0,Y0,right){x.fillStyle=mut;x.beginPath();if(right){x.moveTo(X0,Y0);x.lineTo(X0-7,Y0-4);x.lineTo(X0-7,Y0+4);}else{x.moveTo(X0,Y0);x.lineTo(X0+7,Y0-4);x.lineTo(X0+7,Y0+4);}x.closePath();x.fill();}
+    x.fillStyle=ink;x.font=font(11);x.fillText('ℓ = '+fLen(S.ell)+' ('+(S.ell/lam()).toFixed(3)+' λ)',(x0+x1)/2,yd+14);
+    x.fillStyle=mut;x.textAlign='left';x.fillText('z = −ℓ',x0-8,yd+28);x.textAlign='right';x.fillText('z = 0',x1+8,yd+28);
+    // equivalente
+    var ex0=stack?60:W*0.66, ex1=W-16, ey=stack?160:56;
+    x.fillStyle=mut;x.font=font(18,'600');x.textAlign='center';x.textBaseline='middle';
+    x.fillText('≡',stack?30:W*0.62,ey);x.textBaseline='alphabetic';
+    x.strokeStyle=ink;x.lineWidth=1.8;
+    var hasR=Math.abs(z[0])>0.01*Z0r()&&ch[1]!=='pa'&&ch[1]!=='se', mid=(ex0+ex1)/2, elW=Math.min(70,(ex1-ex0)*0.42);
+    var e0=mid-elW/2, e1=mid+elW/2, lbl='';
+    if(hasR&&ch[1]!=='re'){e0=mid-elW-4;e1=mid+elW+4;}
+    // cable de terminales
+    function term(X0){x.fillStyle=C('--card');x.beginPath();x.arc(X0,ey,3.5,0,6.2832);x.fill();x.stroke();}
+    x.beginPath();x.moveTo(ex0,ey);x.lineTo(e0,ey);x.moveTo(e1,ey);x.lineTo(ex1,ey);x.stroke();
+    var cur=e0;
+    function resistor(a,b){x.strokeStyle=gr;x.lineWidth=1.8;x.strokeRect(a,ey-6,b-a,12);}
+    function coil(a,b){x.strokeStyle=ac;x.lineWidth=2;x.beginPath();var nn=4,s=(b-a)/nn;for(var q=0;q<nn;q++){x.arc(a+s*(q+0.5),ey,s/2,PI,0,false);}x.stroke();}
+    function capac(a,b){var m=(a+b)/2;x.strokeStyle=bl;x.lineWidth=2;x.beginPath();x.moveTo(a,ey);x.lineTo(m-4,ey);x.moveTo(m+4,ey);x.lineTo(b,ey);
+      x.moveTo(m-4,ey-13);x.lineTo(m-4,ey+13);x.moveTo(m+4,ey-13);x.lineTo(m+4,ey+13);x.stroke();}
+    if(ch[1]==='se'){x.strokeStyle=ink;x.beginPath();x.moveTo(e0,ey);x.lineTo(e1,ey);x.stroke();lbl='≈ corto (Z_in → 0)';}
+    else if(ch[1]==='pa'){lbl='≈ abierto (|Z_in| → ∞)';}
+    else{
+      if(hasR){var b1=ch[1]==='re'?e1:mid;resistor(e0,b1-2);x.strokeStyle=ink;x.lineWidth=1.8;x.beginPath();x.moveTo(b1-2,ey);x.lineTo(b1+2,ey);x.stroke();cur=b1+2;}
+      if(ch[1]==='in') coil(cur,e1); else if(ch[1]==='ca') capac(cur,e1);
+      var parts=[]; if(hasR) parts.push('R = '+sig(z[0],3)+' Ω');
+      if(ch[1]==='in') parts.push('L_eq = '+eqStr(z[1],w)); if(ch[1]==='ca') parts.push('C_eq = '+eqStr(z[1],w));
+      lbl=parts.join(' en serie con ');
+      if(lbl.length>30) lbl=parts.join(' + ');}
+    x.strokeStyle=ink;x.lineWidth=1.5;term(ex0);term(ex1);
+    x.fillStyle=ink;x.font=font(12,'600');x.textAlign='center';
+    x.fillText(lbl,mid,ey+30);
+    x.fillStyle=mut;x.font=font(11);x.fillText('a '+fHz(S.f)+': '+ch[0],mid,ey-22);
+    c.setAttribute('aria-label','Esquema: tramo coaxial de '+fLen(S.ell)+' terminado en '+(S.term==='sc'?'corto':S.term==='oc'?'abierto':'carga')+'; equivale a un elemento '+ch[0]+'. '+lbl.replace(/_/g,' '));
+  }
+
+  function drawL(){
+    var c=$('cvL'), W0=c.getBoundingClientRect().width, H=W0<480?400:380;
+    var o=setup(c,H), x=o.x, W=o.W;
+    var mut=C('--muted'),ln=C('--line'),bl=C('--blue'),ac=C('--accent'),ink=C('--ink');
+    x.fillStyle=C('--card');x.fillRect(0,0,W,H);
+    var mL=50,mR=12, pw=W-mL-mR, gap=46, top1=24, ph=(H-top1-gap-40)/2, top2=top1+ph+gap;
+    var lf0=4, lf1=9, N=300, fa=[], A1=[], A2=[], V1=[], V2=[];
+    for(var i=0;i<=N;i++){var f=Math.pow(10,lf0+(lf1-lf0)*i/N),P1=prop(f,true),rg=RGf(f),P2=prop(f,true,rg[0]*S.Cp/S.Lp),w=2*PI*f;
+      fa.push(f);A1.push(Math.max(1e-6,8.686*100*P1.g[0]));A2.push(Math.max(1e-6,8.686*100*P2.g[0]));V1.push(w/P1.g[1]/CL);V2.push(w/P2.g[1]/CL);}
+    function X(f){return mL+(Math.log10(f)-lf0)/(lf1-lf0)*pw;}
+    // panel α (log)
+    var amin=Math.min.apply(null,A1.concat(A2)),amax=Math.max.apply(null,A1.concat(A2));
+    var la0=Math.floor(Math.log10(amin)),la1=Math.ceil(Math.log10(amax)); if(la1-la0<1)la1=la0+1;
+    function Ya(a){return top1+ph-(Math.log10(a)-la0)/(la1-la0)*ph;}
+    var vmin=Math.min.apply(null,V1.concat(V2)),vmax=Math.max.apply(null,V1.concat(V2)), sp=Math.max(0.01,vmax-vmin);
+    var v0=vmin-0.1*sp, v1=vmax+0.4*sp;
+    function Yv(v){return top2+ph-(v-v0)/(v1-v0)*ph;}
+    x.font=font(11);x.textBaseline='middle';
+    for(var e=la0;e<=la1;e++){var yy=Ya(Math.pow(10,e));x.strokeStyle=ln;x.lineWidth=1;x.beginPath();x.moveTo(mL,yy);x.lineTo(mL+pw,yy);x.stroke();
+      x.fillStyle=mut;x.textAlign='right';x.fillText(e>=0?String(Math.pow(10,e)):Math.pow(10,e).toFixed(-e),mL-5,yy);}
+    var nt=4; for(i=0;i<=nt;i++){var vv=v0+(v1-v0)*i/nt,yv=Yv(vv);x.strokeStyle=ln;x.beginPath();x.moveTo(mL,yv);x.lineTo(mL+pw,yv);x.stroke();
+      x.fillStyle=mut;x.textAlign='right';x.fillText(vv.toFixed(sp<0.05?3:2),mL-5,yv);}
+    var dec=['10 kHz','100 kHz','1 MHz','10 MHz','100 MHz','1 GHz'];
+    x.textBaseline='alphabetic';x.textAlign='center';
+    for(e=lf0;e<=lf1;e++){var xx=X(Math.pow(10,e));x.strokeStyle=ln;x.beginPath();x.moveTo(xx,top1);x.lineTo(xx,top1+ph);x.moveTo(xx,top2);x.lineTo(xx,top2+ph);x.stroke();
+      x.fillStyle=mut;var t=dec[e-lf0];if(W<520&&(e-lf0)%2)t='';x.fillText(t,Math.max(mL+14,Math.min(mL+pw-18,xx)),top2+ph+15);}
+    x.strokeStyle=mut;x.strokeRect(mL+0.5,top1+0.5,pw-1,ph-1);x.strokeRect(mL+0.5,top2+0.5,pw-1,ph-1);
+    x.fillStyle=ink;x.font=font(12,'600');x.textAlign='left';
+    x.fillText('α (dB/100 m)',mL,top1-8);x.fillText('v_p/c',mL,top2-8);
+    x.fillStyle=mut;x.font=font(11);x.textAlign='center';x.fillText('frecuencia f',mL+pw/2,H-6);
+    function line(arr,Yf,col,dash){x.save();x.beginPath();x.rect(mL,0,pw,H);x.clip();x.strokeStyle=col;x.lineWidth=2.2;x.setLineDash(dash||[]);x.beginPath();
+      for(var i=0;i<=N;i++){var X0=X(fa[i]),Y0=Yf(arr[i]);if(i)x.lineTo(X0,Y0);else x.moveTo(X0,Y0);}x.stroke();x.restore();}
+    line(A1,Ya,bl);line(A2,Ya,ac,[7,4]);line(V1,Yv,bl);line(V2,Yv,ac,[7,4]);
+    // marcador de f actual
+    if(S.f<=1e9){var xm=X(S.f);x.strokeStyle=ac;x.lineWidth=1.2;x.setLineDash([2,3]);x.beginPath();x.moveTo(xm,top1);x.lineTo(xm,top1+ph);x.moveTo(xm,top2);x.lineTo(xm,top2+ph);x.stroke();x.setLineDash([]);}
+    x.fillStyle=ac;x.font=font(11,'600');x.textAlign='right';x.fillText('Heaviside: v_p constante',mL+pw-6,Yv(V2[0])-8);
+  }
+
+  // ---- lecturas ----
+  function labels(){
+    var Zr=Z0r(), v=vp0(), w=2*PI*S.f, P=prop(S.f,S.loss), lm=2*PI/P.g[1], blv=P.g[1]*S.ell;
+    $('oZ0').textContent=fx(Zr,1)+' Ω';
+    $('ovp').innerHTML=sci(v,3)+' m/s<br>'+(v/CL).toFixed(3)+' c';
+    $('oer').textContent=fx(Math.pow(CL/v,2),2);
+    $('fv').textContent=fHz(S.f); $('lv').textContent=sig(S.ell*100,4)+' cm';
+    $('olam').textContent=fLen(lm);
+    $('obl').innerHTML=sig(blv,3)+' rad<br>'+sig(blv*180/PI,4)+'°';
+    $('olr').textContent=(S.ell/lm).toFixed(3);
+    var z=zin(S.term,[S.RL,S.XL],P,S.ell), ch=caracter(z,Zr);
+    $('oZin').textContent=fmtZ(z,1);
+    $('ochar').textContent=ch[0]+(ch[1]==='pa'?' (se ve como abierto)':ch[1]==='se'?' (se ve como corto)':'');
+    if(ch[1]==='in'){$('kEq').innerHTML='<var>L</var><sub>eq</sub> = <var>X</var><sub>in</sub>/ω';$('oEq').textContent=eqStr(z[1],w);}
+    else if(ch[1]==='ca'){$('kEq').innerHTML='<var>C</var><sub>eq</sub> = −1/(ω<var>X</var><sub>in</sub>)';$('oEq').textContent=eqStr(z[1],w);}
+    else {$('kEq').textContent='elemento equivalente';$('oEq').textContent=ch[1]==='re'?'resistencia':'…';}
+    $('sEq').textContent=(ch[1]==='in'||ch[1]==='ca')&&Math.abs(z[0])>0.01*Zr?'en serie con R_in = '+sig(z[0],3)+' Ω':'';
+    var ap='…',sp='';
+    if(S.term==='sc'){$('kAp').innerHTML='aproximación <var>L</var>′ℓ';
+      if(ch[1]==='in'){var La=S.Lp*S.ell, Le=z[1]/w; ap=sig(La*1e9,4)+' nH'; sp='error '+menos(((La-Le)/Le*100).toFixed(1))+' % frente al exacto';}
+      else sp='no aplica: βℓ ≥ π/2, el corto ya no es inductivo';}
+    else if(S.term==='oc'){$('kAp').innerHTML='aproximación <var>C</var>′ℓ';
+      if(ch[1]==='ca'){var Ca=S.Cp*S.ell, Ce=-1/(w*z[1]); ap=sig(Ca*1e12,4)+' pF'; sp='error '+menos(((Ca-Ce)/Ce*100).toFixed(1))+' % frente al exacto';}
+      else sp='no aplica: βℓ ≥ π/2, el abierto ya no es capacitivo';}
+    else {$('kAp').textContent='aproximación de línea corta'; sp='solo para corto o abierto';}
+    $('oAp').textContent=ap; $('sAp').textContent=sp;
+    // medir Z0 (sin pérdidas)
+    var P0=prop(S.f,false), zs=zin('sc',[0,0],P0,S.ell), zo=zin('oc',[0,0],P0,S.ell);
+    $('mZsc').textContent=fmtZ(zs,1); $('mZoc').textContent=fmtZ(zo,1);
+    if(isFinite(zs[1])&&isFinite(zo[1])&&Math.abs(zo[1])>1e-9&&Math.abs(zs[1])>1e-9){
+      var z0m=Math.sqrt(-zs[1]*zo[1]), tb=Math.sqrt(-zs[1]/zo[1]), blm=Math.atan(tb);
+      $('mZ0').textContent=fx(z0m,2)+' Ω';
+      $('mvp').innerHTML='tan βℓ = '+sig(tb,4)+'<br>'+sci(w*S.ell/blm,4)+' m/s';
+      $('mvpS').textContent=(S.ell<lm/4)?'ℓ < λ/4: la rama principal del arcotangente es la correcta':'ℓ > λ/4: arctan da otra rama (βℓ real = '+sig(blv,3)+' rad); mide a menor frecuencia';
+    } else {$('mZ0').textContent='…';$('mvp').textContent='…';$('mvpS').textContent='en un polo; cambia ℓ o f';}
+    // pérdidas a la frecuencia actual
+    var PL=prop(S.f,true), rg=RGf(S.f);
+    $('lf').textContent=fHz(S.f);
+    $('lRG').innerHTML=sig(rg[0],3)+' Ω/m<br>'+sci(rg[1],2)+' S/m';
+    $('la').textContent=sig(8.686*100*PL.g[0],3); $('laN').innerHTML='α = '+sci(PL.g[0],3)+' Np/m';
+    $('lb').innerHTML=sig(PL.g[1],4)+' rad/m<br>'+(w/PL.g[1]/CL).toFixed(4)+' c';
+    $('lZ0').textContent=fmtZ(PL.Z0,2);
+    $('lH1').innerHTML=sci(rg[0]/S.Lp,3)+'<br>'+sci(rg[1]/S.Cp,3);
+    var GH=rg[0]*S.Cp/S.Lp; $('lH2').innerHTML=sci(GH,3)+' S/m';
+    $('lH3').innerHTML=sci(Math.sqrt(rg[0]*GH),3)+' Np/m<br>'+sig(8.686*100*Math.sqrt(rg[0]*GH),3)+' dB/100 m';
+  }
+  function medidor(){
+    function n(id){var s=String($(id).value).replace(',','.').trim();return s===''?NaN:parseFloat(s);}
+    var L=n('mL')*1e-9, Cc=n('mC')*1e-12, l=n('mLen')/100, f=n('mF')*1e3;
+    if(!(L>0&&Cc>0&&l>0)){['bZ0','bvp','bvx','bLC'].forEach(function(id){$(id).textContent='…';});return;}
+    var vp=l/Math.sqrt(L*Cc);
+    $('bZ0').textContent=fx(Math.sqrt(L/Cc),2)+' Ω';
+    $('bvp').innerHTML=sci(vp,4)+' m/s<br>'+(vp/CL).toFixed(3)+' c';
+    if(f>0){var w=2*PI*f, vx=w*l/Math.atan(w*Math.sqrt(L*Cc)); $('bvx').innerHTML=sci(vx,4)+' m/s<br>diferencia '+menos(((vx-vp)/vp*100).toExponential(1).replace('e',' × 10^'))+' %';
+      $('bvx').innerHTML=$('bvx').innerHTML.replace(/10\^([−+]?)(\d+)/,function(m,s,d){return '10<sup>'+(s==='−'?'−':'')+d+'</sup>';});}
+    else $('bvx').textContent='…';
+    $('bLC').innerHTML=sig(L/l*1e9,4)+' nH/m<br>'+sig(Cc/l*1e12,4)+' pF/m';
+  }
+  function tabla(){
+    var f=parseFloat($('pF').value)*1e6; var Lp=253e-9,Cp=101e-12,Z0=Math.sqrt(Lp/Cp),v=1/Math.sqrt(Lp*Cp),w=2*PI*f;
+    if(!(f>0)){$('pLam').textContent='…';return;}
+    var lm=v/f; $('pLam').innerHTML='A '+fHz(f)+': λ = '+fLen(lm)+', λ/4 = '+fLen(lm/4)+', λ/2 = '+fLen(lm/2)+'.';
+    [['tSc','sc'],['tOc','oc']].forEach(function(t){
+      var h='';[0.10,0.25,0.50,0.75].forEach(function(l){var b=w*l/v, X=t[1]==='sc'?Z0*Math.tan(b):-Z0/Math.tan(b), ch=caracter([0,X],Z0);
+        var cls=ch[1]==='in'?'ind':ch[1]==='ca'?'cap':'';
+        h+='<tr><td>'+(l*100)+'</td><td>'+(l/lm).toFixed(3)+'</td><td>'+sig(b*180/PI,4)+'</td><td>'+(Math.abs(X)>1e7?'∞':fx(X,1))+'</td><td class="c '+cls+'">'+ch[0]+'</td><td>'+
+          (ch[1]==='in'?'L = '+eqStr(X,w):ch[1]==='ca'?'C = '+eqStr(X,w):'…')+'</td></tr>';});
+      document.querySelector('#'+t[0]+' tbody').innerHTML=h;});
+  }
+  function todo(){labels();drawZ();drawE();drawL();}
+
+  // ---- controles ----
+  var fr=$('fr'), lr=$('lr');
+  function f2s(f){return Math.round((Math.log10(f)-6)/(Math.log10(FMAX)-6)*1000);}
+  function s2f(s){var f=Math.pow(10,6+s/1000*(Math.log10(FMAX)-6));var e=Math.pow(10,Math.floor(Math.log10(f))-2);return Math.round(f/e)*e;}
+  function syncIn(){ if(document.activeElement!==$('inF'))$('inF').value=+(S.f/1e6).toPrecision(4);
+    if(document.activeElement!==$('inL'))$('inL').value=+(S.ell*100).toPrecision(4);
+    if(document.activeElement!==$('inLp'))$('inLp').value=+(S.Lp*1e9).toPrecision(4);
+    if(document.activeElement!==$('inCp'))$('inCp').value=+(S.Cp*1e12).toPrecision(4);
+    fr.value=f2s(S.f); lr.value=Math.min(200,Math.max(0.5,S.ell*100));}
+  function upd(){syncIn();todo();}
+  fr.addEventListener('input',function(){S.f=s2f(+fr.value);upd();});
+  lr.addEventListener('input',function(){S.ell=+lr.value/100;upd();});
+  $('inF').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=1&&v<=3000))return;S.f=v*1e6;upd();});
+  $('inL').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0&&v<=10000))return;S.ell=v/100;upd();});
+  $('inLp').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;S.Lp=v*1e-9;upd();});
+  $('inCp').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>0))return;S.Cp=v*1e-12;upd();});
+  $('inRL').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;S.RL=v;todo();});
+  $('inXL').addEventListener('input',function(){var v=parseFloat(this.value);if(isNaN(v))return;S.XL=v;todo();});
+  $('inR').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;S.R100=v;todo();});
+  $('inG').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;S.G100=v;todo();});
+  $('chkLoss').addEventListener('change',function(){S.loss=this.checked;todo();});
+  document.querySelectorAll('[data-term]').forEach(function(b){b.addEventListener('click',function(){
+    S.term=b.getAttribute('data-term');
+    document.querySelectorAll('[data-term]').forEach(function(o){o.setAttribute('aria-pressed',String(o===b));});
+    $('ldBox').hidden=S.term!=='ld'; todo();});});
+  document.querySelectorAll('[data-cab]').forEach(function(b){b.addEventListener('click',function(){
+    var p=b.getAttribute('data-cab').split(',');S.Lp=+p[0]*1e-9;S.Cp=+p[1]*1e-12;upd();});});
+  document.querySelectorAll('[data-ans]').forEach(function(b){b.addEventListener('click',function(){
+    var a=$(b.getAttribute('data-ans')),sh=a.hidden;a.hidden=!sh;b.setAttribute('aria-expanded',String(sh));b.textContent=sh?'Ocultar respuesta':'Ver respuesta';});});
+  ['mL','mC','mLen','mF'].forEach(function(id){$(id).addEventListener('input',medidor);});
+  $('mEj').addEventListener('click',function(){$('mL').value=126.5;$('mC').value=50.5;$('mLen').value=50;$('mF').value=100;medidor();});
+  $('pF').addEventListener('input',tabla);
+  $('cargaEj').addEventListener('click',function(){S.Lp=253e-9;S.Cp=101e-12;S.f=1e9;S.ell=0.02;S.term='sc';S.loss=false;$('chkLoss').checked=false;
+    document.querySelectorAll('[data-term]').forEach(function(o){o.setAttribute('aria-pressed',String(o.getAttribute('data-term')==='sc'));});
+    $('ldBox').hidden=true;upd();$('cvZ').scrollIntoView({behavior:'smooth',block:'center'});});
+  var mq=window.matchMedia('(prefers-color-scheme:dark)');if(mq.addEventListener)mq.addEventListener('change',todo);
+  new MutationObserver(todo).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  window.addEventListener('resize',todo);
+  upd();medidor();tabla();
+})();
+</script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
+<!-- navegacion:inicio -->
+<style>
+  :root{--nv-w:272px}
+  body{margin-top:0!important}
+  @media (min-width:1100px){ body{margin-left:var(--nv-w)!important} }
+  .nvside{position:fixed;top:0;left:0;bottom:0;width:var(--nv-w);z-index:9999;display:flex;flex-direction:column;
+    background:var(--card,#fff);border-right:1px solid var(--line,#e2dcc9);
+    font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:14px;color:var(--ink,#1a1a1a);
+    box-shadow:1px 0 8px rgba(0,0,0,.05);transition:transform .2s ease}
+  .nvside a{text-decoration:none;color:inherit}
+  .nv-cab{padding:14px 16px 10px;border-bottom:1px solid var(--line,#e2dcc9)}
+  .nv-marca{display:block;font-family:"Century Gothic","Questrial",Arial,sans-serif;font-weight:700;font-size:15px;
+    line-height:1.25;color:var(--navy,var(--ink,#1F3864))}
+  .nv-marca small{display:block;font-weight:400;font-size:12px;color:var(--muted,#5a5a5a);margin-top:2px}
+  .nv-pasos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .nv-paso{display:flex;flex-direction:column;gap:1px;padding:6px 8px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font-size:11px;color:var(--muted,#5a5a5a);min-width:0}
+  .nv-paso b{font-size:12.5px;color:var(--ink,#1a1a1a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nv-paso.sig{text-align:right}
+  .nv-paso:hover{background:var(--bg,#f4f1ea)}
+  .nv-paso[aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-busca{margin-top:8px;width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font:inherit;background:var(--bg,#f8f6f0);color:inherit}
+  .nv-lista{flex:1;overflow-y:auto;padding:6px 8px 10px}
+  .nv-grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8a8fa0);padding:12px 8px 4px}
+  .nv-lista a{display:block;padding:6px 8px 6px 10px;border-radius:6px;border-left:3px solid transparent;line-height:1.3}
+  .nv-lista a small{display:block;font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-lista a:hover{background:var(--bg,#f4f1ea)}
+  .nv-lista a.nv-aqui{background:var(--bg,#f4f1ea);border-left-color:var(--accent,#C1571B);font-weight:700}
+  .nv-pie{padding:8px 14px;border-top:1px solid var(--line,#e2dcc9);font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-boton{display:none;position:fixed;top:10px;left:10px;z-index:10000;gap:6px}
+  .nv-boton a,.nv-boton button{display:flex;align-items:center;justify-content:center;height:38px;min-width:38px;padding:0 10px;
+    border:1px solid var(--line,#e2dcc9);border-radius:9px;background:var(--card,#fff);color:var(--ink,#1a1a1a);
+    font:600 14px Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .nv-boton [aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-velo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:10001}
+  .nv-cierra{display:none;position:absolute;top:10px;right:10px;width:32px;height:32px;border:1px solid var(--line,#e2dcc9);border-radius:8px;background:var(--card,#fff);color:inherit;font-size:16px;cursor:pointer}
+  .nv-cab{position:relative}
+  @media (max-width:1099px){
+    body{margin-top:56px!important}
+    .nvside{transform:translateX(-102%);width:min(320px,88vw)}
+    .nvside.abierto{transform:none;z-index:10002}
+    .nv-cierra{display:block}
+    .nv-boton{display:flex}
+    .nvside.abierto ~ .nv-velo{display:block}
+  }
+  @media print{.nvside,.nv-boton,.nv-velo{display:none} body{margin:0!important}}
+</style>
+<nav class="nvside" id="nvside" aria-label="Exploradores del curso">
+  <div class="nv-cab">
+    <button class="nv-cierra" id="nv-cierra" aria-label="Cerrar el temario">✕</button>
+    <a class="nv-marca" href="index.html">Exploradores de Teoría Electromagnética<small>ENES Juriquilla, UNAM · inicio</small></a>
+    <div class="nv-pasos">
+      <a class="nv-paso" id="nv-ant" href="#" aria-label="Explorador anterior">‹ anterior<b id="nv-ant-t">…</b></a>
+      <a class="nv-paso sig" id="nv-sig" href="#" aria-label="Explorador siguiente">siguiente ›<b id="nv-sig-t">…</b></a>
+    </div>
+    <input class="nv-busca" id="nv-busca" type="search" placeholder="Buscar (tecla /)" aria-label="Buscar explorador">
+  </div>
+  <div class="nv-lista" id="nv-lista">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss<small>1.1 · P1</small></a>
+<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico<small>1.2 · P1</small></a>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito<small>1.4 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday<small>1.6 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores<small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas<small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel<small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización<small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler<small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal<small>3.2 · P8</small></a>
+<a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8 · P11</small></a>
+<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
+<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
+<a href="ImpedanciaEntrada_explorador.html" data-nv="ImpedanciaEntrada_explorador.html">Líneas cortas como reactancias<small>4.5–4.6 · P14</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7 · P15</small></a>
+<a href="Acoplamiento_explorador.html" data-nv="Acoplamiento_explorador.html">Acoplamiento λ/4 y stub<small>4.8–4.9 · P15</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12 · P16</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>
+  </div>
+  <div class="nv-pie">Teclas: ← anterior · → siguiente · / buscar · Esc cerrar</div>
+</nav>
+<div class="nv-boton"><button id="nv-abre" aria-controls="nvside" aria-expanded="false">☰ Temario</button>
+  <a id="nv-ant2" href="#" aria-label="Anterior">‹</a><a id="nv-sig2" href="#" aria-label="Siguiente">›</a></div>
+<div class="nv-velo" id="nv-velo"></div>
+<script>
+(function(){
+  var lista=document.getElementById('nv-lista'), side=document.getElementById('nvside');
+  var l=lista.querySelectorAll('a[data-nv]'), orden=[], dat={};
+  for(var i=0;i<l.length;i++){var f=l[i].getAttribute('data-nv');orden.push(f);
+    dat[f]={el:l[i],t:l[i].childNodes[0].textContent.trim()};}
+  var aqui=(location.pathname.split('/').pop()||'index.html'), k=orden.indexOf(aqui);
+  function paso(idA,idT,j){var a=document.getElementById(idA);
+    if(j<0||j>=orden.length){a.setAttribute('aria-disabled','true');if(idT)document.getElementById(idT).textContent='';return;}
+    a.href=orden[j];a.title=dat[orden[j]].t+(j<k?' (tecla ←)':' (tecla →)');if(idT)document.getElementById(idT).textContent=dat[orden[j]].t;}
+  if(k>=0){dat[aqui].el.className='nv-aqui';dat[aqui].el.setAttribute('aria-current','page');
+    paso('nv-ant','nv-ant-t',k-1);paso('nv-sig','nv-sig-t',k+1);paso('nv-ant2',null,k-1);paso('nv-sig2',null,k+1);
+    setTimeout(function(){var r=dat[aqui].el;lista.scrollTop=r.offsetTop-lista.clientHeight/3;},0);}
+  else{paso('nv-ant','nv-ant-t',-1);paso('nv-sig','nv-sig-t',0);paso('nv-ant2',null,-1);paso('nv-sig2',null,0);}
+  var bus=document.getElementById('nv-busca');
+  bus.addEventListener('input',function(){var q=bus.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    var grp=null,vis=0;
+    Array.prototype.forEach.call(lista.children,function(c){
+      if(c.classList.contains('nv-grp')){if(grp)grp.style.display=vis?'':'none';grp=c;vis=0;return;}
+      var t=c.textContent.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      var ok=!q||t.indexOf(q)>=0;c.style.display=ok?'':'none';if(ok)vis++;});
+    if(grp)grp.style.display=vis?'':'none';});
+  bus.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=lista.querySelector('a[data-nv]:not([style*="none"])');if(v)location.href=v.href;}});
+  var abre=document.getElementById('nv-abre'), velo=document.getElementById('nv-velo');
+  function cambia(on){side.classList.toggle('abierto',on);abre.setAttribute('aria-expanded',on?'true':'false');}
+  abre.addEventListener('click',function(){cambia(!side.classList.contains('abierto'));});
+  velo.addEventListener('click',function(){cambia(false);});
+  document.getElementById('nv-cierra').addEventListener('click',function(){cambia(false);});
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toUpperCase();
+    if(e.key==='Escape'){cambia(false);if(t==='INPUT')e.target.blur();return;}
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
+    if(e.key==='/'){e.preventDefault();if(innerWidth<1100)cambia(true);bus.focus();return;}
+    if(k<0) return;
+    if(e.key==='ArrowLeft'&&k>0) location.href=orden[k-1];
+    if(e.key==='ArrowRight'&&k<orden.length-1) location.href=orden[k+1];
+  });
+})();
+</script>
+<!-- navegacion:fin -->

@@ -2,6 +2,15 @@
 
 La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones archivadas en Zenodo. Cada versión archivada tiene su propio DOI de versión; el DOI de concepto [10.5281/zenodo.23423156](https://doi.org/10.5281/zenodo.23423156) (citar «todas las versiones») resuelve siempre a la más reciente.
 
+## Sin versión archivada · 2026-11-06 (Unidad 4 completa y tarjetas de práctica)
+- Explorador nuevo `ImpedanciaEntrada_explorador.html` (4.5–4.6 · P14): líneas cortas como reactancias. R y X de entrada contra ℓ/λ en corto, abierto o con carga; inductancia o capacitancia equivalente y comparación con L′ℓ y C′ℓ; medición de Z₀ = √(Z_sc Z_oc) y de v_p con un medidor LCR; pérdidas (R′ ∝ √f, G′ ∝ f) y condición de Heaviside con α(f) y v_p(f); paso a paso y tarjeta para la P14 con fragmento en Python.
+- Explorador nuevo `Acoplamiento_explorador.html` (4.8–4.9 · P15): transformador λ/4 (en la carga real o en V_máx/V_mín) y stub en corto en paralelo con sus dos soluciones; recorrido numerado en la carta de Smith; ancho de banda |Γ(f)| de cada diseño (S ≤ 2); paso a paso para Z_L = 100 + j50 Ω y práctica con comprobación.
+- Carta de Smith: admitancias (y = −Γ, rejilla g–b), V_máx y V_mín con d_máx/λ, escala exterior de longitudes de onda hacia el generador, modo práctica con retroalimentación y paso a paso.
+- Guía de onda: relleno dieléctrico ε_r, tabla de los ocho primeros modos TE/TM con Z_TE, Z_TM y atenuación bajo el corte, diagrama de dispersión con v_p y v_g, patrones de campo transversal de TE₁₀, TE₂₀, TE₀₁, TE₁₁ y TM₁₁, paso a paso de la frecuencia de corte y tarjeta para la P16.
+- Tarjetas «Para la práctica»: P10 en Snell (figura del semicilindro, tabla de predicciones, ajuste por mínimos cuadrados), P11 en Fresnel (θ_B y θ_c en acrílico y agua, figura con analizador, tabla de registro); Fresnel añade acrílico (PMMA, n = 1.49) y agua con n = 1.333.
+- Línea de transmisión: potencia incidente, reflejada y en la carga, pérdida de retorno y pérdida por desacoplamiento.
+- Portada, menú lateral, README, sitemap y `.zenodo.json`: 22 exploradores.
+
 ## Sin versión archivada · 2026-11-06 (estilo académico y navegación lateral)
 - Tipografía institucional del Manual de identidad gráfica de la ENES Juriquilla (nov. 2025): Century Gothic en títulos (respaldo web Questrial), Arial/Helvética en texto, controles y lecturas con cifras tabulares, Cambria en fórmulas (respaldo STIX Two Text). Se retiran Spectral e IBM Plex. Script `add_tipografia_em.py` (idempotente).
 - Notación: los subíndices y superíndices escritos a mano (Z_L, Z_in, v_p, V_inc, e^(−z/δ)) y los subíndices Unicode (Z₀, η₁, TE₁₀) se muestran como subíndices y superíndices reales en el texto, en las lecturas que generan los scripts y en los lienzos (canvas). Script `estilo_academico_em.py` (idempotente).

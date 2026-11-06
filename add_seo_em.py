@@ -23,7 +23,7 @@ INI, FIN = "<!-- seo:inicio -->", "<!-- seo:fin -->"
 # archivo: (título, descripción ≤ ~160 caracteres, temas)
 PAGINAS = {
  "index.html": ("Teoría Electromagnética: exploradores interactivos (ENES Juriquilla, UNAM)",
-   "19 simuladores gratuitos de electromagnetismo en español: Gauss, inducción, ondas planas, Fresnel, líneas de transmisión, carta de Smith y guías de onda.",
+   "22 simuladores gratuitos de electromagnetismo en español: Gauss, inducción, ondas planas, Fresnel, líneas de transmisión, carta de Smith, acoplamiento y guías de onda.",
    ["electromagnetismo", "ondas electromagnéticas", "líneas de transmisión"]),
  "CampoGauss_explorador.html": ("Ley de Gauss: simulador interactivo de flujo eléctrico",
    "Arrastra una superficie gaussiana alrededor de una carga puntual, una esfera cargada o una lámina y comprueba que el flujo solo depende de la carga encerrada.",
@@ -73,6 +73,12 @@ PAGINAS = {
  "LineaTransmision_interactivo.html": ("Línea de transmisión: coeficiente de reflexión y VSWR",
    "Onda estacionaria de voltaje en una línea con carga compleja: Γ, VSWR, mínimos de voltaje e impedancia de entrada Z_in(d).",
    ["línea de transmisión", "VSWR", "impedancia de entrada"]),
+ "ImpedanciaEntrada_explorador.html": ("Líneas cortas como reactancias: impedancia de entrada y stubs",
+   "Un tramo de coaxial en corto o abierto como inductor o capacitor: R y X de entrada contra la longitud, medir Z₀ con dos mediciones, pérdidas y Heaviside.",
+   ["impedancia de entrada", "stub", "condición de Heaviside"]),
+ "Acoplamiento_explorador.html": ("Acoplamiento de impedancias: transformador λ/4 y stub",
+   "Diseña el acoplamiento de una antena con un transformador de cuarto de onda o un stub en paralelo, sigue el recorrido en la carta de Smith y compara el ancho de banda.",
+   ["acoplamiento de impedancias", "transformador de cuarto de onda", "stub"]),
  "Smith_explorador.html": ("Carta de Smith interactiva",
    "La carga como un punto en el plano de Γ: arrástrala, gira hacia el generador y lee la impedancia de entrada y el VSWR sobre la carta.",
    ["carta de Smith", "adaptación de impedancias", "líneas de transmisión"]),

@@ -88,6 +88,7 @@
 
 
 
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- movil:inicio -->
 <style>
@@ -258,13 +259,32 @@
     <p class="note" style="margin-top:12px">El cociente |V|<sub>máx</sub>/|V|<sub>mín</sub> es exactamente el VSWR: por eso en el laboratorio se mide deslizando una sonda por una línea ranurada. La posición del primer mínimo fija la fase de Γ, de modo que patrón + VSWR bastan para reconstruir la carga.</p>
   </section>
 
+  <section class="card" id="potencia">
+    <p class="sec-tag">Lecturas · potencia, pérdida de retorno y de desacople</p>
+    <p class="note" style="margin-top:0">Con la misma Z<sub>0</sub> y la misma carga de arriba, fija la amplitud de la onda incidente |V<sub>0</sub><sup>+</sup>| (valor pico) y lee cuánta potencia llega, cuánta regresa y cuánta absorbe la carga.</p>
+    <div class="inrow" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+      <div class="inbox"><label for="inV0">|<span class="vinc">V</span><sub>0</sub><sup>+</sup>| (V, pico)</label><input id="inV0" type="number" step="any" min="0" value="1" inputmode="decimal"></div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">P<sub>inc</sub> = |V<sub>0</sub><sup>+</sup>|²/(2Z<sub>0</sub>)</div><div class="v" id="pInc">…</div></div>
+      <div class="tile"><div class="k">P<sub>ref</sub> = |Γ|² P<sub>inc</sub></div><div class="v" id="pRef">…</div></div>
+      <div class="tile key"><div class="k">P<sub>L</sub> = P<sub>inc</sub>(1 − |Γ|²)</div><div class="v" id="pL">…</div></div>
+      <div class="tile"><div class="k">Pérdida de retorno RL</div><div class="v" id="pRL">…</div></div>
+      <div class="tile"><div class="k">Pérdida por desacople ML</div><div class="v" id="pML">…</div></div>
+    </div>
+    <p class="note" style="margin-top:12px"><b style="color:var(--ink)">La potencia no oscila con z.</b> En una línea sin pérdidas la potencia promedio P<sub>av</sub> = P<sub>inc</sub> − P<sub>ref</sub> es la misma en todos los puntos, aunque |V(z)| suba y baje a lo largo de la onda estacionaria: donde |V| es máximo, |I| es mínimo, y viceversa. Calcular la potencia como |V|<sub>máx</sub>²/(2Z<sub>0</sub>) es un error típico; esa expresión solo vale para una onda viajera pura (Γ = 0). Una RL grande (en dB) es buena: poco reflejo. La ML dice cuántos dB se pierden en la carga solo por el desacople.</p>
+  </section>
+
   <details class="card" open>
     <summary>Formulario y casos notables</summary>
     <div class="eq"><var>Γ</var> <span class="op">=</span> (<var>Z</var><sub>L</sub> <span class="op">−</span> <var>Z</var><sub>0</sub>) / (<var>Z</var><sub>L</sub> <span class="op">+</span> <var>Z</var><sub>0</sub>)<span class="op">,</span>&emsp;VSWR <span class="op">=</span> (1 + |<var>Γ</var>|) / (1 − |<var>Γ</var>|)</div>
     <div class="eq">|<var>V</var>(<var>d</var>)| <span class="op">=</span> |<var>V</var><sub>0</sub>⁺| · |1 + <var>Γ</var> e<sup>−j2β<var>d</var></sup>|<span class="op">,</span>&emsp;β <span class="op">=</span> 2π/λ</div>
     <div class="eq"><var>Z</var><sub>in</sub>(<var>d</var>) <span class="op">=</span> <var>Z</var><sub>0</sub> · [<var>Z</var><sub>L</sub> <span class="op">+</span> j<var>Z</var><sub>0</sub> tan(β<var>d</var>)] / [<var>Z</var><sub>0</sub> <span class="op">+</span> j<var>Z</var><sub>L</sub> tan(β<var>d</var>)]</div>
     <div class="eq"><var>d</var> <span class="op">=</span> λ/2 → <var>Z</var><sub>in</sub> <span class="op">=</span> <var>Z</var><sub>L</sub><span class="op">;</span>&emsp;<var>d</var> <span class="op">=</span> λ/4 → <var>Z</var><sub>in</sub> <span class="op">=</span> <var>Z</var><sub>0</sub>²/<var>Z</var><sub>L</sub><span class="op">;</span>&emsp;corto → <var>Z</var><sub>in</sub> <span class="op">=</span> j<var>Z</var><sub>0</sub> tan(β<var>d</var>)</div>
+    <div class="eq"><var>P</var><sub>av</sub> <span class="op">=</span> ½ Re{<var>V</var> <var>I</var><sup>*</sup>} <span class="op">=</span> [|<var>V</var><sub>0</sub>⁺|²/(2<var>Z</var><sub>0</sub>)](1 <span class="op">−</span> |<var>Γ</var>|²)&emsp;(igual en todo <var>z</var> si no hay pérdidas)</div>
+    <div class="eq">RL <span class="op">=</span> <span class="op">−</span>20 log<sub>10</sub>|<var>Γ</var>| dB<span class="op">,</span>&emsp;ML <span class="op">=</span> <span class="op">−</span>10 log<sub>10</sub>(1 <span class="op">−</span> |<var>Γ</var>|²) dB</div>
     <p class="note" style="margin-top:6px">Es la misma estructura que η(<var>d</var>) para ondas planas (tema 3.3): basta sustituir η → Z<sub>0</sub>. Línea sin pérdidas.</p>
+    <p class="note">Un tramo corto de línea en corto o en abierto se comporta como una inductancia o una capacitancia (Z<sub>in</sub> = j<var class="vinc">Z</var><sub>0</sub> tan β<var class="vinc">d</var> o −j<var class="vinc">Z</var><sub>0</sub> cot β<var class="vinc">d</var>): eso se explora, junto con la práctica P14, en el <a href="ImpedanciaEntrada_explorador.html">explorador de impedancia de entrada</a>.</p>
     <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span>. En este explorador no interviene ninguna constante de la naturaleza: Z<sub>0</sub> y Z<sub>L</sub> son parámetros de diseño (todo está normalizado a λ).</p>
   </details>
 
@@ -331,7 +351,18 @@
     document.getElementById('dr').value=dLam;
     ponSiLibre(IN.Z0,+Z0.toFixed(1));ponSiLibre(IN.RL,+RL.toFixed(1));
     ponSiLibre(IN.XL,+XL.toFixed(1));ponSiLibre(IN.D,+dLam.toFixed(3));
+    potencia(aG);
   }
+  // ---- potencia: P_inc, P_ref, P_L, RL y ML ----
+  var V0=1;
+  function fW(p){var a=Math.abs(p);if(a===0)return '0 W';if(a>=1)return p.toPrecision(3)+' W';if(a>=1e-3)return (p*1e3).toPrecision(3)+' mW';return (p*1e6).toPrecision(3)+' µW';}
+  function potencia(aG){
+    var Pi=V0*V0/(2*Z0),g2=aG*aG,$=function(i){return document.getElementById(i);};
+    $('pInc').textContent=fW(Pi);$('pRef').textContent=fW(g2*Pi);$('pL').textContent=fW(aG>=0.9999?0:Pi*(1-g2));
+    $('pRL').textContent=aG<1e-6?'∞ (adaptada)':(-20*Math.log10(aG)).toFixed(2)+' dB';
+    $('pML').textContent=aG>=0.9999?'∞ (no llega nada)':(-10*Math.log10(1-g2)).toFixed(2)+' dB';
+  }
+  document.getElementById('inV0').addEventListener('input',function(){var v=parseFloat(this.value);if(!(v>=0))return;V0=v;labels();});
   function draw(){
     var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),W=Math.max(320,r.width),H=360;
     cv.width=W*dpr;cv.height=H*dpr;var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
@@ -516,12 +547,14 @@
 <a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
 <a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
 <a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
-<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10, P11</small></a>
-<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8 · P11</small></a>
 <div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
 <a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
-<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7–4.8</small></a>
-<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12</small></a>
+<a href="ImpedanciaEntrada_explorador.html" data-nv="ImpedanciaEntrada_explorador.html">Líneas cortas como reactancias<small>4.5–4.6 · P14</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7 · P15</small></a>
+<a href="Acoplamiento_explorador.html" data-nv="Acoplamiento_explorador.html">Acoplamiento λ/4 y stub<small>4.8–4.9 · P15</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12 · P16</small></a>
 <div class="nv-grp">Transversales</div>
 <a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
 <a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>

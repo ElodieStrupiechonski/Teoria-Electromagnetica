@@ -1,0 +1,846 @@
+<!doctype html><html lang="es"><meta charset="utf-8">
+<!-- tipografia:inicio -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root:root{
+    --f-tit:"Century Gothic","Questrial","URW Gothic","Avant Garde",sans-serif;
+    --sans:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",Calibri,sans-serif;
+    --serif:Cambria,"STIX Two Text","Times New Roman",serif;
+    --mono:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",sans-serif;
+  }
+  body,button,input,select,textarea{font-family:var(--sans)}
+  body{font-variant-numeric:tabular-nums}
+  h1,h2,h3,.ct,.eyebrow,header .sub{font-family:var(--f-tit)!important;letter-spacing:0}
+  sub,sup{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}
+  sub{bottom:-.25em} sup{top:-.45em}
+</style>
+<script>
+(function(){
+  // ---- lienzos: subíndices y superíndices escritos como Z_L, V_inc, e^(−z/δ) ----
+  var RX=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})/g;
+  var P=CanvasRenderingContext2D.prototype, F=P.fillText;
+  P.fillText=function(t,x,y,mw){
+    t=String(t);
+    if((t.indexOf('_')<0&&t.indexOf('^')<0)||/\.(html|py|png|csv|txt|svg|jpg|pdf)\b/i.test(t)) return F.call(this,t,x,y,mw);
+    var sg=[],last=0,m; RX.lastIndex=0;
+    while((m=RX.exec(t))){
+      if(m[1]){sg.push([t.slice(last,m.index)+m[1],0]);sg.push([m[2].replace(/[{}]/g,''),1]);}
+      else{sg.push([t.slice(last,m.index),0]);sg.push([m[3].replace(/[{}()]/g,''),2]);}
+      last=RX.lastIndex;
+    }
+    if(!sg.length) return F.call(this,t,x,y,mw);
+    sg.push([t.slice(last),0]);
+    var f0=this.font, mm=/(\d+(?:\.\d+)?)px/.exec(f0), px=mm?+mm[1]:12,
+        fs=mm?f0.replace(mm[0],(px*0.72).toFixed(1)+'px'):f0, W=0,i;
+    for(i=0;i<sg.length;i++){this.font=sg[i][1]?fs:f0;sg[i][2]=this.measureText(sg[i][0]).width;W+=sg[i][2];}
+    var a=this.textAlign, x0=x;
+    if(a==='center') x0=x-W/2; else if(a==='right'||a==='end') x0=x-W;
+    this.textAlign='left';
+    for(i=0;i<sg.length;i++){
+      this.font=sg[i][1]?fs:f0;
+      F.call(this,sg[i][0],x0,y+(sg[i][1]===1?0.28*px:sg[i][1]===2?-0.38*px:0));
+      x0+=sg[i][2];
+    }
+    this.font=f0; this.textAlign=a;
+  };
+  // ---- texto generado por los scripts: misma notación en <sub>/<sup> ----
+  if(/AnatomiaGrafica/.test(location.pathname)) return;
+  var US=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})|([₀-₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ]+)/g;
+  var UNI="₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ", ASC="0123456789aeoxhklmnpstiruvj";
+  var SALTA={SCRIPT:1,STYLE:1,TEXTAREA:1,OPTION:1,PRE:1,CODE:1,TITLE:1,INPUT:1,SELECT:1};
+  function arreglar(n){
+    var p=n.parentNode; if(!p||SALTA[p.nodeName]||p.namespaceURI==='http://www.w3.org/2000/svg') return;
+    var t=n.nodeValue; US.lastIndex=0; if(!US.test(t)||/\.(html|py|png|csv)\b/.test(t)) return;
+    US.lastIndex=0; var fr=document.createDocumentFragment(), last=0, m, e;
+    while((m=US.exec(t))){
+      var antes=t.slice(last,m.index);
+      if(m[1]){fr.appendChild(document.createTextNode(antes+m[1]));e=document.createElement('sub');e.textContent=m[2].replace(/[{}]/g,'');}
+      else if(m[3]){fr.appendChild(document.createTextNode(antes));e=document.createElement('sup');e.textContent=m[3].replace(/[{}()]/g,'');}
+      else{fr.appendChild(document.createTextNode(antes));e=document.createElement('sub');
+        e.textContent=m[4].split('').map(function(c){return ASC[UNI.indexOf(c)];}).join('');}
+      fr.appendChild(e); last=US.lastIndex;
+    }
+    fr.appendChild(document.createTextNode(t.slice(last)));
+    p.replaceChild(fr,n);
+  }
+  function recorrer(r){
+    if(r.nodeType===3){arreglar(r);return;}
+    if(r.nodeType!==1||SALTA[r.nodeName]) return;
+    var w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT,null), l=[], n;
+    while((n=w.nextNode())) l.push(n);
+    l.forEach(arreglar);
+  }
+  function inicio(){
+    recorrer(document.body);
+    new MutationObserver(function(ms){ms.forEach(function(m){
+      if(m.type==='characterData') arreglar(m.target); else m.addedNodes.forEach(recorrer);
+    });}).observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',inicio); else inicio();
+})();
+</script>
+<!-- tipografia:fin -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
+<title>Acoplamiento de impedancias: transformador λ/4 y stub</title>
+<!-- seo:inicio -->
+<meta name="description" content="Diseña el acoplamiento de una antena con un transformador de cuarto de onda o un stub en paralelo, sigue el recorrido en la carta de Smith y compara el ancho de banda.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Acoplamiento_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Acoplamiento de impedancias: transformador λ/4 y stub">
+<meta property="og:description" content="Diseña el acoplamiento de una antena con un transformador de cuarto de onda o un stub en paralelo, sigue el recorrido en la carta de Smith y compara el ancho de banda.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Acoplamiento_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Acoplamiento de impedancias: transformador λ/4 y stub",
+ "description": "Diseña el acoplamiento de una antena con un transformador de cuarto de onda o un stub en paralelo, sigue el recorrido en la carta de Smith y compara el ancho de banda.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Acoplamiento_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "acoplamiento de impedancias",
+  "transformador de cuarto de onda",
+  "stub"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética: exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México, ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
+<style>
+  :root{--bg:#f3f1ec;--card:#fff;--ink:#191b22;--muted:#5c6070;--faint:#8a8fa0;--line:#e3e0d6;
+    --blue:#2456a6;--blueSoft:#4a7fd0;--red:#c0392b;--redSoft:#d9635a;--accent:#c96a1e;--green:#2f7d46;--greenSoft:#5aa871;--panel:#10141d;
+    --serif:"Spectral",Georgia,serif;--sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}}
+  :root[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#171a22;--ink:#eef0f6;--muted:#a2a7b8;--faint:#767c8f;--line:#282c38;--blue:#6f9be8;--blueSoft:#5480c8;--red:#e5776b;--redSoft:#c9564b;--accent:#e08a3e;--green:#6cc487;--greenSoft:#6cc487;--panel:#0a0d14;}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;margin:0}
+  .wrap{max-width:940px;margin:0 auto;padding-block:32px 40px;padding-left:16px;padding-right:16px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.6vw,40px);line-height:1.08;margin:.04em 0 .18em;text-wrap:balance}
+  .lede{font-size:17px;color:var(--muted);max-width:64ch;margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:22px;box-shadow:0 1px 3px rgba(20,20,40,.05)}
+  .sec-tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+  .note{font-size:14.5px;color:var(--muted)}
+  canvas{width:100%;display:block;border-radius:10px}
+  .panelcanvas{background:var(--panel)}
+  .grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:22px;align-items:start}
+  @media (max-width:680px){.grid2{grid-template-columns:1fr}}
+  .grid2>*{min-width:0}
+  .ctrl label{display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin:12px 0 6px}
+  .ctrl label b{font-family:var(--mono);color:var(--accent);font-weight:500}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:7px 12px;cursor:pointer}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .tile{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .tile .k{font-size:12px;color:var(--muted)} .tile .v{font-family:var(--mono);font-size:16.5px;font-weight:500;color:var(--ink)}
+  .tile.key{border-color:var(--accent)} .tile.key .v{color:var(--accent)}
+  .legend{display:flex;gap:16px;font-size:13px;flex-wrap:wrap;margin-top:10px;color:var(--muted)}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:middle;margin-right:6px}
+  .eq{font-family:var(--serif);font-size:16px;font-style:normal;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 15px;text-align:center;margin:12px 0;overflow-x:auto;letter-spacing:.01em;line-height:1.7}
+  .eq var{font-style:italic;color:var(--accent)}
+  .eq sub,.eq sup{font-style:normal;font-size:.72em}
+  .eq .op{font-style:normal;color:var(--muted);padding:0 .08em}
+  .credits{margin-top:30px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
+  .credits a{color:var(--blue)} .credits b{color:var(--ink)}
+  .cnat{font-family:var(--mono);font-weight:600;color:var(--green);white-space:nowrap;font-style:normal}
+  .vinc{font-style:italic;color:var(--accent);font-weight:600}
+  .convleg{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .convleg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 4px 0 10px}
+  .inrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px}
+  .inbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .inbox label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:400}
+  .inbox input{width:100%;min-width:0;font-family:var(--mono);font-size:15px;background:var(--card);color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  details.card summary{cursor:pointer;font-family:var(--serif);font-size:19px;font-weight:600;list-style:none}
+  details.card summary::-webkit-details-marker{display:none}
+  details.card summary::after{content:" ▸";color:var(--accent)} details.card[open] summary::after{content:" ▾"}
+  @media (max-width:560px){.tiles{grid-template-columns:1fr 1fr!important;gap:8px}h1{font-size:26px}.card{padding:18px 16px}}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:12px;max-width:100%}
+  .seg .btn{border:0;border-radius:0;margin:0}
+  .seg .btn+.btn{border-left:1px solid var(--line)}
+  .seg .btn[aria-pressed="true"]{background:var(--accent);color:#fff}
+  .btnx{border-color:var(--accent);color:var(--accent)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .reto{font-size:15px;background:var(--bg);border:1px dashed var(--accent);border-radius:9px;padding:9px 12px;margin-top:6px}
+  .fb{margin-top:10px;font-size:14.5px;line-height:1.55}
+  .fb p{margin:4px 0}
+  .fb .ok{color:var(--green)} .fb .no{color:var(--red)}
+  ol.pasos{padding-left:22px;margin:12px 0 0}
+  ol.pasos li{margin:7px 0}
+  .tile .v{overflow-wrap:anywhere}
+  /* propio de este explorador: tablas de soluciones, lista de pasos numerada y tabla de práctica */
+  .tbw{overflow-x:auto;margin-top:12px}
+  table.sol{border-collapse:collapse;width:100%;font-size:13px}
+  table.sol th,table.sol td{border-bottom:1px solid var(--line);padding:6px 5px;text-align:right;white-space:nowrap}
+  table.sol th{font-weight:600;color:var(--muted);font-size:12px}
+  table.sol th:first-child,table.sol td:first-child{text-align:left}
+  table.sol td{font-family:var(--mono)}
+  table.sol tr.sel td{background:var(--bg);color:var(--accent)}
+  table.sol label{display:inline-flex;gap:5px;align-items:center;cursor:pointer;font-family:var(--sans);font-weight:600}
+  table.sol input[type=radio]{accent-color:var(--accent);margin:0}
+  table.sol input[type=number]{width:74px;font-family:var(--mono);font-size:14px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:4px 6px}
+  ol.steps{list-style:none;padding:0;margin:12px 0 0;counter-reset:st}
+  ol.steps li{position:relative;padding-left:32px;margin:9px 0;font-size:14.5px;line-height:1.5}
+  ol.steps li::before{counter-increment:st;content:counter(st);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;
+    background:var(--c,var(--accent));color:#fff;font-family:var(--mono);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .ver{font-size:13px;color:var(--green);margin-top:10px}
+  .cmp{font-size:14.5px;margin:12px 0 0}
+  .refs{font-style:italic}
+  .linkcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:10px}
+  .linkcards a{display:block;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 13px;color:var(--ink);text-decoration:none;font-size:14px}
+  .linkcards a b{color:var(--blue)}
+  .sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  ul.pred{margin:8px 0 0;padding-left:20px;font-size:14.5px}
+  ul.pred li{margin:5px 0}
+</style>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Teoría Electromagnética · Unidad 4 · temas 4.8–4.9 · P15</p>
+    <h1>Acoplamiento de impedancias: transformador λ/4 y stub</h1>
+    <p class="lede">Cuando la antena no tiene la misma impedancia que el cable, parte de la potencia se regresa al transmisor. Acoplar es añadir algo sencillo (un tramo de línea de otra impedancia, o un tramo en corto conectado en paralelo) para que, vista desde el cable, la carga parezca exactamente Z<sub>0</sub>. Así toda la potencia llega a la antena, el amplificador de salida no recibe ecos que lo calienten o lo dañen, y cumplimos la especificación típica de pérdida de retorno RL ≥ 10 dB (menos del 10&nbsp;% de la potencia reflejada).</p>
+  </header>
+
+  <section class="card">
+    <p class="sec-tag">Datos · línea, carga y frecuencia de diseño</p>
+    <div class="inrow">
+      <div class="inbox"><label for="inZ0"><span class="vinc">Z</span><sub>0</sub> (Ω)</label><input id="inZ0" type="number" step="any" min="1" inputmode="decimal"></div>
+      <div class="inbox"><label for="inRL"><span class="vinc">R</span><sub>L</sub> (Ω)</label><input id="inRL" type="number" step="any" min="0.1" inputmode="decimal"></div>
+      <div class="inbox"><label for="inXL"><span class="vinc">X</span><sub>L</sub> (Ω)</label><input id="inXL" type="number" step="any" inputmode="decimal"></div>
+      <div class="inbox"><label for="inF"><span class="vinc">f</span><sub>0</sub> (GHz)</label><input id="inF" type="number" step="any" min="0.001" inputmode="decimal"></div>
+      <div class="inbox"><label for="inVF">factor de velocidad <span class="vinc">v</span>/<span class="cnat">c</span></label><input id="inVF" type="number" step="any" min="0.1" max="1" inputmode="decimal"></div>
+    </div>
+    <div class="row" aria-label="Cargas de ejemplo">
+      <button class="btn" type="button" data-zl="100,0">100 Ω</button>
+      <button class="btn" type="button" data-zl="25,0">25 Ω</button>
+      <button class="btn" type="button" data-zl="100,50">100 + j50 Ω</button>
+      <button class="btn" type="button" data-zl="30,-40">30 − j40 Ω</button>
+      <button class="btn" type="button" data-zl="73,42.5">dipolo 73 + j42.5 Ω</button>
+    </div>
+    <p class="note" style="margin:10px 0 0">La frecuencia y el factor de velocidad solo sirven para pasar las longitudes de λ a centímetros: en la línea, λ = (<span class="vinc">v</span>/<span class="cnat">c</span>)·<span class="cnat">c</span>/<span class="vinc">f</span><sub>0</sub> = <b id="olam">…</b>. El valor 0.66 corresponde al coaxial RG-58 (dieléctrico de polietileno sólido).</p>
+    <div class="seg" role="group" aria-label="Método de acoplamiento">
+      <button class="btn" id="mQ" type="button" aria-pressed="false">Transformador λ/4</button>
+      <button class="btn" id="mS" type="button" aria-pressed="true">Stub en paralelo (corto)</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag" id="tagCarta">Carta de Smith · el diseño paso a paso</p>
+    <div class="grid2">
+      <div>
+        <canvas id="sm" role="img" aria-label="Carta de Smith con los pasos del acoplamiento" class="panelcanvas" height="460"></canvas>
+        <div class="legend" id="leg"></div>
+      </div>
+      <div>
+        <ol class="steps" id="steps"></ol>
+        <div class="tbw"><table class="sol" id="tsol"></table></div>
+        <div class="tiles" id="tiles"></div>
+        <p class="ver" id="ver" aria-live="polite">…</p>
+      </div>
+    </div>
+    <p class="note" id="nota" style="margin-top:12px"></p>
+  </section>
+
+  <section class="card">
+    <p class="sec-tag">Ancho de banda · |Γ<sub>in</sub>| contra la frecuencia</p>
+    <canvas id="bw" role="img" aria-label="Magnitud del coeficiente de reflexión a la entrada contra f/f0 para ambos métodos" class="panelcanvas" height="300"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--accent);border-radius:2px;height:3px;width:16px"></i>transformador λ/4 (<span id="lgQ">…</span>)</span>
+      <span><i style="background:var(--blueSoft);border-radius:2px;height:3px;width:16px"></i>stub en corto (<span id="lgS">…</span>)</span>
+      <span><i style="background:transparent;border-top:2px dashed #b8bccb;border-radius:0;height:0;width:16px"></i>|Γ| = 0.333 (S = 2) y 0.316 (RL = 10 dB)</span>
+    </div>
+    <div class="tiles">
+      <div class="tile key"><div class="k">ancho de banda con S ≤ 2, λ/4</div><div class="v" id="bwQ">…</div></div>
+      <div class="tile ytile" style="border-color:var(--blueSoft)"><div class="k">ancho de banda con S ≤ 2, stub</div><div class="v" id="bwS" style="color:var(--blue)">…</div></div>
+    </div>
+    <p class="cmp" id="cmp">…</p>
+    <p class="note">Suposiciones: la carga vale lo mismo a todas las frecuencias (una antena real no lo cumple, así que esto mide solo lo que aporta la red de acoplamiento) y todas las longitudes eléctricas escalan con la frecuencia, βd = 2π(d/λ<sub>0</sub>)(f/f<sub>0</sub>), sin pérdidas ni dispersión. El ancho de banda fraccional es (f<sub>2</sub> − f<sub>1</sub>)/f<sub>0</sub>, con f<sub>1</sub> y f<sub>2</sub> los bordes de la banda continua alrededor de f<sub>0</sub> donde |Γ<sub>in</sub>| ≤ 1/3.</p>
+  </section>
+
+  <details class="card" open>
+    <summary>Paso a paso: Z<sub>L</sub> = 100 + j50 Ω sobre Z<sub>0</sub> = 50 Ω</summary>
+    <p class="note" style="margin-top:10px">Diseñamos el stub en corto en paralelo, y al final el transformador λ/4 para comparar. Frecuencia de diseño 1 GHz, coaxial con factor de velocidad 0.66: λ = 0.66 × 30 cm ≈ 19.79 cm.</p>
+    <ol class="pasos">
+      <li><b>Normalizar.</b> Dividimos entre Z<sub>0</sub> para trabajar con números que no dependen del cable: z<sub>L</sub> = (100 + j50)/50 = 2 + j1. Con esto Γ<sub>L</sub> = (z<sub>L</sub> − 1)/(z<sub>L</sub> + 1) = 0.4 + j0.2 = 0.447 ∠ 26.6° y S = 2.62.</li>
+      <li><b>¿Qué es una admitancia y por qué la usamos?</b> La admitancia es el inverso de la impedancia, Y = 1/Z: dice cuánta corriente deja pasar un elemento por cada volt (se mide en siemens). El stub se conecta <b>en paralelo</b> con la línea: los dos ven el mismo voltaje y sus corrientes se suman, así que sus admitancias también se suman. Por eso, para elementos en paralelo, conviene trabajar en admitancia: sumar es más fácil que combinar impedancias en paralelo.</li>
+      <li><b>Pasar a admitancia.</b> y<sub>L</sub> = 1/z<sub>L</sub> = 1/(2 + j1) = (2 − j1)/5 = 0.4 − j0.2 (Y<sub>L</sub> = 8 − j4 mS). En la carta es el punto diametralmente opuesto a z<sub>L</sub>.</li>
+      <li><b>La meta.</b> En el punto donde conectaremos el stub necesitamos que la línea presente y(d) = 1 + j<var>b</var>: la parte real ya correcta (<var>g</var> = 1) y una parte imaginaria que el stub cancelará. En la carta, eso es llegar al círculo <var>g</var> = 1.</li>
+      <li><b>Buscar d.</b> Con <var>t</var> = tan β<var>d</var>, la condición Re{y(d)} = 1 da (Pozar, §5.2) <var>t</var> = [X<sub>L</sub> ± √(R<sub>L</sub>[(Z<sub>0</sub> − R<sub>L</sub>)<sup>2</sup> + X<sub>L</sub><sup>2</sup>]/Z<sub>0</sub>)]/(R<sub>L</sub> − Z<sub>0</sub>) = (50 ± 100)/50, es decir <var>t</var><sub>1</sub> = 3 y <var>t</var><sub>2</sub> = −1. Entonces d<sub>1</sub>/λ = arctan(3)/(2π) = 0.1988 y d<sub>2</sub>/λ = [π + arctan(−1)]/(2π) = 0.375. Son las dos veces por vuelta que el círculo de |Γ| = 0.447 corta al círculo <var>g</var> = 1.</li>
+      <li><b>Leer la susceptancia en cada d.</b> y(d<sub>1</sub>) = 1 + j1 (<var>b</var><sub>1</sub> = +1) y y(d<sub>2</sub>) = 1 − j1 (<var>b</var><sub>2</sub> = −1). La parte real es 1 en ambos: lo comprobamos con la fórmula de la línea, Z(d) = Z<sub>0</sub>(Z<sub>L</sub> + jZ<sub>0</sub><var>t</var>)/(Z<sub>0</sub> + jZ<sub>L</sub><var>t</var>).</li>
+      <li><b>Cancelar con el stub.</b> El stub debe aportar −j<var>b</var>. Un tramo en corto de longitud ℓ tiene y = −j cot βℓ, así que pedimos cot βℓ = <var>b</var>. Solución 1: cot βℓ<sub>1</sub> = 1, βℓ<sub>1</sub> = π/4, ℓ<sub>1</sub> = 0.125 λ. Solución 2: cot βℓ<sub>2</sub> = −1, βℓ<sub>2</sub> = 3π/4, ℓ<sub>2</sub> = 0.375 λ.</li>
+      <li><b>Pasar a centímetros.</b> Con λ = 19.79 cm: solución 1, d<sub>1</sub> = 3.93 cm y ℓ<sub>1</sub> = 2.47 cm; solución 2, d<sub>2</sub> = 7.42 cm y ℓ<sub>2</sub> = 7.42 cm.</li>
+      <li><b>Verificar.</b> En d<sub>1</sub>: y = (1 + j1) + (−j1) = 1, es decir Z<sub>in</sub> = 50 Ω y Γ<sub>in</sub> = 0. El explorador lo recalcula con la fórmula de la línea y obtiene |Γ<sub>in</sub>| del orden de 10<sup>−16</sup> (error de redondeo).</li>
+      <li><b>Comparar con el transformador λ/4.</b> La carga es compleja, así que primero giramos hasta un punto donde la impedancia sea real: el primer máximo de voltaje está a d<sub>máx</sub> = 0.0369 λ (0.73 cm), donde Z = S·Z<sub>0</sub> = 130.9 Ω; ahí un transformador de Z<sub>T</sub> = √(50 × 130.9) = 80.9 Ω y λ/4 = 4.95 cm de largo acopla. La otra opción es el mínimo, a 0.2869 λ, con Z = Z<sub>0</sub>/S = 19.1 Ω y Z<sub>T</sub> = 30.9 Ω.</li>
+      <li><b>Ancho de banda (S ≤ 2).</b> Transformador en d<sub>máx</sub>: 73.8 %; stub, solución 1: 39.9 %; stub, solución 2: 18.2 %. La solución más corta del stub es la de mayor ancho de banda: cuanto menos línea hay entre la carga y el punto acoplado, menos cambia la fase cuando cambia la frecuencia.</li>
+    </ol>
+    <div class="row"><button class="btn btnx" id="cargaEj" type="button">Cargar este ejemplo en el explorador</button></div>
+  </details>
+
+  <section class="card">
+    <p class="sec-tag">Para la práctica P15 (carta de Smith y acoplamiento)</p>
+    <p class="note" style="margin-top:0">Antes del laboratorio, con la carga que tengas en el explorador, predecimos en una carta impresa:</p>
+    <ul class="pred">
+      <li>dónde cae y<sub>L</sub> y cuánto vale S (el radio del círculo que recorreremos);</li>
+      <li>las dos distancias d en que el círculo de S corta al círculo <var>g</var> = 1, y el signo de <var>b</var> en cada una;</li>
+      <li>la longitud ℓ del stub en corto para cada solución, y cuál de las dos es más corta en total (d + ℓ);</li>
+      <li>qué esperamos medir si nos equivocamos en d por 1 mm: ¿S sube poco o mucho? (pruébalo cambiando la frecuencia en la gráfica de ancho de banda).</li>
+    </ul>
+    <div class="reto" id="pReto" style="margin-top:12px">…</div>
+    <div class="tbw">
+      <table class="sol" id="tprac">
+        <tr><th scope="col">solución</th><th scope="col">d/λ</th><th scope="col">ℓ/λ</th></tr>
+        <tr><td>1 (d menor)</td><td><label class="sr" for="p_d1">d/λ solución 1</label><input id="p_d1" type="number" step="any" min="0" inputmode="decimal"></td><td><label class="sr" for="p_l1">ℓ/λ solución 1</label><input id="p_l1" type="number" step="any" min="0" inputmode="decimal"></td></tr>
+        <tr id="pRow2"><td>2</td><td><label class="sr" for="p_d2">d/λ solución 2</label><input id="p_d2" type="number" step="any" min="0" inputmode="decimal"></td><td><label class="sr" for="p_l2">ℓ/λ solución 2</label><input id="p_l2" type="number" step="any" min="0" inputmode="decimal"></td></tr>
+      </table>
+    </div>
+    <div class="row">
+      <button class="btn btnx" id="pChk" type="button">Comprobar</button>
+      <button class="btn" id="pSol" type="button">Mostrar solución</button>
+      <button class="btn" id="pClr" type="button">Borrar</button>
+    </div>
+    <div class="fb" id="pFb" aria-live="polite"></div>
+    <p class="note">Tolerancia: ±0.005 λ en cada valor (lo que se alcanza a leer en una carta impresa). Las distancias se comparan módulo λ/2, porque la impedancia sobre la línea se repite cada media longitud de onda.</p>
+  </section>
+
+  <details class="card" open>
+    <summary>Formulario</summary>
+    <div class="eq"><var>Z</var><sub>T</sub> <span class="op">=</span> √(<var>Z</var><sub>0</sub> <var>R</var>)&emsp;(transformador λ/4 entre <var>Z</var><sub>0</sub> y una resistencia <var>R</var>)<span class="op">;</span>&emsp;<var>R</var> <span class="op">=</span> <var>S</var>·<var>Z</var><sub>0</sub> en <var>d</var><sub>máx</sub>, <var>Z</var><sub>0</sub>/<var>S</var> en <var>d</var><sub>mín</sub></div>
+    <div class="eq"><var>y</var> <span class="op">=</span> 1/<var>z</var> <span class="op">=</span> (1 − <var>Γ</var>)/(1 + <var>Γ</var>)<span class="op">,</span>&emsp;<var>Γ</var>(<var>d</var>) <span class="op">=</span> <var>Γ</var><sub>L</sub> e<sup>−j2β<var>d</var></sup><span class="op">,</span>&emsp;β <span class="op">=</span> 2π/λ</div>
+    <div class="eq">stub en corto: <var>y</var> <span class="op">=</span> −j cot βℓ<span class="op">;</span>&emsp;stub abierto: <var>y</var> <span class="op">=</span> j tan βℓ<span class="op">;</span>&emsp;condición: <var>y</var>(<var>d</var>) <span class="op">=</span> 1 + j<var>b</var>, stub <span class="op">=</span> −j<var>b</var></div>
+    <div class="eq"><var>t</var> <span class="op">=</span> tan β<var>d</var> <span class="op">=</span> [<var>X</var><sub>L</sub> ± √(<var>R</var><sub>L</sub>[(<var>Z</var><sub>0</sub> − <var>R</var><sub>L</sub>)<sup>2</sup> + <var>X</var><sub>L</sub><sup>2</sup>]/<var>Z</var><sub>0</sub>)]/(<var>R</var><sub>L</sub> − <var>Z</var><sub>0</sub>)<span class="op">,</span>&emsp;ℓ/λ <span class="op">=</span> (1/2π) arctan(1/<var>b</var>)&emsp;(mód 1/2)</div>
+    <div class="eq">RL <span class="op">=</span> −20 log<sub>10</sub>|<var>Γ</var>| dB<span class="op">,</span>&emsp;<var>S</var> <span class="op">=</span> (1 + |<var>Γ</var>|)/(1 − |<var>Γ</var>|)&emsp;(RL = 10 dB ⇔ |<var>Γ</var>| = 0.316 ⇔ <var>S</var> = 1.92)</div>
+    <p class="convleg">Convención de color en todo el sitio: <i style="background:var(--green)"></i><span class="cnat">constantes de la naturaleza</span> · <i style="background:var(--accent)"></i><span class="vinc">variables y cantidades por determinar</span>. Aquí la única constante es la rapidez de la luz <span class="cnat">c</span>, que solo entra al pasar a centímetros.</p>
+  </details>
+
+  <section class="card">
+    <p class="sec-tag">Para seguir</p>
+    <div class="linkcards">
+      <a href="Smith_explorador.html"><b>Carta de Smith</b><br>Leer z, Γ, S, V<sub>máx</sub> y V<sub>mín</sub>, y girar hacia el generador.</a>
+      <a href="ImpedanciaEntrada_explorador.html"><b>Impedancia de entrada</b><br>Líneas cortas como reactancias: por qué un stub en corto se comporta como bobina o capacitor.</a>
+    </div>
+  </section>
+
+  <div class="credits">
+    <p><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+    <p><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Acoplamiento de impedancias: explorador interactivo</i> (Versión 1.3.1) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+    <p class="refs">Referencias: Pozar, D. M. (2012). Microwave Engineering, 4.ª ed., Wiley, cap. 5; Ulaby, F. T., &amp; Ravaioli, U. (2015). Fundamentals of Applied Electromagnetics, 7.ª ed., Pearson, §2.8–2.11.</p>
+  </div>
+</div>
+<script>
+(function(){
+  var C=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  var PI=Math.PI, CLUZ=29.9792458; // c en cm·GHz
+  var Z0=50, RL=100, XL=50, F0=1, VF=0.66, met='stub', sQ=0, sS=0;
+  function $(id){return document.getElementById(id);}
+  // ---- álgebra compleja ----
+  function cm(a,b){return [a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]];}
+  function cdiv(a,b){var d=b[0]*b[0]+b[1]*b[1];return [(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d];}
+  function cadd(a,b){return [a[0]+b[0],a[1]+b[1]];}
+  function gam(z){return cdiv([z[0]-1,z[1]],[z[0]+1,z[1]]);}
+  function rot(G,d){var ph=-4*PI*d,c=Math.cos(ph),s=Math.sin(ph);return [G[0]*c-G[1]*s,G[0]*s+G[1]*c];}
+  function neg(G){return [-G[0],-G[1]];}
+  function mod05(v){v=v%0.5;if(v<0)v+=0.5;if(v>=0.5-1e-12)v=0;return v;}
+  // impedancia normalizada (a Z0) a la entrada de un tramo de impedancia zc (normalizada) con carga zl; t = tan(βx)
+  function zline(zl,zc,t){
+    if(!isFinite(t)) return cdiv([zc*zc,0],zl);
+    return cm([zc,0],cdiv(cadd(zl,[0,zc*t]),cadd([zc,0],cm([0,t],zl))));}
+  function menos(t){return String(t).replace(/-/g,'−');}
+  function fmtC(z,dec){dec=dec===undefined?2:dec;
+    if(!isFinite(z[0])||!isFinite(z[1])) return '∞';
+    var re=z[0],im=z[1];
+    if(Math.abs(im)<0.5*Math.pow(10,-dec)) return menos(re.toFixed(dec));
+    if(Math.abs(re)<0.5*Math.pow(10,-dec)) return (im>=0?'j':'−j')+Math.abs(im).toFixed(dec);
+    return menos(re.toFixed(dec))+(im>=0?' + j':' − j')+Math.abs(im).toFixed(dec);}
+  function fmtE(v){ if(v===0) return '0'; var s=v.toExponential(1).split('e'); return s[0]+' × 10<sup>'+menos(String(+s[1]))+'</sup>'; }
+  // ---- diseño ----
+  function stubSol(R,X,Z){ // Pozar (2012), §5.2, stub en paralelo
+    var ts=[], zl=[R/Z,X/Z];
+    if(Math.abs(R-Z)<1e-9*Z){ ts.push(-X/(2*Z)); if(Math.abs(X)>1e-9*Z) ts.push(Infinity); }
+    else { var q=Math.sqrt(R*((Z-R)*(Z-R)+X*X)/Z); ts.push((X+q)/(R-Z),(X-q)/(R-Z)); }
+    var out=ts.map(function(t){
+      var d=!isFinite(t)?0.25:(t>=0?Math.atan(t)/(2*PI):(PI+Math.atan(t))/(2*PI));
+      var y=cdiv([1,0],zline(zl,1,t)), b=y[1];
+      var l=Math.abs(b)<1e-12?0.25:mod05(Math.atan(1/b)/(2*PI));
+      return {d:d,b:b,g:y[0],l:l};});
+    out.sort(function(a,b){return a.d-b.d;});
+    return out;}
+  function qwSol(R,X,Z){
+    var G=gam([R/Z,X/Z]), a=Math.hypot(G[0],G[1]), th=Math.atan2(G[1],G[0]), S=(1+a)/(1-a);
+    if(Math.abs(X)<1e-9*Z) return [{d:0,R:R,ZT:Math.sqrt(Z*R),k:'carga'}];
+    var o=[{d:mod05(th/(4*PI)),R:S*Z,ZT:Z*Math.sqrt(S),k:'max'},{d:mod05((th+PI)/(4*PI)),R:Z/S,ZT:Z/Math.sqrt(S),k:'min'}];
+    o.sort(function(p,q){return p.d-q.d;}); return o;}
+  // |Γ_in| a f/f0 = fr (carga constante, longitudes eléctricas proporcionales a f)
+  function gS(s,fr){ var zl=[RL/Z0,XL/Z0], y=cdiv([1,0],zline(zl,1,Math.tan(2*PI*s.d*fr)));
+    var yt=cadd(y,[0,-1/Math.tan(2*PI*s.l*fr)]); var G=gam(cdiv([1,0],yt)); return Math.hypot(G[0],G[1]); }
+  function gQ(o,fr){ var z=zline([RL/Z0,XL/Z0],1,Math.tan(2*PI*o.d*fr)); z=zline(z,o.ZT/Z0,Math.tan(2*PI*0.25*fr));
+    var G=gam(z); return Math.hypot(G[0],G[1]); }
+  function band(fn){ var lim=1/3, h=5e-4, lo=1, hi=1;
+    if(!(fn(1)<=lim)) return {lo:1,hi:1,bw:0,oL:false,oH:false};
+    while(lo-h>=0.5-1e-9&&fn(lo-h)<=lim) lo-=h;
+    while(hi+h<=1.5+1e-9&&fn(hi+h)<=lim) hi+=h;
+    return {lo:lo,hi:hi,bw:hi-lo,oL:lo<=0.5+1e-6,oH:hi>=1.5-1e-6}; }
+  var D=null;
+  function calc(){
+    var GL=gam([RL/Z0,XL/Z0]), a=Math.hypot(GL[0],GL[1]);
+    D={GL:GL,a:a,S:a>=0.999999?Infinity:(1+a)/(1-a),st:stubSol(RL,XL,Z0),qw:qwSol(RL,XL,Z0),lam:VF*CLUZ/F0};
+    if(sS>=D.st.length) sS=0; if(sQ>=D.qw.length) sQ=0;
+    D.st.forEach(function(s){s.v=gS(s,1);s.B=band(function(f){return gS(s,f);});});
+    D.qw.forEach(function(o){o.v=gQ(o,1);o.B=band(function(f){return gQ(o,f);});});
+  }
+  // ---- carta de Smith (rejilla del explorador de la carta de Smith) ----
+  function grid(c,mode){
+    var dpr=window.devicePixelRatio||1,r=c.getBoundingClientRect(),W=Math.max(280,r.width),H=Math.round(W+44);
+    c.style.height=H+'px'; c.width=W*dpr; c.height=H*dpr; var x=c.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0);
+    var cx=W/2, cy=H/2, R=W/2-42, mono=C('--mono')+',monospace', sans=C('--sans')+',sans-serif';
+    x.fillStyle=C('--panel'); x.fillRect(0,0,W,H);
+    x.save(); x.beginPath(); x.arc(cx,cy,R,0,6.2832); x.clip(); x.lineWidth=1;
+    [0.2,0.5,1,2,5].forEach(function(rr){ x.strokeStyle=rr===1?'rgba(255,255,255,.34)':'rgba(255,255,255,.16)';
+      x.beginPath(); x.arc(cx+R*rr/(1+rr),cy,R/(1+rr),0,6.2832); x.stroke(); });
+    [0.2,0.5,1,2,5].forEach(function(xx){ [1,-1].forEach(function(sg){ x.strokeStyle='rgba(255,255,255,.14)';
+      x.beginPath(); x.arc(cx+R,cy-sg*R/xx,R/xx,0,6.2832); x.stroke(); }); });
+    x.strokeStyle='rgba(255,255,255,.34)'; x.beginPath(); x.moveTo(cx-R,cy); x.lineTo(cx+R,cy); x.stroke();
+    if(mode==='y'){ x.strokeStyle=C('--greenSoft'); x.lineWidth=2.5; x.beginPath(); x.arc(cx+R/2,cy,R/2,0,6.2832); x.stroke(); }
+    x.restore();
+    x.strokeStyle='rgba(255,255,255,.5)'; x.lineWidth=1.5; x.beginPath(); x.arc(cx,cy,R,0,6.2832); x.stroke();
+    x.fillStyle='rgba(255,255,255,.55)'; x.font='11px '+mono; x.textAlign='center'; x.textBaseline='alphabetic';
+    [[0.2,'0.2'],[0.5,'0.5'],[1,'1'],[2,'2'],[5,'5']].forEach(function(p){ x.fillText(p[1],cx+R*((p[0]-1)/(p[0]+1)),cy-5); });
+    x.fillText('0',cx-R+9,cy-5); x.fillText('∞',cx+R-9,cy-5);
+    x.fillText(mode==='y'?'+jb (capacitivo)':'+jx (inductivo)',cx,cy-R+18);
+    x.fillText(mode==='y'?'−jb (inductivo)':'−jx (capacitivo)',cx,cy+R-9);
+    var rr0=R+4;
+    x.strokeStyle='rgba(255,255,255,.4)'; x.lineWidth=1; x.beginPath(); x.arc(cx,cy,rr0,0,6.2832); x.stroke();
+    for(var k=0;k<50;k++){ var ph=PI-4*PI*k/100, cs=Math.cos(ph), sn=-Math.sin(ph), L=(k%5===0)?8:4;
+      x.strokeStyle=(k%5===0)?'rgba(255,255,255,.6)':'rgba(255,255,255,.35)';
+      x.beginPath(); x.moveTo(cx+rr0*cs,cy+rr0*sn); x.lineTo(cx+(rr0+L)*cs,cy+(rr0+L)*sn); x.stroke(); }
+    x.fillStyle='rgba(255,255,255,.7)'; x.font='11px '+mono; x.textBaseline='middle';
+    for(k=5;k<50;k+=5){ var p2=PI-4*PI*k/100, lb=(k/100).toFixed(2), rl=R+17+x.measureText(lb).width/2*Math.abs(Math.cos(p2))+5*Math.abs(Math.sin(p2));
+      x.fillText(lb,cx+rl*Math.cos(p2),cy-rl*Math.sin(p2)); }
+    x.fillText('0',cx-R-25,cy-7); x.fillText('0.5',cx-R-25,cy+8);
+    x.textBaseline='alphabetic'; x.fillStyle='rgba(255,255,255,.62)'; x.font='11px '+sans;
+    x.fillText(mode==='y'?'carta de admitancias · hacia el generador ⟳':'carta de impedancias · hacia el generador ⟳',cx,15);
+    return {x:x,cx:cx,cy:cy,R:R,W:W,H:H,mono:mono,sans:sans,PX:function(q){return cx+q[0]*R;},PY:function(q){return cy-q[1]*R;}};
+  }
+  function marker(x,X,Y,shape,col,r){
+    x.lineWidth=2; x.strokeStyle=C('--panel');
+    if(shape==='sq'){ x.fillStyle=col; x.beginPath(); x.rect(X-r,Y-r,2*r,2*r); x.fill(); x.stroke(); return; }
+    if(shape==='hollow'){ x.fillStyle=C('--panel'); x.beginPath(); x.arc(X,Y,r,0,6.2832); x.fill(); x.strokeStyle=col; x.stroke(); return; }
+    x.fillStyle=col; x.beginPath(); x.arc(X,Y,r,0,6.2832); x.fill(); x.stroke();
+  }
+  function poly(g,pts,col,w,dash){ var x=g.x; x.strokeStyle=col; x.lineWidth=w; x.setLineDash(dash||[]);
+    x.beginPath(); pts.forEach(function(p,i){ var X=g.PX(p),Y=g.PY(p); if(i)x.lineTo(X,Y); else x.moveTo(X,Y); }); x.stroke(); x.setLineDash([]); }
+  function arrow(g,pts,col){ if(pts.length<3)return; var n=pts.length, k=Math.max(0,n-1-Math.ceil(n/14)), a=pts[k], b=pts[n-1];
+    var X1=g.PX(a),Y1=g.PY(a),X2=g.PX(b),Y2=g.PY(b), L=Math.hypot(X2-X1,Y2-Y1); if(L<2)return;
+    var ux=(X2-X1)/L, uy=(Y2-Y1)/L, x=g.x; x.fillStyle=col; x.beginPath();
+    x.moveTo(X2,Y2); x.lineTo(X2-10*ux-4.5*uy,Y2-10*uy+4.5*ux); x.lineTo(X2-10*ux+4.5*uy,Y2-10*uy-4.5*ux); x.closePath(); x.fill(); }
+  function badge(g,n,q,ux,uy,col){ var x=g.x, X=g.PX(q)+ux*19, Y=g.PY(q)-uy*19;
+    x.fillStyle=col; x.strokeStyle=C('--panel'); x.lineWidth=2; x.beginPath(); x.arc(X,Y,9.5,0,6.2832); x.fill(); x.stroke();
+    x.fillStyle='#10141d'; x.font='700 12px '+g.mono; x.textAlign='center'; x.textBaseline='middle'; x.fillText(n,X,Y+0.5);
+    x.textBaseline='alphabetic'; x.textAlign='left'; }
+  function radial(q){ var m=Math.hypot(q[0],q[1]); return m>0.08?[q[0]/m,q[1]/m]:[0.707,0.707]; }
+  function arcRot(G,d){ var n=Math.max(2,Math.ceil(d*400)), p=[]; for(var i=0;i<=n;i++) p.push(rot(G,d*i/n)); return p; }
+  var cv=$('sm'), bc=$('bw');
+  function drawSmith(){
+    var mode=met==='stub'?'y':'z', g=grid(cv,mode), x=g.x, GL=D.GL, a=D.a;
+    var cA=C('--accent'), cG=C('--greenSoft'), cB=C('--blueSoft'), cR=C('--redSoft');
+    if(a>1e-4){ x.strokeStyle=cB; x.lineWidth=1.6; x.setLineDash([6,4]); x.beginPath(); x.arc(g.cx,g.cy,a*g.R,0,6.2832); x.stroke(); x.setLineDash([]); }
+    var u, end;
+    if(mode==='z'){
+      var o=D.qw[sQ], G2=rot(GL,o.d), p1=arcRot(GL,o.d);
+      if(o.d>1e-4){ poly(g,p1,cG,3); arrow(g,p1,cG); }
+      // trayectoria dentro del transformador: de R (real) al centro
+      var zt=o.ZT/Z0, zr=[o.R/Z0,0], p2=[];
+      for(var i=0;i<=120;i++){ var th=(PI/2)*i/120, t=i===120?Infinity:Math.tan(th); p2.push(gam(zline(zr,zt,t))); }
+      if(a>1e-4){ poly(g,p2,cR,2.5,[5,4]); arrow(g,p2,cR); }
+      marker(x,g.PX(G2),g.PY(G2),'c',cG,6);
+      marker(x,g.PX([0,0]),g.PY([0,0]),'c','#ffffff',5);
+      marker(x,g.PX(GL),g.PY(GL),'c',cA,8);
+      u=radial(GL); badge(g,'1',GL,u[0],u[1],cA);
+      if(o.d>1e-4){ u=radial(G2); badge(g,'2',G2,u[0]*0.8,0.6,cG); } else if(a>1e-4) badge(g,'2',GL,0,-1,cG);
+      end=p2[p2.length-8];
+    } else {
+      var s=D.st[sS], yL=neg(GL), y2=rot(yL,s.d), p3=arcRot(yL,s.d);
+      // z_L tenue y su punto opuesto y_L
+      x.strokeStyle='rgba(255,255,255,.35)'; x.lineWidth=1; x.setLineDash([4,4]);
+      x.beginPath(); x.moveTo(g.PX(GL),g.PY(GL)); x.lineTo(g.PX(yL),g.PY(yL)); x.stroke(); x.setLineDash([]);
+      if(s.d>1e-4){ poly(g,p3,cG,3); arrow(g,p3,cG); }
+      // recorrido sobre g = 1 hasta el centro (lo aporta el stub)
+      var f0=Math.atan2(y2[1],y2[0]-0.5), f1=(f0>=0?PI:-PI), p4=[];
+      for(var j=0;j<=100;j++){ var ff=f0+(f1-f0)*j/100; p4.push([0.5+0.5*Math.cos(ff),0.5*Math.sin(ff)]); }
+      if(Math.abs(s.b)>1e-4){ poly(g,p4,cR,3,[5,4]); arrow(g,p4,cR); }
+      marker(x,g.PX(GL),g.PY(GL),'hollow','rgba(255,255,255,.6)',6);
+      x.fillStyle='rgba(255,255,255,.7)'; x.font='600 12px '+g.sans; var ug=radial(GL); x.textAlign='center'; x.textBaseline='middle';
+      x.fillText('z_L',g.PX(GL)+ug[0]*20,g.PY(GL)-ug[1]*20); x.textBaseline='alphabetic';
+      marker(x,g.PX(y2),g.PY(y2),'c',cG,6);
+      marker(x,g.PX([0,0]),g.PY([0,0]),'c','#ffffff',5);
+      marker(x,g.PX(yL),g.PY(yL),'sq',cA,6.5);
+      u=radial(yL); badge(g,'1',yL,u[0],u[1],cA);
+      if(s.d>1e-4){ u=radial(y2); badge(g,'2',y2,u[0],u[1],cG); }
+      end=p4[p4.length-8];
+    }
+    // insignia 3 en el centro, del lado opuesto a la llegada
+    var m=Math.hypot(end[0],end[1]); if(m>1e-6) badge(g,'3',[0,0],-end[0]/m,-end[1]/m,cR); else badge(g,'3',[0,0],-0.707,0.707,cR);
+    x.font='11px '+g.sans; x.textAlign='center'; x.fillStyle='rgba(255,255,255,.75)';
+    x.fillText('S = '+(isFinite(D.S)?D.S.toFixed(2):'∞')+' · |Γ_L| = '+a.toFixed(3),g.cx,g.H-9);
+  }
+  function drawBW(){
+    var dpr=window.devicePixelRatio||1, r=bc.getBoundingClientRect(), W=Math.max(280,r.width), H=Math.round(Math.max(240,Math.min(340,W*0.5)));
+    bc.style.height=H+'px'; bc.width=W*dpr; bc.height=H*dpr; var x=bc.getContext('2d'); x.setTransform(dpr,0,0,dpr,0,0);
+    var mono=C('--mono')+',monospace', sans=C('--sans')+',sans-serif';
+    var L=40, Rm=12, T=16, B=34, pw=W-L-Rm, ph=H-T-B;
+    function X(f){return L+(f-0.5)*pw;} function Y(v){return T+(1-Math.min(1,v))*ph;}
+    x.fillStyle=C('--panel'); x.fillRect(0,0,W,H);
+    var o=D.qw[sQ], s=D.st[sS], act=met==='stub'?s.B:o.B;
+    if(act.bw>0){ x.fillStyle='rgba(255,255,255,.06)'; x.fillRect(X(act.lo),T,X(act.hi)-X(act.lo),ph); }
+    x.lineWidth=1; x.font='11px '+mono; x.fillStyle='rgba(255,255,255,.6)';
+    x.textAlign='center'; x.textBaseline='top';
+    for(var f=0.5;f<=1.5001;f+=0.1){ x.strokeStyle=Math.abs(f-1)<1e-6?'rgba(255,255,255,.3)':'rgba(255,255,255,.1)';
+      x.beginPath(); x.moveTo(X(f),T); x.lineTo(X(f),T+ph); x.stroke();
+      if(W>=420||Math.round(f*10)%2===1) x.fillText(f.toFixed(1),X(f),T+ph+5); }
+    x.textAlign='right'; x.textBaseline='middle';
+    for(var v=0;v<=1.0001;v+=0.2){ x.strokeStyle='rgba(255,255,255,.1)'; x.beginPath(); x.moveTo(L,Y(v)); x.lineTo(L+pw,Y(v)); x.stroke(); x.fillText(v.toFixed(1),L-6,Y(v)); }
+    x.textAlign='right'; x.textBaseline='alphabetic'; x.font='11px '+sans; x.fillStyle='rgba(255,255,255,.7)'; x.fillText('f/f_0',L+pw,H-4);
+    x.textAlign='left'; x.fillText('|Γ_in|',L+4,T+12);
+    x.setLineDash([5,4]); x.strokeStyle='rgba(255,255,255,.55)';
+    x.beginPath(); x.moveTo(L,Y(1/3)); x.lineTo(L+pw,Y(1/3)); x.stroke();
+    x.strokeStyle='rgba(255,255,255,.35)'; x.beginPath(); x.moveTo(L,Y(0.316)); x.lineTo(L+pw,Y(0.316)); x.stroke(); x.setLineDash([]);
+    x.fillStyle='rgba(255,255,255,.75)'; x.textAlign='left'; x.fillText('S = 2',L+4,Y(1/3)-5);
+    x.textAlign='right'; x.textBaseline='top'; x.fillText('RL = 10 dB',L+pw-4,Y(0.316)+4); x.textBaseline='alphabetic';
+    function curve(fn,col,w){ x.strokeStyle=col; x.lineWidth=w; x.beginPath();
+      for(var i=0;i<=500;i++){ var ff=0.5+i/500, yy=Y(fn(ff)); if(i)x.lineTo(X(ff),yy); else x.moveTo(X(ff),yy); } x.stroke(); }
+    var wq=met==='stub'?1.8:3, ws=met==='stub'?3:1.8;
+    if(met==='stub'){ curve(function(f){return gQ(o,f);},C('--accent'),wq); curve(function(f){return gS(s,f);},C('--blueSoft'),ws); }
+    else { curve(function(f){return gS(s,f);},C('--blueSoft'),ws); curve(function(f){return gQ(o,f);},C('--accent'),wq); }
+    bc.setAttribute('aria-label','|Γ_in| contra f/f0: ancho de banda con S ≤ 2 de '+pct(o.B)+' para el transformador y '+pct(s.B)+' para el stub');
+  }
+  function pct(B){ if(B.bw<=0) return '0\u00a0%'; var t=(100*B.bw).toFixed(1)+'\u00a0%'; return (B.oL||B.oH)?'≥ '+t:t; }
+  function pctH(B){ var t=pct(B); if(B.bw>0) t+='<br><span style="font-size:12px;color:var(--muted)">('+B.lo.toFixed(3)+'–'+B.hi.toFixed(3)+' f<sub>0</sub>)</span>'; return t; }
+  function cmS(v){ return (v*D.lam).toFixed(2); }
+  function sgn(v,dec){ return (v<0?'−':'+')+Math.abs(v).toFixed(dec); }
+  function labels(){
+    var zl=[RL/Z0,XL/Z0], yl=cdiv([1,0],zl), matched=D.a<1e-6;
+    $('olam').textContent=D.lam.toFixed(2)+' cm';
+    $('mQ').setAttribute('aria-pressed',String(met!=='stub')); $('mS').setAttribute('aria-pressed',String(met==='stub'));
+    var st=$('steps'), tb=$('tsol'), ti=$('tiles'), h='', t='', w='';
+    var cA='var(--accent)', cG='var(--greenSoft)', cR='var(--redSoft)';
+    if(met==='stub'){
+      var s=D.st[sS];
+      $('tagCarta').textContent='Carta de admitancias · stub en corto en paralelo';
+      h+='<li style="--c:'+cA+'"><b>Admitancia de la carga.</b> y<sub>L</sub> = 1/z<sub>L</sub> = '+fmtC(yl,3)+': es el punto opuesto a z<sub>L</sub> = '+fmtC(zl,3)+'.</li>';
+      h+='<li style="--c:'+cG+'"><b>Girar hasta g = 1.</b> Avanzamos d = '+s.d.toFixed(4)+' λ hacia el generador (sentido horario) sobre el círculo de |Γ| = '+D.a.toFixed(3)+' hasta el círculo verde: y(d) = 1 '+(s.b<0?'− j':'+ j')+Math.abs(s.b).toFixed(3)+'.</li>';
+      h+='<li style="--c:'+cR+'"><b>El stub cancela la susceptancia.</b> En paralelo las admitancias se suman: el stub en corto de ℓ = '+s.l.toFixed(4)+' λ aporta '+(s.b<0?'+j':'−j')+Math.abs(s.b).toFixed(3)+' y recorremos el círculo g = 1 hasta el centro: y = 1, acoplado.</li>';
+      t='<tr><th scope="col">solución</th><th scope="col">d/λ</th><th scope="col"><var>b</var></th><th scope="col">ℓ/λ</th><th scope="col">d (cm)</th><th scope="col">ℓ (cm)</th></tr>';
+      D.st.forEach(function(q,i){ t+='<tr'+(i===sS?' class="sel"':'')+'><td><label for="rs'+i+'"><input type="radio" name="rs" id="rs'+i+'" value="'+i+'"'+(i===sS?' checked':'')+'>'+(i+1)+'</label></td><td>'+q.d.toFixed(4)+'</td><td>'+menos(q.b.toFixed(3))+'</td><td>'+q.l.toFixed(4)+'</td><td>'+cmS(q.d)+'</td><td>'+cmS(q.l)+'</td></tr>'; });
+      w+='<div class="tile key"><div class="k">punto de conexión d/λ</div><div class="v">'+s.d.toFixed(4)+'<br><span style="font-size:13px">'+cmS(s.d)+' cm</span></div></div>';
+      w+='<div class="tile key"><div class="k">stub en corto ℓ/λ</div><div class="v">'+s.l.toFixed(4)+'<br><span style="font-size:13px">'+cmS(s.l)+' cm</span></div></div>';
+      w+='<div class="tile"><div class="k">y(d) antes del stub</div><div class="v">'+fmtC([s.g,s.b],2)+'</div></div>';
+      w+='<div class="tile"><div class="k">susceptancia del stub</div><div class="v">'+(s.b<0?'+j':'−j')+Math.abs(s.b).toFixed(3)+'</div></div>';
+      $('ver').innerHTML='Verificación con la fórmula de la línea: |Γ<sub>in</sub>(f<sub>0</sub>)| = '+fmtE(s.v)+(s.v<1e-6?' (&lt; 10<sup>−6</sup>, acoplado ✔)':' ✘');
+      $('nota').innerHTML='Usamos la carta como carta de admitancias: la rejilla es la misma, pero ahora sus círculos se leen como conductancia <var>g</var> y susceptancia <var>b</var>, y el punto de cada admitancia es el opuesto (−Γ) al de su impedancia. El círculo verde es <var>g</var> = 1, el único lugar desde el cual un elemento puramente reactivo en paralelo puede llevarnos al centro. Cada vuelta del círculo de |Γ| corta dos veces al círculo <var>g</var> = 1: de ahí las dos soluciones. Un stub en corto de longitud menor que λ/4 aporta susceptancia negativa (inductiva) y uno entre λ/4 y λ/2, positiva (capacitiva); lo exploramos en <a href="ImpedanciaEntrada_explorador.html">impedancia de entrada</a>.';
+      $('leg').innerHTML='<span><i style="background:var(--accent);border-radius:2px"></i>y<sub>L</sub></span><span><i style="background:transparent;border:2px solid #aaa"></i>z<sub>L</sub></span><span><i style="background:var(--greenSoft);border-radius:2px;height:3px;width:15px"></i>giro d y círculo <var>g</var> = 1</span><span><i style="background:var(--redSoft);border-radius:2px;height:3px;width:15px"></i>efecto del stub</span><span><i style="background:var(--blueSoft);border-radius:2px;height:3px;width:15px"></i>|Γ| constante</span>';
+    } else {
+      var o=D.qw[sQ], real=o.k==='carga';
+      $('tagCarta').textContent='Carta de impedancias · transformador λ/4';
+      h+='<li style="--c:'+cA+'"><b>Carga.</b> z<sub>L</sub> = '+fmtC(zl,3)+', sobre el círculo de S = '+(isFinite(D.S)?D.S.toFixed(3):'∞')+'.</li>';
+      if(real) h+='<li style="--c:'+cG+'"><b>Sin giro.</b> La carga ya es real: insertamos el transformador justo en la carga (d = 0).</li>';
+      else h+='<li style="--c:'+cG+'"><b>Girar hasta el eje real.</b> Avanzamos d = '+o.d.toFixed(4)+' λ hacia el generador hasta el '+(o.k==='max'?'máximo de voltaje (eje derecho): Z = S·Z<sub>0</sub>':'mínimo de voltaje (eje izquierdo): Z = Z<sub>0</sub>/S')+' = '+o.R.toFixed(2)+' Ω, puramente resistiva.</li>';
+      h+='<li style="--c:'+cR+'"><b>Transformador.</b> Un tramo de λ/4 de Z<sub>T</sub> = √(Z<sub>0</sub> R) = '+o.ZT.toFixed(2)+' Ω convierte R en Z<sub>T</sub><sup>2</sup>/R = Z<sub>0</sub>: la curva roja lleva el punto al centro.</li>';
+      t='<tr><th scope="col">opción</th><th scope="col">d/λ</th><th scope="col">R (Ω)</th><th scope="col">Z<sub>T</sub> (Ω)</th><th scope="col">d (cm)</th></tr>';
+      D.qw.forEach(function(q,i){ var nm=q.k==='max'?'V<sub>máx</sub>':(q.k==='min'?'V<sub>mín</sub>':'carga');
+        t+='<tr'+(i===sQ?' class="sel"':'')+'><td><label for="rq'+i+'"><input type="radio" name="rq" id="rq'+i+'" value="'+i+'"'+(i===sQ?' checked':'')+'>'+nm+'</label></td><td>'+q.d.toFixed(4)+'</td><td>'+q.R.toFixed(2)+'</td><td>'+q.ZT.toFixed(2)+'</td><td>'+cmS(q.d)+'</td></tr>'; });
+      w+='<div class="tile key"><div class="k">punto de inserción d/λ</div><div class="v">'+o.d.toFixed(4)+'<br><span style="font-size:13px">'+cmS(o.d)+' cm</span></div></div>';
+      w+='<div class="tile key"><div class="k">Z<sub>T</sub> (Ω)</div><div class="v">'+o.ZT.toFixed(2)+'</div></div>';
+      w+='<div class="tile"><div class="k">largo λ/4 a f<sub>0</sub></div><div class="v">'+cmS(0.25)+' cm</div></div>';
+      w+='<div class="tile"><div class="k">R vista en d (Ω)</div><div class="v">'+o.R.toFixed(2)+'</div></div>';
+      $('ver').innerHTML='Verificación con la fórmula de la línea: |Γ<sub>in</sub>(f<sub>0</sub>)| = '+fmtE(o.v)+(o.v<1e-6?' (&lt; 10<sup>−6</sup>, acoplado ✔)':' ✘');
+      $('nota').innerHTML='El transformador λ/4 solo acopla resistencias: Z<sub>in</sub> = Z<sub>T</sub><sup>2</sup>/R. Si la carga es compleja, primero avanzamos por la línea hasta donde la impedancia es real, que son justo el máximo (R = S·Z<sub>0</sub>) y el mínimo (R = Z<sub>0</sub>/S) de voltaje. Para dibujar la curva roja recalculamos la impedancia a lo largo del transformador y la normalizamos a Z<sub>0</sub>: no es un círculo centrado en el origen porque el tramo tiene otra impedancia característica. Para el largo físico suponemos que el transformador tiene el mismo factor de velocidad que el cable.';
+      $('leg').innerHTML='<span><i style="background:var(--accent)"></i>z<sub>L</sub></span><span><i style="background:var(--greenSoft);border-radius:2px;height:3px;width:15px"></i>giro d hasta el eje real</span><span><i style="background:var(--redSoft);border-radius:2px;height:3px;width:15px"></i>dentro del transformador</span><span><i style="background:var(--blueSoft);border-radius:2px;height:3px;width:15px"></i>círculo de S</span>';
+    }
+    if(matched){ $('ver').innerHTML='La carga ya vale Z<sub>0</sub>: Γ<sub>L</sub> = 0 y no hace falta acoplar.'; }
+    st.innerHTML=h; tb.innerHTML=t; ti.innerHTML=w;
+    tb.querySelectorAll('input[type=radio]').forEach(function(rb){ rb.addEventListener('change',function(){
+      if(rb.name==='rs') sS=+rb.value; else sQ=+rb.value; labels(); draws(); }); });
+    var oq=D.qw[sQ], ss=D.st[sS];
+    $('lgQ').innerHTML=oq.k==='carga'?'en la carga':(oq.k==='max'?'en V<sub>máx</sub>':'en V<sub>mín</sub>');
+    $('lgS').textContent='solución '+(sS+1);
+    $('bwQ').innerHTML=pctH(oq.B); $('bwS').innerHTML=pctH(ss.B);
+    // comparación con números
+    var c='';
+    if(matched) c='La carga ya está acoplada a todas las frecuencias.';
+    else {
+      c='Con esta carga: transformador λ/4 '+($('lgQ').innerHTML)+', '+pct(oq.B)+'; ';
+      D.st.forEach(function(q,i){ c+='stub, solución '+(i+1)+' (d + ℓ = '+(q.d+q.l).toFixed(3)+' λ), '+pct(q.B)+(i<D.st.length-1?'; ':'. '); });
+      if(D.st.length===2){ var A=D.st[0],Bq=D.st[1], sh=(A.d+A.l)<=(Bq.d+Bq.l)?0:1, wide=A.B.bw>=Bq.B.bw?0:1;
+        c+= sh===wide ? 'La solución de stub más corta (solución '+(sh+1)+') es la de mayor ancho de banda, como esperábamos: menos línea entre la carga y el punto acoplado significa menos cambio de fase al cambiar la frecuencia.'
+                      : 'Aquí la solución de stub más corta (solución '+(sh+1)+') no es la de mayor ancho de banda: la regla general falla para esta carga, y por eso conviene calcular.'; }
+      var bq=Math.max.apply(null,D.qw.map(function(q){return q.B.bw;})), bs=Math.max.apply(null,D.st.map(function(q){return q.B.bw;}));
+      c+=' El mejor transformador da '+(bq>bs?'más':'menos')+' ancho de banda que el mejor stub.';
+    }
+    $('cmp').innerHTML=c;
+    cv.setAttribute('aria-label',met==='stub'?'Carta de admitancias: y_L, giro hasta el círculo g = 1 y stub hasta el centro':'Carta de impedancias: z_L, giro hasta el eje real y transformador λ/4 hasta el centro');
+    retoTxt();
+  }
+  function draws(){ drawSmith(); drawBW(); }
+  function upd(){ calc(); labels(); draws(); ponIn(); }
+  var IN={Z0:$('inZ0'),RL:$('inRL'),XL:$('inXL'),F:$('inF'),VF:$('inVF')};
+  function ponSiLibre(el,v){ if(document.activeElement!==el) el.value=v; }
+  function ponIn(){ ponSiLibre(IN.Z0,+Z0.toFixed(2)); ponSiLibre(IN.RL,+RL.toFixed(2)); ponSiLibre(IN.XL,+XL.toFixed(2)); ponSiLibre(IN.F,+F0.toFixed(4)); ponSiLibre(IN.VF,+VF.toFixed(3)); }
+  IN.Z0.addEventListener('input',function(){ var v=parseFloat(this.value); if(!(v>=1)) return; Z0=v; nuevaCarga(); });
+  IN.RL.addEventListener('input',function(){ var v=parseFloat(this.value); if(!(v>=0.1)) return; RL=v; nuevaCarga(); });
+  IN.XL.addEventListener('input',function(){ var v=parseFloat(this.value); if(isNaN(v)) return; XL=v; nuevaCarga(); });
+  IN.F.addEventListener('input',function(){ var v=parseFloat(this.value); if(!(v>0)) return; F0=v; upd(); });
+  IN.VF.addEventListener('input',function(){ var v=parseFloat(this.value); if(!(v>0&&v<=1)) return; VF=v; upd(); });
+  function nuevaCarga(){ sS=0; sQ=0; limpiaP(); upd(); }
+  document.querySelectorAll('[data-zl]').forEach(function(b){ b.addEventListener('click',function(){
+    var p=b.getAttribute('data-zl').split(','); RL=parseFloat(p[0]); XL=parseFloat(p[1]); nuevaCarga(); }); });
+  $('mQ').addEventListener('click',function(){ met='qw'; labels(); draws(); });
+  $('mS').addEventListener('click',function(){ met='stub'; labels(); draws(); });
+  $('cargaEj').addEventListener('click',function(){ Z0=50; RL=100; XL=50; F0=1; VF=0.66; met='stub'; nuevaCarga(); cv.scrollIntoView({behavior:'smooth',block:'center'}); });
+  // ---- práctica P15 ----
+  function retoTxt(){
+    var n=D.st.length;
+    $('pReto').innerHTML='Carga actual: Z<sub>L</sub> = '+menos(RL.toFixed(1))+(XL<0?' − j':' + j')+Math.abs(XL).toFixed(1)+' Ω sobre Z<sub>0</sub> = '+Z0.toFixed(1)+' Ω. Escribe d/λ y ℓ/λ del stub en corto para '+(n===2?'las dos soluciones (la 1 es la de d menor)':'la única solución')+'.';
+    $('pRow2').hidden=n<2;
+  }
+  function num(id){ var s=String($(id).value).replace(',','.').trim(); return s===''?NaN:parseFloat(s); }
+  function circ(a,b){ var d=Math.abs(mod05(a)-mod05(b)); return Math.min(d,0.5-d); }
+  function linea(ok,txt){ return '<p class="'+(ok?'ok':'no')+'">'+(ok?'✔ ':'✘ ')+txt+'</p>'; }
+  function limpiaP(){ ['p_d1','p_l1','p_d2','p_l2'].forEach(function(id){ $(id).value=''; }); $('pFb').innerHTML=''; }
+  $('pClr').addEventListener('click',limpiaP);
+  $('pChk').addEventListener('click',function(){
+    var h='', todo=true, TOL=0.005;
+    D.st.forEach(function(s,i){ var k=i+1, vd=num('p_d'+k), vl=num('p_l'+k), o=D.st[1-i];
+      if(isNaN(vd)||isNaN(vl)){ todo=false; h+=linea(false,'Solución '+k+': escribe d/λ y ℓ/λ.'); return; }
+      var okd=circ(vd,s.d)<=TOL, okl=circ(vl,s.l)<=TOL;
+      if(okd&&okl){ h+=linea(true,'Solución '+k+': d = '+s.d.toFixed(4)+' λ, ℓ = '+s.l.toFixed(4)+' λ.'); return; }
+      todo=false; var p='Solución '+k+': ';
+      if(o&&circ(vd,o.d)<=TOL&&circ(vl,o.l)<=TOL) p+='esos valores son de la otra solución; la 1 es la de d menor.';
+      else {
+        if(!okd) p+='d/λ fuera de tolerancia (gira desde y<sub>L</sub>, no desde z<sub>L</sub>, hasta cortar el círculo g = 1). ';
+        if(!okl){ p+='ℓ/λ fuera de tolerancia'; var hA=circ(vl,mod05(s.l+0.25))<=TOL, hB=circ(vl,mod05(0.5-s.l))<=TOL; if(hA&&hB) p+=' (puede ser un stub abierto, que difiere del corto en λ/4, o un cambio de signo: el stub debe aportar −j<var>b</var>, no +j<var>b</var>)'; else if(hA) p+=' (ese sería un stub abierto: el corto está λ/4 antes o después)'; else if(hB) p+=' (cambiaste el signo: el stub debe aportar −j<var>b</var>, no +j<var>b</var>)'; p+='.'; }
+      }
+      h+=linea(false,p); });
+    if(todo) h+='<p class="ok"><b>Todo correcto.</b> Lleva estos valores a la práctica y compáralos con lo que midas.</p>';
+    $('pFb').innerHTML=h;
+  });
+  $('pSol').addEventListener('click',function(){
+    var h='<p>y<sub>L</sub> = '+fmtC(cdiv([1,0],[RL/Z0,XL/Z0]),3)+', S = '+(isFinite(D.S)?D.S.toFixed(3):'∞')+'.</p>';
+    D.st.forEach(function(s,i){ h+='<p>Solución '+(i+1)+': d = '+s.d.toFixed(4)+' λ ('+cmS(s.d)+' cm), y(d) = '+fmtC([s.g,s.b],3)+', stub en corto ℓ = '+s.l.toFixed(4)+' λ ('+cmS(s.l)+' cm).</p>'; });
+    $('pFb').innerHTML=h;
+  });
+  var mq=window.matchMedia('(prefers-color-scheme:dark)'); if(mq.addEventListener) mq.addEventListener('change',draws);
+  new MutationObserver(draws).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  window.addEventListener('resize',draws);
+  upd();
+})();
+</script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
+<!-- navegacion:inicio -->
+<style>
+  :root{--nv-w:272px}
+  body{margin-top:0!important}
+  @media (min-width:1100px){ body{margin-left:var(--nv-w)!important} }
+  .nvside{position:fixed;top:0;left:0;bottom:0;width:var(--nv-w);z-index:9999;display:flex;flex-direction:column;
+    background:var(--card,#fff);border-right:1px solid var(--line,#e2dcc9);
+    font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:14px;color:var(--ink,#1a1a1a);
+    box-shadow:1px 0 8px rgba(0,0,0,.05);transition:transform .2s ease}
+  .nvside a{text-decoration:none;color:inherit}
+  .nv-cab{padding:14px 16px 10px;border-bottom:1px solid var(--line,#e2dcc9)}
+  .nv-marca{display:block;font-family:"Century Gothic","Questrial",Arial,sans-serif;font-weight:700;font-size:15px;
+    line-height:1.25;color:var(--navy,var(--ink,#1F3864))}
+  .nv-marca small{display:block;font-weight:400;font-size:12px;color:var(--muted,#5a5a5a);margin-top:2px}
+  .nv-pasos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .nv-paso{display:flex;flex-direction:column;gap:1px;padding:6px 8px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font-size:11px;color:var(--muted,#5a5a5a);min-width:0}
+  .nv-paso b{font-size:12.5px;color:var(--ink,#1a1a1a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nv-paso.sig{text-align:right}
+  .nv-paso:hover{background:var(--bg,#f4f1ea)}
+  .nv-paso[aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-busca{margin-top:8px;width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font:inherit;background:var(--bg,#f8f6f0);color:inherit}
+  .nv-lista{flex:1;overflow-y:auto;padding:6px 8px 10px}
+  .nv-grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8a8fa0);padding:12px 8px 4px}
+  .nv-lista a{display:block;padding:6px 8px 6px 10px;border-radius:6px;border-left:3px solid transparent;line-height:1.3}
+  .nv-lista a small{display:block;font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-lista a:hover{background:var(--bg,#f4f1ea)}
+  .nv-lista a.nv-aqui{background:var(--bg,#f4f1ea);border-left-color:var(--accent,#C1571B);font-weight:700}
+  .nv-pie{padding:8px 14px;border-top:1px solid var(--line,#e2dcc9);font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-boton{display:none;position:fixed;top:10px;left:10px;z-index:10000;gap:6px}
+  .nv-boton a,.nv-boton button{display:flex;align-items:center;justify-content:center;height:38px;min-width:38px;padding:0 10px;
+    border:1px solid var(--line,#e2dcc9);border-radius:9px;background:var(--card,#fff);color:var(--ink,#1a1a1a);
+    font:600 14px Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .nv-boton [aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-velo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:10001}
+  .nv-cierra{display:none;position:absolute;top:10px;right:10px;width:32px;height:32px;border:1px solid var(--line,#e2dcc9);border-radius:8px;background:var(--card,#fff);color:inherit;font-size:16px;cursor:pointer}
+  .nv-cab{position:relative}
+  @media (max-width:1099px){
+    body{margin-top:56px!important}
+    .nvside{transform:translateX(-102%);width:min(320px,88vw)}
+    .nvside.abierto{transform:none;z-index:10002}
+    .nv-cierra{display:block}
+    .nv-boton{display:flex}
+    .nvside.abierto ~ .nv-velo{display:block}
+  }
+  @media print{.nvside,.nv-boton,.nv-velo{display:none} body{margin:0!important}}
+</style>
+<nav class="nvside" id="nvside" aria-label="Exploradores del curso">
+  <div class="nv-cab">
+    <button class="nv-cierra" id="nv-cierra" aria-label="Cerrar el temario">✕</button>
+    <a class="nv-marca" href="index.html">Exploradores de Teoría Electromagnética<small>ENES Juriquilla, UNAM · inicio</small></a>
+    <div class="nv-pasos">
+      <a class="nv-paso" id="nv-ant" href="#" aria-label="Explorador anterior">‹ anterior<b id="nv-ant-t">…</b></a>
+      <a class="nv-paso sig" id="nv-sig" href="#" aria-label="Explorador siguiente">siguiente ›<b id="nv-sig-t">…</b></a>
+    </div>
+    <input class="nv-busca" id="nv-busca" type="search" placeholder="Buscar (tecla /)" aria-label="Buscar explorador">
+  </div>
+  <div class="nv-lista" id="nv-lista">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss<small>1.1 · P1</small></a>
+<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico<small>1.2 · P1</small></a>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito<small>1.4 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday<small>1.6 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores<small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas<small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel<small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización<small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler<small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal<small>3.2 · P8</small></a>
+<a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8 · P11</small></a>
+<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
+<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
+<a href="ImpedanciaEntrada_explorador.html" data-nv="ImpedanciaEntrada_explorador.html">Líneas cortas como reactancias<small>4.5–4.6 · P14</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7 · P15</small></a>
+<a href="Acoplamiento_explorador.html" data-nv="Acoplamiento_explorador.html">Acoplamiento λ/4 y stub<small>4.8–4.9 · P15</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12 · P16</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>
+  </div>
+  <div class="nv-pie">Teclas: ← anterior · → siguiente · / buscar · Esc cerrar</div>
+</nav>
+<div class="nv-boton"><button id="nv-abre" aria-controls="nvside" aria-expanded="false">☰ Temario</button>
+  <a id="nv-ant2" href="#" aria-label="Anterior">‹</a><a id="nv-sig2" href="#" aria-label="Siguiente">›</a></div>
+<div class="nv-velo" id="nv-velo"></div>
+<script>
+(function(){
+  var lista=document.getElementById('nv-lista'), side=document.getElementById('nvside');
+  var l=lista.querySelectorAll('a[data-nv]'), orden=[], dat={};
+  for(var i=0;i<l.length;i++){var f=l[i].getAttribute('data-nv');orden.push(f);
+    dat[f]={el:l[i],t:l[i].childNodes[0].textContent.trim()};}
+  var aqui=(location.pathname.split('/').pop()||'index.html'), k=orden.indexOf(aqui);
+  function paso(idA,idT,j){var a=document.getElementById(idA);
+    if(j<0||j>=orden.length){a.setAttribute('aria-disabled','true');if(idT)document.getElementById(idT).textContent='';return;}
+    a.href=orden[j];a.title=dat[orden[j]].t+(j<k?' (tecla ←)':' (tecla →)');if(idT)document.getElementById(idT).textContent=dat[orden[j]].t;}
+  if(k>=0){dat[aqui].el.className='nv-aqui';dat[aqui].el.setAttribute('aria-current','page');
+    paso('nv-ant','nv-ant-t',k-1);paso('nv-sig','nv-sig-t',k+1);paso('nv-ant2',null,k-1);paso('nv-sig2',null,k+1);
+    setTimeout(function(){var r=dat[aqui].el;lista.scrollTop=r.offsetTop-lista.clientHeight/3;},0);}
+  else{paso('nv-ant','nv-ant-t',-1);paso('nv-sig','nv-sig-t',0);paso('nv-ant2',null,-1);paso('nv-sig2',null,0);}
+  var bus=document.getElementById('nv-busca');
+  bus.addEventListener('input',function(){var q=bus.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    var grp=null,vis=0;
+    Array.prototype.forEach.call(lista.children,function(c){
+      if(c.classList.contains('nv-grp')){if(grp)grp.style.display=vis?'':'none';grp=c;vis=0;return;}
+      var t=c.textContent.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      var ok=!q||t.indexOf(q)>=0;c.style.display=ok?'':'none';if(ok)vis++;});
+    if(grp)grp.style.display=vis?'':'none';});
+  bus.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=lista.querySelector('a[data-nv]:not([style*="none"])');if(v)location.href=v.href;}});
+  var abre=document.getElementById('nv-abre'), velo=document.getElementById('nv-velo');
+  function cambia(on){side.classList.toggle('abierto',on);abre.setAttribute('aria-expanded',on?'true':'false');}
+  abre.addEventListener('click',function(){cambia(!side.classList.contains('abierto'));});
+  velo.addEventListener('click',function(){cambia(false);});
+  document.getElementById('nv-cierra').addEventListener('click',function(){cambia(false);});
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toUpperCase();
+    if(e.key==='Escape'){cambia(false);if(t==='INPUT')e.target.blur();return;}
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
+    if(e.key==='/'){e.preventDefault();if(innerWidth<1100)cambia(true);bus.focus();return;}
+    if(k<0) return;
+    if(e.key==='ArrowLeft'&&k>0) location.href=orden[k-1];
+    if(e.key==='ArrowRight'&&k<orden.length-1) location.href=orden[k+1];
+  });
+})();
+</script>
+<!-- navegacion:fin -->
