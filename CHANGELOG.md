@@ -2,7 +2,11 @@
 
 La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones archivadas en Zenodo. Cada versión archivada tiene su propio DOI de versión; el DOI de concepto [10.5281/zenodo.23423156](https://doi.org/10.5281/zenodo.23423156) (citar «todas las versiones») resuelve siempre a la más reciente.
 
-## Sin versión archivada · 2026-11-06 (Unidad 4 completa y tarjetas de práctica)
+## [1.4] · 2026-11-09 · DOI de versión: se anota al publicar la *release* v1.4 en Zenodo
+
+Veintidós exploradores. Reúne los cambios de la rama principal posteriores a la v1.3.1 (21 oct a 6 nov), detallados abajo.
+
+### Unidad 4 completa y tarjetas de práctica (6 nov)
 - Explorador nuevo `ImpedanciaEntrada_explorador.html` (4.5–4.6 · P14): líneas cortas como reactancias. R y X de entrada contra ℓ/λ en corto, abierto o con carga; inductancia o capacitancia equivalente y comparación con L′ℓ y C′ℓ; medición de Z₀ = √(Z_sc Z_oc) y de v_p con un medidor LCR; pérdidas (R′ ∝ √f, G′ ∝ f) y condición de Heaviside con α(f) y v_p(f); paso a paso y tarjeta para la P14 con fragmento en Python.
 - Explorador nuevo `Acoplamiento_explorador.html` (4.8–4.9 · P15): transformador λ/4 (en la carga real o en V_máx/V_mín) y stub en corto en paralelo con sus dos soluciones; recorrido numerado en la carta de Smith; ancho de banda |Γ(f)| de cada diseño (S ≤ 2); paso a paso para Z_L = 100 + j50 Ω y práctica con comprobación.
 - Carta de Smith: admitancias (y = −Γ, rejilla g–b), V_máx y V_mín con d_máx/λ, escala exterior de longitudes de onda hacia el generador, modo práctica con retroalimentación y paso a paso.
@@ -11,14 +15,14 @@ La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones arc
 - Línea de transmisión: potencia incidente, reflejada y en la carga, pérdida de retorno y pérdida por desacoplamiento.
 - Portada, menú lateral, README, sitemap y `.zenodo.json`: 22 exploradores.
 
-## Sin versión archivada · 2026-11-06 (estilo académico y navegación lateral)
+### Estilo académico y navegación lateral (6 nov)
 - Tipografía institucional del Manual de identidad gráfica de la ENES Juriquilla (nov. 2025): Century Gothic en títulos (respaldo web Questrial), Arial/Helvética en texto, controles y lecturas con cifras tabulares, Cambria en fórmulas (respaldo STIX Two Text). Se retiran Spectral e IBM Plex. Script `add_tipografia_em.py` (idempotente).
 - Notación: los subíndices y superíndices escritos a mano (Z_L, Z_in, v_p, V_inc, e^(−z/δ)) y los subíndices Unicode (Z₀, η₁, TE₁₀) se muestran como subíndices y superíndices reales en el texto, en las lecturas que generan los scripts y en los lienzos (canvas). Script `estilo_academico_em.py` (idempotente).
 - Puntuación académica: la raya (U+2014) se sustituye por dos puntos, comas o punto medio en todo el sitio y en los scripts de mantenimiento; los intervalos conservan la semirraya (3.6–3.8). Los valores aún no calculados se muestran con «…».
 - Navegación: el menú superior pasa a un panel lateral fijo a la izquierda con anterior/siguiente (nombre del explorador vecino), buscador (tecla /), lista por unidades con la página actual marcada y atajos ← →; en pantallas de menos de 1100 px se abre con «☰ Temario» y se cierra con ✕, Esc o tocando fuera.
 - Línea de transmisión: la etiqueta del plano de medición ya no se corta en el borde del lienzo.
 
-## Sin versión archivada · 2026-10-21 (rama principal, después de la v1.3.1)
+### Rama principal después de la v1.3.1 (21 a 29 oct)
 - Documentación del expediente de auditoría según el informe de cierre: origen de los informes declarado (asistente de IA), informes de verificación y cierre añadidos, fecha de `CITATION.cff`.
 - Efecto piel: profundidades mayores que 10⁴ km en notación científica.
 - Portada con `<head>`/`<body>` explícitos (requisito del verificador de Google Search Console).
