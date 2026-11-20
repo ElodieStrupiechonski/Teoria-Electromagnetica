@@ -2,6 +2,10 @@
 
 La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones archivadas en Zenodo. Cada versión archivada tiene su propio DOI de versión; el DOI de concepto [10.5281/zenodo.23423156](https://doi.org/10.5281/zenodo.23423156) (citar «todas las versiones») resuelve siempre a la más reciente.
 
+## Rama principal después de la v1.4 (20 nov)
+
+- Explorador nuevo `OndaQueRebota_explorador.html` (4.10): modelo de la onda que rebota entre dos paredes conductoras. Campo animado y sus dos ondas planas componentes, rayos con el ángulo θ, reglas de λ₀ y λ_g, régimen bajo el corte con 1/α, carrera entre la fase, una señal en el vacío y la energía, curva de v_p y v_g contra f/f_c, sección «¿Puede la velocidad de fase ser mayor que c?» con un pulso de banda angosta y la cresta marcada, y tres ejercicios con pista al tercer intento. Veintitrés exploradores.
+
 ## [1.4] · 2026-11-09 · DOI de versión: se anota al publicar la *release* v1.4 en Zenodo
 
 Veintidós exploradores. Reúne los cambios de la rama principal posteriores a la v1.3.1 (21 oct a 6 nov), detallados abajo.

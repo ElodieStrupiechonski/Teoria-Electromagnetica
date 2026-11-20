@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<!-- tipografia:inicio -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root:root{
+    --f-tit:"Century Gothic","Questrial","URW Gothic","Avant Garde",sans-serif;
+    --sans:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",Calibri,sans-serif;
+    --serif:Cambria,"STIX Two Text","Times New Roman",serif;
+    --mono:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",sans-serif;
+  }
+  body,button,input,select,textarea{font-family:var(--sans)}
+  body{font-variant-numeric:tabular-nums}
+  h1,h2,h3,.ct,.eyebrow,header .sub{font-family:var(--f-tit)!important;letter-spacing:0}
+  sub,sup{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}
+  sub{bottom:-.25em} sup{top:-.45em}
+</style>
+<script>
+(function(){
+  // ---- lienzos: subíndices y superíndices escritos como Z_L, V_inc, e^(−z/δ) ----
+  var RX=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})/g;
+  var P=CanvasRenderingContext2D.prototype, F=P.fillText;
+  P.fillText=function(t,x,y,mw){
+    t=String(t);
+    if((t.indexOf('_')<0&&t.indexOf('^')<0)||/\.(html|py|png|csv|txt|svg|jpg|pdf)\b/i.test(t)) return F.call(this,t,x,y,mw);
+    var sg=[],last=0,m; RX.lastIndex=0;
+    while((m=RX.exec(t))){
+      if(m[1]){sg.push([t.slice(last,m.index)+m[1],0]);sg.push([m[2].replace(/[{}]/g,''),1]);}
+      else{sg.push([t.slice(last,m.index),0]);sg.push([m[3].replace(/[{}()]/g,''),2]);}
+      last=RX.lastIndex;
+    }
+    if(!sg.length) return F.call(this,t,x,y,mw);
+    sg.push([t.slice(last),0]);
+    var f0=this.font, mm=/(\d+(?:\.\d+)?)px/.exec(f0), px=mm?+mm[1]:12,
+        fs=mm?f0.replace(mm[0],(px*0.72).toFixed(1)+'px'):f0, W=0,i;
+    for(i=0;i<sg.length;i++){this.font=sg[i][1]?fs:f0;sg[i][2]=this.measureText(sg[i][0]).width;W+=sg[i][2];}
+    var a=this.textAlign, x0=x;
+    if(a==='center') x0=x-W/2; else if(a==='right'||a==='end') x0=x-W;
+    this.textAlign='left';
+    for(i=0;i<sg.length;i++){
+      this.font=sg[i][1]?fs:f0;
+      F.call(this,sg[i][0],x0,y+(sg[i][1]===1?0.28*px:sg[i][1]===2?-0.38*px:0));
+      x0+=sg[i][2];
+    }
+    this.font=f0; this.textAlign=a;
+  };
+  // ---- texto generado por los scripts: misma notación en <sub>/<sup> ----
+  if(/AnatomiaGrafica/.test(location.pathname)) return;
+  var US=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})|([₀-₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ]+)/g;
+  var UNI="₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ", ASC="0123456789aeoxhklmnpstiruvj";
+  var SALTA={SCRIPT:1,STYLE:1,TEXTAREA:1,OPTION:1,PRE:1,CODE:1,TITLE:1,INPUT:1,SELECT:1};
+  function arreglar(n){
+    var p=n.parentNode; if(!p||SALTA[p.nodeName]||p.namespaceURI==='http://www.w3.org/2000/svg') return;
+    var t=n.nodeValue; US.lastIndex=0; if(!US.test(t)||/\.(html|py|png|csv)\b/.test(t)) return;
+    US.lastIndex=0; var fr=document.createDocumentFragment(), last=0, m, e;
+    while((m=US.exec(t))){
+      var antes=t.slice(last,m.index);
+      if(m[1]){fr.appendChild(document.createTextNode(antes+m[1]));e=document.createElement('sub');e.textContent=m[2].replace(/[{}]/g,'');}
+      else if(m[3]){fr.appendChild(document.createTextNode(antes));e=document.createElement('sup');e.textContent=m[3].replace(/[{}()]/g,'');}
+      else{fr.appendChild(document.createTextNode(antes));e=document.createElement('sub');
+        e.textContent=m[4].split('').map(function(c){return ASC[UNI.indexOf(c)];}).join('');}
+      fr.appendChild(e); last=US.lastIndex;
+    }
+    fr.appendChild(document.createTextNode(t.slice(last)));
+    p.replaceChild(fr,n);
+  }
+  function recorrer(r){
+    if(r.nodeType===3){arreglar(r);return;}
+    if(r.nodeType!==1||SALTA[r.nodeName]) return;
+    var w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT,null), l=[], n;
+    while((n=w.nextNode())) l.push(n);
+    l.forEach(arreglar);
+  }
+  function inicio(){
+    recorrer(document.body);
+    new MutationObserver(function(ms){ms.forEach(function(m){
+      if(m.type==='characterData') arreglar(m.target); else m.addedNodes.forEach(recorrer);
+    });}).observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',inicio); else inicio();
+})();
+</script>
+<!-- tipografia:fin -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
+<title>Guía de onda: el modelo de la onda que rebota, velocidad de fase y de grupo</title>
+<!-- seo:inicio -->
+<meta name="description" content="Dos ondas planas que rebotan entre dos paredes conductoras: frecuencia de corte, longitud de onda en la guía y por qué la velocidad de fase supera a c sin transportar energía.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/OndaQueRebota_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Guía de onda: el modelo de la onda que rebota, velocidad de fase y de grupo">
+<meta property="og:description" content="Dos ondas planas que rebotan entre dos paredes conductoras: frecuencia de corte, longitud de onda en la guía y por qué la velocidad de fase supera a c sin transportar energía.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/OndaQueRebota_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Guía de onda: el modelo de la onda que rebota, velocidad de fase y de grupo",
+ "description": "Dos ondas planas que rebotan entre dos paredes conductoras: frecuencia de corte, longitud de onda en la guía y por qué la velocidad de fase supera a c sin transportar energía.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/OndaQueRebota_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "guía de onda",
+  "frecuencia de corte",
+  "velocidad de fase",
+  "velocidad de grupo"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética: exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México, ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
+<meta name="description" content="Dos ondas planas que rebotan entre dos paredes conductoras: frecuencia de corte, longitud de onda en la guía y velocidades de fase y de grupo.">
+<style>
+:root{--navy:#1F3864;--acc:#C1571B;--verde:#2E7D32;--azul:#1F5FBF;--rojo:#B3261E;--gris:#5A5F6B;--suave:#EEF3FA;--borde:#D5DBE6;--tinta:#1b1e27}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--tinta);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:18px 16px 40px}
+.eyebrow{font:600 12px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--acc);text-transform:uppercase}
+h1{font:700 30px/1.15 Spectral,Georgia,"Times New Roman",serif;color:var(--navy);margin:6px 0 6px}
+h2{font:700 20px/1.2 Spectral,Georgia,"Times New Roman",serif;color:var(--navy);margin:26px 0 8px;border-bottom:1px solid var(--borde);padding-bottom:4px}
+p{margin:8px 0}
+.lede{color:#333;max-width:860px}
+.m{font-family:"Latin Modern Math","Cambria Math","STIX Two Math",Georgia,serif;font-style:italic;white-space:nowrap}
+.m b,.m .r{font-style:normal;font-weight:400}
+.panel{border:1px solid var(--borde);border-radius:8px;padding:12px;margin:12px 0;background:#fff}
+.controles{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px 22px;align-items:end}
+label{display:block;font-size:14px;color:#333;font-weight:600}
+select,input[type=number]{font:inherit;padding:5px 7px;border:1px solid #AEB6C4;border-radius:5px;background:#fff;color:inherit}
+input[type=number]{width:104px}
+input[type=range]{width:100%;margin:6px 0 0}
+.fila{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:10px}
+.fila label{font-weight:400;display:inline-flex;gap:6px;align-items:center}
+button{font:inherit;padding:6px 12px;border:1px solid var(--navy);border-radius:5px;background:var(--navy);color:#fff;cursor:pointer}
+button.sec{background:#fff;color:var(--navy)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #F2B04C;outline-offset:1px}
+.lienzo{width:100%;overflow-x:auto}
+canvas{display:block;max-width:100%;height:auto}
+#estado{font-weight:600;padding:6px 10px;border-radius:5px;margin:8px 0 0;font-size:15px}
+.ok{background:#E8F4EA;color:#1D5A22}.no{background:#FBEAE8;color:#8C1D17}.av{background:#FFF4DD;color:#7A4B00}
+.dos{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px}
+@media(max-width:760px){.dos{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{padding:5px 8px;border-bottom:1px solid var(--borde);text-align:left;vertical-align:baseline}
+td.v{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+th{font-size:13px;color:var(--gris);font-weight:600}
+.formulas{background:var(--suave);border-radius:8px;padding:10px 14px;margin:12px 0;display:flex;flex-wrap:wrap;gap:6px 30px;font-size:17px}
+ol.obs li{margin:6px 0}
+.ej{border-left:4px solid var(--navy);background:var(--suave);padding:8px 12px;margin:10px 0;border-radius:0 6px 6px 0}
+.ej .res{font-size:14px;margin-top:4px;min-height:1.4em}
+.pista{color:#7A4B00}.bien{color:#1D5A22;font-weight:600}.mal{color:#8C1D17}
+.leyenda{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13.5px;color:#333;margin-top:6px}
+.leyenda i{display:inline-block;width:22px;height:4px;vertical-align:middle;margin-right:6px;border-radius:2px}
+.ref{font-size:14px;color:#333}
+.nota{font-size:14px;color:var(--gris)}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">Teoría Electromagnética · Unidad 4 · tema 4.10</div>
+<h1>Guía de onda: el modelo de la onda que rebota</h1>
+<p class="lede">Entre dos paredes conductoras separadas una distancia <span class="m">a</span>, el campo del modo fundamental es la suma de dos ondas planas que se reflejan alternadamente en las paredes. Con este único dibujo obtenemos la frecuencia de corte, la longitud de onda en la guía y las velocidades de fase y de grupo. En todos los cálculos <span class="m">c</span> = 3 × 10<sup>8</sup> m/s y la guía está llena de aire.</p>
+
+<div class="panel">
+ <div class="controles">
+  <div><label for="guia">Guía</label>
+   <select id="guia">
+    <option value="22.86">WR-90 · a = 22.86 mm (banda X)</option>
+    <option value="72.136">WR-284 · a = 72.14 mm (banda S)</option>
+    <option value="10.668">WR-42 · a = 10.67 mm (banda K)</option>
+    <option value="0">Personalizada</option>
+   </select>
+   <span id="aPers" hidden>&nbsp;<span class="m">a</span> = <input type="number" id="aMm" min="1" max="500" step="0.01" value="30" aria-label="Separación a en milímetros"> mm</span>
+  </div>
+  <div><label for="fNum">Frecuencia <span class="m">f</span> (GHz)</label>
+   <input type="number" id="fNum" step="0.01" min="0.01" aria-describedby="rango">
+   <span class="nota" id="rango"></span>
+  </div>
+  <div><label for="fDes">Frecuencia relativa <span class="m">f / f<sub>c</sub></span> = <span id="rel"></span></label>
+   <input type="range" id="fDes" min="0.5" max="3" step="0.005" value="1.524">
+  </div>
+ </div>
+ <div class="fila">
+  <label><input type="radio" name="vista" value="total" checked> Campo total</label>
+  <label><input type="radio" name="vista" value="A"> Onda plana 1</label>
+  <label><input type="radio" name="vista" value="B"> Onda plana 2</label>
+  <label><input type="checkbox" id="rayos" checked> Rayos</label>
+  <label><input type="checkbox" id="perfil" checked> Perfil transversal</label>
+  <button id="pausa" class="sec" aria-pressed="false">Pausar</button>
+  <button id="carrera">Reiniciar la carrera</button>
+  <label>Rapidez <input type="range" id="rap" min="0.2" max="2" step="0.1" value="1" style="width:110px;margin:0" aria-label="Rapidez de la animación"></label>
+ </div>
+ <div id="estado" role="status" aria-live="polite"></div>
+</div>
+
+<div class="lienzo"><canvas id="cv" width="960" height="360" role="img" aria-label="Vista lateral de la guía: campo eléctrico, rayos, longitudes de onda y carrera entre la fase, la energía y una señal en el vacío"></canvas></div>
+<div class="leyenda">
+ <span><i style="background:#C13A2B"></i>campo positivo</span><span><i style="background:#1F5FBF"></i>campo negativo</span>
+ <span><i style="background:#C1571B"></i><span class="m">λ</span><sub>0</sub> (a lo largo del rayo)</span>
+ <span><i style="background:#2E7D32"></i><span class="m">λ<sub>g</sub></span> (a lo largo del eje)</span>
+ <span>La animación está en cámara lenta: las tres marcas de la carrera usan la misma escala de tiempo.</span>
+</div>
+
+<div class="formulas" aria-label="Relaciones del modelo">
+ <span class="m">f<sub>c</sub> = c / (2a)</span>
+ <span class="m"><span class="r">sen</span> θ = f<sub>c</sub> / f</span>
+ <span class="m">λ<sub>g</sub> = λ<sub>0</sub> / <span class="r">cos</span> θ</span>
+ <span class="m">v<sub>p</sub> = c / <span class="r">cos</span> θ</span>
+ <span class="m">v<sub>g</sub> = c <span class="r">cos</span> θ</span>
+ <span class="m">v<sub>p</sub> v<sub>g</sub> = c<sup>2</sup></span>
+</div>
+
+<div class="dos">
+ <div>
+  <h2>Lecturas</h2>
+  <table id="tabla" aria-live="off"><tbody></tbody></table>
+  <p class="nota"><span class="m">θ</span> es el ángulo entre el rayo y el eje de la guía. La onda plana 1 corresponde a los tramos ascendentes del rayo y la onda plana 2 a los descendentes; tienen signos opuestos por el cambio de fase de 180° en cada reflexión sobre un conductor perfecto (<span class="m">Γ</span> = −1).</p>
+ </div>
+ <div>
+  <h2>Velocidades contra frecuencia</h2>
+  <canvas id="dv" width="460" height="320" role="img" aria-label="Velocidad de fase y velocidad de grupo, divididas entre c, en función de f entre f sub c"></canvas>
+ </div>
+</div>
+
+<h2>¿Puede la velocidad de fase ser mayor que <span class="m">c</span>?</h2>
+<p>Sí. Para toda frecuencia por encima del corte, <span class="m">v<sub>p</sub> = c / <span class="r">cos</span> θ</span> es mayor que <span class="m">c</span>, y esto no contradice la relatividad especial. La relatividad limita la rapidez con que viajan la energía y la información; la velocidad de fase es la rapidez de un punto geométrico, el punto donde un frente de onda inclinado corta al eje de la guía, y ese punto no transporta nada. La energía y la información viajan con la envolvente de un pulso, a la velocidad de grupo <span class="m">v<sub>g</sub> = c <span class="r">cos</span> θ</span>, que siempre es menor que <span class="m">c</span>.</p>
+<div class="panel" id="periodo" aria-live="off"></div>
+<p><b>Tres caminos independientes llevan al mismo resultado.</b></p>
+<ol class="obs">
+ <li><b>Geometría.</b> Elegimos «Onda plana 1» en la figura superior. Cada frente avanza <span class="m">λ</span><sub>0</sub> a lo largo de su rayo en un periodo, con rapidez <span class="m">c</span>. Como el frente está inclinado, su intersección con el eje recorre en ese mismo periodo la distancia mayor <span class="m">λ<sub>g</sub> = λ</span><sub>0</sub><span class="m"> / <span class="r">cos</span> θ</span>. Ocurre lo mismo con el punto de cruce de las dos hojas de unas tijeras al cerrarse: se desplaza más rápido que las hojas.</li>
+ <li><b>Relación de dispersión.</b> La componente del vector de onda a lo largo del eje cumple <span class="m">β</span><sup>2</sup> <span class="m">= (ω/c)</span><sup>2</sup> <span class="m">− (π/a)</span><sup>2</sup>. De ella se obtienen <span class="m">v<sub>p</sub> = ω/β</span> &gt; <span class="m">c</span> y <span class="m">v<sub>g</sub> = </span>d<span class="m">ω</span>/d<span class="m">β</span> = <span class="m">c</span><sup>2</sup><span class="m">β/ω</span> &lt; <span class="m">c</span>, con <span class="m">v<sub>p</sub> v<sub>g</sub> = c</span><sup>2</sup>.</li>
+ <li><b>Un pulso.</b> En la figura siguiente, un pulso de banda angosta viaja por la guía. Seguimos el punto negro: está fijo sobre una cresta, nace en la parte trasera del pulso, lo atraviesa a <span class="m">v<sub>p</sub></span> y se extingue al frente. El pulso completo, que es lo que detecta un receptor, avanza a <span class="m">v<sub>g</sub></span> y llega después que una señal en el vacío.</li>
+</ol>
+<div class="lienzo"><canvas id="pv" width="960" height="250" role="img" aria-label="Pulso en la guía: las crestas avanzan a la velocidad de fase dentro de una envolvente que avanza a la velocidad de grupo"></canvas></div>
+<div class="leyenda">
+ <span><i style="background:#1F3864"></i>campo en el centro de la guía</span>
+ <span><i style="background:#B3261E"></i>envolvente del pulso (energía), <span class="m">v<sub>g</sub></span></span>
+ <span><i style="background:#111"></i>cresta marcada, <span class="m">v<sub>p</sub></span></span>
+ <span><i style="background:#6A3D9A"></i>señal en el vacío, <span class="m">c</span></span>
+ <span>Se desprecia el ensanchamiento del pulso; la longitud mostrada es 10 <span class="m">λ<sub>g</sub></span>.</span>
+</div>
+<p class="nota">Casos límite: cuando <span class="m">f</span> se acerca a <span class="m">f<sub>c</sub></span>, <span class="m">v<sub>p</sub></span> crece sin límite y <span class="m">v<sub>g</sub></span> tiende a cero; cuando <span class="m">f</span> es mucho mayor que <span class="m">f<sub>c</sub></span>, las dos tienden a <span class="m">c</span>. Por ejemplo, con <span class="m">f / f<sub>c</sub></span> = 2.7 se obtiene <span class="m">v<sub>p</sub></span> = 1.077 <span class="m">c</span> y <span class="m">v<sub>g</sub></span> = 0.929 <span class="m">c</span>.</p>
+
+<h2>Qué observar</h2>
+<ol class="obs">
+ <li>Bajamos la frecuencia hacia <span class="m">f<sub>c</sub></span>: el ángulo <span class="m">θ</span> tiende a 90°, los rayos rebotan casi perpendicularmente a las paredes y la marca de la energía apenas avanza.</li>
+ <li>Por debajo de <span class="m">f<sub>c</sub></span> no existe ningún ángulo que cumpla la condición en las paredes: el campo oscila en fase en toda la guía y su amplitud decae exponencialmente, como la onda evanescente de la reflexión total.</li>
+ <li>Subimos la frecuencia: <span class="m">θ</span> disminuye, <span class="m">λ<sub>g</sub></span> se acerca a <span class="m">λ</span><sub>0</sub> y las tres marcas de la carrera tienden a llegar juntas.</li>
+ <li>Elegimos «Onda plana 1» y «Onda plana 2»: cada una tiene frentes separados <span class="m">λ</span><sub>0</sub> a lo largo de su rayo; su suma se anula en las dos paredes para todo instante.</li>
+ <li>Seguimos la línea punteada de la figura superior: está fija sobre una cresta del campo total y avanza a <span class="m">v<sub>p</sub></span> &gt; <span class="m">c</span>. Lo que viaja a esa rapidez es un punto geométrico, no la energía.</li>
+ <li>Con <span class="m">f / f<sub>c</sub></span> = 2.7 comparamos las tres marcas de la carrera de la figura superior: llega primero la fase, después la señal en el vacío y al final la energía.</li>
+</ol>
+
+<h2>Comprobación</h2>
+<p>Guía WR-90 (<span class="m">a</span> = 22.86 mm) a 8.00 GHz. Calculamos primero en papel y después verificamos; se aceptan tres cifras significativas.</p>
+<div id="ejercicios"></div>
+
+<h2>Referencias</h2>
+<p class="ref">Pozar, D. M. (2012). <i>Microwave Engineering</i> (4.ª ed.). Wiley. Secciones 3.2 (guía de placas paralelas) y 3.3 (guía rectangular).<br>
+Ulaby, F. T., &amp; Ravaioli, U. (2015). <i>Fundamentals of Applied Electromagnetics</i> (7.ª ed.). Pearson. Capítulo 8.<br>
+Jackson, J. D. (1999). <i>Classical Electrodynamics</i> (3.ª ed.). Wiley. Secciones 7.8, 7.9 y 7.11 (velocidad de grupo, ensanchamiento de un pulso y llegada de una señal).</p>
+<p class="ref"><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+<p class="ref"><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Guía de onda: el modelo de la onda que rebota. Explorador interactivo</i> (Versión 1.4) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+</main>
+
+<script>
+"use strict";
+const C=3e8, $=id=>document.getElementById(id);
+const cv=$("cv"), g=cv.getContext("2d"), dv=$("dv"), h=dv.getContext("2d");
+const X0=92, Y0=34, GW=800, GH=160, NA=5;            // la vista abarca una longitud L = 5a
+const off=document.createElement("canvas"); off.width=200; off.height=40;
+const og=off.getContext("2d"), img=og.createImageData(200,40);
+const S={a:22.86e-3, f:10e9, vista:"total", pausa:false, sim:0, T0:0, rap:1, fin:null};
+function modelo(a,f){                                  // todas las magnitudes en SI
+  const fc=C/(2*a), prop=f>fc, lam0=C/f, kx=Math.PI/a, o={a,f,fc,prop,lam0,kx,L:NA*a};
+  if(prop){ o.sen=fc/f; o.cos=Math.sqrt(1-o.sen*o.sen); o.th=Math.asin(o.sen)*180/Math.PI;
+    o.lg=lam0/o.cos; o.vp=C/o.cos; o.vg=C*o.cos; o.beta=2*Math.PI/o.lg; }
+  else { o.alpha=(2*Math.PI/C)*Math.sqrt(fc*fc-f*f); }
+  return o;
+}
+function campo(m,vista,x,z,fase){                      // E_y normalizado a la amplitud de la vista
+  if(!m.prop) return Math.sin(m.kx*x)*Math.exp(-m.alpha*z)*Math.cos(fase);
+  if(vista==="A") return -Math.sin(fase-m.beta*z-m.kx*x);   // onda 1: viaja hacia +x (tramos ascendentes del rayo)
+  if(vista==="B") return  Math.sin(fase-m.beta*z+m.kx*x);   // onda 2: viaja hacia −x (tramos descendentes)
+  return Math.sin(m.kx*x)*Math.cos(fase-m.beta*z);          // suma de las dos, con amplitud 1/2 cada una
+}
+function fmt(v,n){ return Number(v).toPrecision(n).replace(/\.?0+e/,"e").replace(/e\+?(-?\d+)/,(s,e)=>" × 10"+sup(e)); }
+function sup(e){ return String(e).replace(/./g,ch=>({"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"}[ch])); }
+function fix(v,n){ return v.toFixed(n); }
+function m3(v){ const e=Math.floor(Math.log10(v)); return (v/Math.pow(10,e)).toFixed(2)+" × 10"+sup(e); }
+
+function lecturas(){
+  const m=modelo(S.a,S.f), r=[];
+  r.push(["Frecuencia de corte, <span class='m'>f<sub>c</sub> = c/(2a)</span>", fix(m.fc/1e9,3)+" GHz"]);
+  r.push(["Longitud de onda en el vacío, <span class='m'>λ</span><sub>0</sub>", fix(m.lam0*100,2)+" cm"]);
+  if(m.prop){
+    r.push(["<span class='m'><span class='r'>sen</span> θ = f<sub>c</sub>/f</span>", fix(m.sen,3)]);
+    r.push(["Ángulo del rayo con el eje, <span class='m'>θ</span>", fix(m.th,1)+"°"]);
+    r.push(["<span class='m'><span class='r'>cos</span> θ</span>", fix(m.cos,3)]);
+    r.push(["Longitud de onda en la guía, <span class='m'>λ<sub>g</sub></span>", fix(m.lg*100,2)+" cm"]);
+    r.push(["Velocidad de fase, <span class='m'>v<sub>p</sub></span>", m3(m.vp)+" m/s &nbsp;("+fix(m.vp/C,3)+" <span class='m'>c</span>)"]);
+    r.push(["Velocidad de grupo, <span class='m'>v<sub>g</sub></span>", m3(m.vg)+" m/s &nbsp;("+fix(m.vg/C,3)+" <span class='m'>c</span>)"]);
+    r.push(["Tiempo de tránsito por metro, <span class='m'>1/v<sub>g</sub></span>", fix(1e9/m.vg,2)+" ns &nbsp;(vacío: 3.33 ns)"]);
+  } else {
+    r.push(["Propagación","no hay ángulo <span class='m'>θ</span> posible"]);
+    r.push(["Constante de atenuación, <span class='m'>α</span>", fix(m.alpha,1)+" Np/m"]);
+    r.push(["Distancia de decaimiento a 1/e, <span class='m'>1/α</span>", fix(1000/m.alpha,2)+" mm"]);
+  }
+  $("tabla").tBodies[0].innerHTML=r.map(x=>"<tr><td>"+x[0]+"</td><td class='v'>"+x[1]+"</td></tr>").join("");
+  const e=$("estado");
+  if(!m.prop){ e.className="no"; e.innerHTML="<i>f</i> &lt; <i>f</i><sub>c</sub>: la guía no transmite. El campo decae exponencialmente a lo largo del eje."; }
+  else if(S.f>2*m.fc){ e.className="av"; e.innerHTML="<i>f</i> &gt; 2 <i>f</i><sub>c</sub>: la guía transmite, pero ya admite además el modo siguiente (una onda completa entre las paredes). Aquí solo se muestra el fundamental."; }
+  else { e.className="ok"; e.innerHTML="<i>f</i><sub>c</sub> &lt; <i>f</i> &lt; 2 <i>f</i><sub>c</sub>: la guía transmite un solo modo."; }
+  const pe=$("periodo");
+  if(m.prop){ pe.innerHTML="<b>En un periodo</b> <span class='m'>T = 1/f</span> = "+fix(1e12/S.f,1)+" ps: el frente de onda avanza <span class='m'>λ</span><sub>0</sub> = "+fix(m.lam0*100,2)+" cm a lo largo del rayo (rapidez <span class='m'>c</span>); su intersección con el eje avanza <span class='m'>λ<sub>g</sub></span> = "+fix(m.lg*100,2)+" cm (rapidez <span class='m'>v<sub>p</sub></span> = "+fix(m.vp/C,3)+" <span class='m'>c</span>); la energía avanza a lo largo del eje <span class='m'>λ</span><sub>0</sub> <span class='m'><span class='r'>cos</span> θ</span> = "+fix(m.lam0*m.cos*100,2)+" cm (rapidez <span class='m'>v<sub>g</sub></span> = "+fix(m.vg/C,3)+" <span class='m'>c</span>)."; }
+  else pe.innerHTML="Por debajo del corte no hay velocidad de fase ni de grupo: el campo no se propaga.";
+  $("rel").textContent=fix(S.f/m.fc,3);
+  $("rango").textContent=" de "+fix(0.5*m.fc/1e9,2)+" a "+fix(3*m.fc/1e9,2)+" GHz";
+  for(const b of document.querySelectorAll("input[name=vista]")){ if(b.value!=="total") b.disabled=!m.prop; }
+  if(!m.prop && S.vista!=="total"){ S.vista="total"; document.querySelector("input[name=vista][value=total]").checked=true; }
+  return m;
+}
+
+function color(v){                                      // escala divergente azul, blanco, rojo
+  const t=Math.min(1,Math.abs(v)), k=Math.pow(t,0.8);
+  return v>=0 ? [255-(255-193)*k,255-(255-58)*k,255-(255-43)*k] : [255-(255-31)*k,255-(255-95)*k,255-(255-191)*k];
+}
+function flecha(c,x1,y1,x2,y2,col,w){
+  const a=Math.atan2(y2-y1,x2-x1); c.strokeStyle=col; c.fillStyle=col; c.lineWidth=w||2;
+  c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
+  c.beginPath(); c.moveTo(x2,y2); c.lineTo(x2-9*Math.cos(a-0.35),y2-9*Math.sin(a-0.35)); c.lineTo(x2-9*Math.cos(a+0.35),y2-9*Math.sin(a+0.35)); c.closePath(); c.fill();
+}
+function ts(c,partes,x,y,al){                           // texto con subíndices: [[texto,esSubíndice],...]
+  const base=c.font, px=parseFloat(base.match(/([\d.]+)px/)[1]), chica=base.replace(/([\d.]+)px/,(px*0.76).toFixed(1)+"px");
+  let w=0; for(const q of partes){ c.font=q[1]?chica:base; w+=c.measureText(q[0]).width; }
+  let x0=al==="right"?x-w:(al==="center"?x-w/2:x); const ta=c.textAlign; c.textAlign="left";
+  for(const q of partes){ c.font=q[1]?chica:base; c.fillText(q[0],x0,y+(q[1]?px*0.28:0)); x0+=c.measureText(q[0]).width; }
+  c.font=base; c.textAlign=ta;
+}
+function regla(y,len,col,txt){
+  const px=Math.min(len,GW); g.strokeStyle=col; g.fillStyle=col; g.lineWidth=3;
+  g.beginPath(); g.moveTo(X0,y); g.lineTo(X0+px,y); g.stroke(); g.lineWidth=2;
+  g.beginPath(); g.moveTo(X0,y-5); g.lineTo(X0,y+5); g.stroke();
+  if(len<=GW){ g.beginPath(); g.moveTo(X0+px,y-5); g.lineTo(X0+px,y+5); g.stroke(); }
+  g.font="600 13px system-ui,sans-serif"; g.textAlign="right"; g.textBaseline="middle"; ts(g,txt,X0-8,y,"right");
+  if(len>GW){ g.textAlign="left"; g.fillText("continúa",X0+GW+6,y); }
+}
+function pista(y,z,L,col,txt,llego){
+  g.strokeStyle="#C9CFDA"; g.lineWidth=1; g.beginPath(); g.moveTo(X0,y); g.lineTo(X0+GW,y); g.stroke();
+  g.fillStyle=col; g.font="600 13px system-ui,sans-serif"; g.textAlign="right"; g.textBaseline="middle"; ts(g,txt,X0-8,y,"right");
+  if(z==null) return;
+  const x=X0+Math.min(z/L,1)*GW; g.beginPath(); g.moveTo(x,y); g.lineTo(x-9,y-6); g.lineTo(x-9,y+6); g.closePath(); g.fill();
+  if(llego){ g.textAlign="left"; g.font="12px system-ui,sans-serif"; g.fillText(llego,X0+GW+6,y); }
+}
+function dibuja(m){
+  const L=m.L, esc=GW/L, t=S.sim-S.T0, fase=2*Math.PI*S.f*t, d=img.data;
+  g.clearRect(0,0,cv.width,cv.height);
+  for(let j=0;j<40;j++){ const x=m.a*(1-(j+0.5)/40);
+    for(let i=0;i<200;i++){ const c3=color(campo(m,S.vista,x,L*(i+0.5)/200,fase)), p=4*(j*200+i);
+      d[p]=c3[0]; d[p+1]=c3[1]; d[p+2]=c3[2]; d[p+3]=255; } }
+  og.putImageData(img,0,0); g.imageSmoothingEnabled=true; g.drawImage(off,X0,Y0,GW,GH);
+  g.fillStyle="#3A3F4B"; g.fillRect(X0-2,Y0-8,GW+4,8); g.fillRect(X0-2,Y0+GH,GW+4,8);       // paredes conductoras
+  g.fillStyle="#333"; g.font="13px system-ui,sans-serif"; g.textAlign="right"; g.textBaseline="middle";
+  g.fillText("x = a",X0-8,Y0+2); g.fillText("x = 0",X0-8,Y0+GH-2);
+  g.textAlign="left"; g.textBaseline="alphabetic"; g.fillText("pared conductora",X0+4,Y0-13);
+  g.textAlign="right"; g.fillText("eje de la guía, z   →",X0+GW,Y0-13);
+  if(m.prop && $("rayos").checked){                     // rayo en zigzag con ángulo θ respecto del eje
+    const dz=m.a/Math.tan(m.th*Math.PI/180)*esc; let x=X0, arriba=true, n=0;
+    g.save(); g.beginPath(); g.rect(X0,Y0,GW,GH); g.clip();
+    g.strokeStyle="#111"; g.setLineDash([]); let xa=X0, ya=Y0+GH;
+    while(x<X0+GW && n<600){ x+=dz; const yb=arriba?Y0:Y0+GH, fuerte=S.vista==="total"||(S.vista==="A")===arriba;
+      g.globalAlpha=fuerte?1:0.22; g.lineWidth=fuerte&&S.vista!=="total"?2.4:1.6; g.beginPath(); g.moveTo(xa,ya); g.lineTo(x,yb); g.stroke();
+      xa=x; ya=yb; arriba=!arriba; n++; } g.globalAlpha=1; g.restore();
+    const ux=Math.cos(m.th*Math.PI/180), uy=Math.sin(m.th*Math.PI/180), q=Math.min(GH/uy,GW/Math.max(ux,1e-6))*0.55;
+    if(S.vista!=="B") flecha(g,X0+q*0.5*ux,Y0+GH-q*0.5*uy,X0+q*ux,Y0+GH-q*uy,"#111",1.6);
+    g.strokeStyle="#111"; g.lineWidth=1.2; g.beginPath(); g.arc(X0,Y0+GH,34,-m.th*Math.PI/180,0); g.stroke();
+    g.fillStyle="#111"; g.font="italic 600 15px Georgia,serif"; g.textAlign="left";
+    const am=m.th*Math.PI/360; g.fillText("θ",X0+42*Math.cos(am),Y0+GH-42*Math.sin(am)+5);
+  }
+  if($("perfil").checked && S.vista==="total"){                              // amplitud transversal |E_y| ∝ sen(πx/a)
+    g.strokeStyle="#2E7D32"; g.lineWidth=2.2; g.beginPath();
+    for(let k=0;k<=40;k++){ const xx=k/40, px=X0+GW-70+60*Math.sin(Math.PI*xx), py=Y0+GH*(1-xx); k?g.lineTo(px,py):g.moveTo(px,py); } g.stroke();
+    g.strokeStyle="#2E7D32"; g.lineWidth=1; g.setLineDash([3,3]); g.beginPath(); g.moveTo(X0+GW-70,Y0); g.lineTo(X0+GW-70,Y0+GH); g.stroke(); g.setLineDash([]);
+  }
+  let y=Y0+GH+30;
+  regla(y,m.lam0*esc,"#C1571B",[["λ",0],["0",1],[" = "+fix(m.lam0*100,2)+" cm",0]]);
+  if(m.prop){
+    regla(y+22,m.lg*esc,"#2E7D32",[["λ",0],["g",1],[" = "+fix(m.lg*100,2)+" cm",0]]);
+    const zc=C*t, zg=m.vg*t, N=Math.max(1,Math.floor(L/m.lg)), zp=(m.vp*t)%(N*m.lg);
+    if(zp<=L){ const xp=X0+zp*esc; g.strokeStyle="#111"; g.lineWidth=1.3; g.setLineDash([5,4]); g.beginPath(); g.moveTo(xp,Y0); g.lineTo(xp,Y0+GH+68); g.stroke(); g.setLineDash([]); }
+    y+=54;
+    pista(y,zp<=L?zp:null,L,"#111",[["fase, v",0],["p",1]],null);
+    pista(y+20,zc,L,"#6A3D9A",[["vacío, c",0]],zc>=L?fix(L/C*1e9,3)+" ns":null);
+    pista(y+40,zg,L,"#B3261E",[["energía, v",0],["g",1]],zg>=L?fix(L/m.vg*1e9,3)+" ns":null);
+    g.fillStyle="#5A5F6B"; g.font="12.5px system-ui,sans-serif"; g.textAlign="left"; g.textBaseline="alphabetic";
+    g.fillText("Carrera sobre la longitud mostrada, L = 5a = "+fix(L*100,2)+" cm. La línea punteada acompaña a una cresta del campo total.",X0,y+64);
+    if(zg>=L && zc>=L && S.fin==null) S.fin=performance.now();
+    S.zp=zp;
+  } else {
+    g.fillStyle="#8C1D17"; g.font="600 14px system-ui,sans-serif"; g.textAlign="left"; g.textBaseline="alphabetic";
+    g.fillText("Sin propagación: amplitud ∝ exp(−αz), con 1/α = "+fix(1000/m.alpha,2)+" mm. No hay velocidad de fase ni de grupo.",X0,y+40);
+  }
+}
+function curvas(m){
+  const W=dv.width,H=dv.height,x0=52,y0=H-44,w=W-70,hh=H-66, X=r=>x0+r/3*w, Y=v=>y0-v/3*hh;
+  h.clearRect(0,0,W,H);
+  h.fillStyle="#F3D9D6"; h.fillRect(X(0),Y(3),X(1)-X(0),hh); h.fillStyle="#FFF4DD"; h.fillRect(X(2),Y(3),X(3)-X(2),hh);
+  h.strokeStyle="#C9CFDA"; h.lineWidth=1; h.font="12px system-ui,sans-serif"; h.fillStyle="#333";
+  for(let k=0;k<=3;k++){ h.beginPath(); h.moveTo(X(k),y0); h.lineTo(X(k),Y(3)); h.stroke(); h.beginPath(); h.moveTo(x0,Y(k)); h.lineTo(X(3),Y(k)); h.stroke();
+    h.textAlign="center"; h.textBaseline="top"; h.fillText(k,X(k),y0+5); h.textAlign="right"; h.textBaseline="middle"; h.fillText(k,x0-6,Y(k)); }
+  h.strokeStyle="#333"; h.strokeRect(x0,Y(3),w,hh);
+  h.strokeStyle="#6A3D9A"; h.setLineDash([5,4]); h.lineWidth=1.4; h.beginPath(); h.moveTo(X(0),Y(1)); h.lineTo(X(3),Y(1)); h.stroke(); h.setLineDash([]);
+  const traza=(fn,col)=>{ h.strokeStyle=col; h.lineWidth=2.4; h.beginPath(); let ini=true;
+    for(let r=1.0005;r<=3;r+=0.004){ const v=fn(Math.sqrt(1-1/(r*r))); if(v>3) continue; ini?h.moveTo(X(r),Y(v)):h.lineTo(X(r),Y(v)); ini=false; } h.stroke(); };
+  traza(c=>1/c,"#111"); traza(c=>c,"#B3261E");
+  h.font="600 13px system-ui,sans-serif"; h.textAlign="left"; h.textBaseline="middle";
+  h.fillStyle="#111"; ts(h,[["v",0],["p",1],[" / c",0]],X(1.45),Y(1.66),"left"); h.fillStyle="#B3261E"; ts(h,[["v",0],["g",1],[" / c",0]],X(1.45),Y(0.5),"left"); h.fillStyle="#6A3D9A"; h.fillText("c",X(2.86),Y(1.14));
+  h.fillStyle="#8C1D17"; h.font="12px system-ui,sans-serif"; h.textAlign="center"; h.fillText("corte",X(0.5),Y(2.8));
+  h.fillStyle="#7A4B00"; h.fillText("más de un modo",X(2.5),Y(2.8));
+  h.fillStyle="#333"; h.font="13px system-ui,sans-serif"; h.textBaseline="alphabetic"; ts(h,[["f / f",0],["c",1]],x0+w/2,H-8,"center");
+  h.save(); h.translate(14,Y(1.5)); h.rotate(-Math.PI/2); h.fillText("velocidad / c",0,0); h.restore();
+  const r=S.f/m.fc; h.strokeStyle="#C1571B"; h.lineWidth=1.6; h.beginPath(); h.moveTo(X(r),y0); h.lineTo(X(r),Y(3)); h.stroke();
+  if(m.prop){ for(const [v,col] of [[m.vp/C,"#111"],[m.vg/C,"#B3261E"]]){ if(v<=3){ h.fillStyle=col; h.beginPath(); h.arc(X(r),Y(v),5,0,7); h.fill(); h.strokeStyle="#fff"; h.lineWidth=1.5; h.stroke(); } } }
+}
+const pv=$("pv"), q=pv.getContext("2d"), P={t:0,el:0,k:null};
+function pulso(m,dt){                                   // pulso de banda angosta: A(z − v_g t) cos(ωt − βz)
+  const W=pv.width, x0=92, w=800, yc=92, amp=62; q.clearRect(0,0,W,pv.height);
+  q.font="600 13px system-ui,sans-serif"; q.textBaseline="middle";
+  if(!m.prop){ q.fillStyle="#8C1D17"; q.textAlign="left"; q.fillText("Por debajo del corte no se propaga ningún pulso.",x0,yc); return; }
+  const Lp=10*m.lg, sig=1.1*m.lg, z0=2.4*m.lg, X=z=>x0+z/Lp*w;
+  if(!S.pausa){ P.t+=dt*S.rap*Lp/(6*C); P.el+=dt; }       // cámara lenta: c recorre la longitud mostrada en 6 s
+  if(z0+m.vg*P.t>Lp-2.4*m.lg || P.el>16){ P.t=0; P.el=0; P.k=null; }
+  const ze=z0+m.vg*P.t, env=z=>Math.exp(-(z-ze)*(z-ze)/(2*sig*sig)), E=z=>env(z)*Math.cos(m.beta*(z-z0-m.vp*P.t));
+  q.strokeStyle="#C9CFDA"; q.lineWidth=1; q.beginPath(); q.moveTo(x0,yc); q.lineTo(x0+w,yc); q.stroke();
+  q.strokeStyle="#B3261E"; q.lineWidth=1.6; q.setLineDash([6,4]);
+  for(const sg of [1,-1]){ q.beginPath(); for(let i=0;i<=400;i++){ const z=Lp*i/400, y=yc-sg*amp*env(z); i?q.lineTo(X(z),y):q.moveTo(X(z),y); } q.stroke(); }
+  q.setLineDash([]); q.strokeStyle="#1F3864"; q.lineWidth=2; q.beginPath();
+  for(let i=0;i<=1600;i++){ const z=Lp*i/1600, y=yc-amp*E(z); i?q.lineTo(X(z),y):q.moveTo(X(z),y); } q.stroke();
+  const zk=k=>z0+m.vp*P.t+k*m.lg;                         // posiciones de las crestas de la portadora
+  if(P.k==null || zk(P.k)-ze>2.3*sig) P.k=Math.ceil((ze-2.3*sig-z0-m.vp*P.t)/m.lg);
+  const zc=zk(P.k); P.zc=zc; P.Ec=E(zc); P.envc=env(zc);
+  q.fillStyle="#111"; q.beginPath(); q.arc(X(zc),yc-amp*env(zc),6,0,7); q.fill(); q.strokeStyle="#fff"; q.lineWidth=1.5; q.stroke();
+  const fila=(y,z,col,txt)=>{ q.strokeStyle="#C9CFDA"; q.lineWidth=1; q.beginPath(); q.moveTo(x0,y); q.lineTo(x0+w,y); q.stroke();
+    q.fillStyle=col; q.textAlign="right"; ts(q,txt,x0-8,y,"right"); const x=X(Math.min(Math.max(z,0),Lp));
+    q.beginPath(); q.moveTo(x,y); q.lineTo(x-9,y-6); q.lineTo(x-9,y+6); q.closePath(); q.fill(); };
+  fila(184,zc,"#111",[["cresta, v",0],["p",1]]); fila(204,z0+C*P.t,"#6A3D9A",[["vacío, c",0]]); fila(224,ze,"#B3261E",[["pulso, v",0],["g",1]]);
+  q.fillStyle="#333"; q.textAlign="right"; q.font="13px system-ui,sans-serif"; q.fillText("eje de la guía, z   →",x0+w,14); q.textAlign="left"; q.fillText("campo eléctrico en el centro de la guía",x0,14);
+}
+let M=null, tAnt=null;
+function actualiza(){ M=lecturas(); curvas(M); reinicia(); reiniciaPulso(); }
+function reinicia(){ S.T0=S.sim; S.fin=null; }
+function reiniciaPulso(){ P.t=0; P.el=0; P.k=null; }
+function cuadro(ts){
+  if(tAnt==null) tAnt=ts; const dt=Math.min(0.05,(ts-tAnt)/1000); tAnt=ts;
+  if(!S.pausa) S.sim+=dt*S.rap*M.L/(4*C);                  // cámara lenta: c recorre L en 4 s
+  if(S.fin!=null && performance.now()-S.fin>1500) reinicia();
+  if(M.prop && (S.sim-S.T0)*M.vg<M.L && (S.sim-S.T0)>12*M.L/(4*C)) reinicia();
+  dibuja(M); pulso(M,dt); requestAnimationFrame(cuadro);
+}
+function ponF(f){ const fc=C/(2*S.a); S.f=Math.min(3*fc,Math.max(0.5*fc,f)); $("fDes").value=S.f/fc; $("fNum").value=(S.f/1e9).toFixed(3); actualiza(); }
+$("fDes").addEventListener("input",e=>{ S.f=parseFloat(e.target.value)*C/(2*S.a); $("fNum").value=(S.f/1e9).toFixed(3); actualiza(); });
+$("fNum").addEventListener("change",e=>{ const v=parseFloat(e.target.value); if(isFinite(v)&&v>0) ponF(v*1e9); else ponF(S.f); });
+function ponA(){ const v=parseFloat($("guia").value); $("aPers").hidden=v!==0;
+  const mm=v!==0?v:Math.min(500,Math.max(1,parseFloat($("aMm").value)||30)); const rel=parseFloat($("fDes").value); S.a=mm*1e-3;
+  ponF(v===22.86?10e9:(v===72.136?3e9:rel*C/(2*S.a))); }
+$("guia").addEventListener("change",ponA); $("aMm").addEventListener("change",ponA);
+for(const b of document.querySelectorAll("input[name=vista]")) b.addEventListener("change",e=>{ S.vista=e.target.value; });
+$("pausa").addEventListener("click",e=>{ S.pausa=!S.pausa; e.target.textContent=S.pausa?"Continuar":"Pausar"; e.target.setAttribute("aria-pressed",S.pausa); });
+$("carrera").addEventListener("click",()=>{ reinicia(); reiniciaPulso(); });
+$("rap").addEventListener("input",e=>{ S.rap=parseFloat(e.target.value); });
+
+// Comprobación: tres intentos antes de mostrar la pista
+const R8=modelo(22.86e-3,8e9);
+const EJ=[
+ {t:"(a) Ángulo <span class='m'>θ</span> entre el rayo y el eje, en grados.",v:R8.th,u:"°",p:"Pista: <span class='m'><span class='r'>sen</span> θ = f<sub>c</sub>/f</span>, con <span class='m'>f<sub>c</sub> = c/(2a)</span> = 6.56 GHz."},
+ {t:"(b) Longitud de onda en la guía, <span class='m'>λ<sub>g</sub></span>, en centímetros.",v:R8.lg*100,u:"cm",p:"Pista: <span class='m'>λ</span><sub>0</sub> = 3.75 cm y <span class='m'>λ<sub>g</sub> = λ</span><sub>0</sub><span class='m'>/<span class='r'>cos</span> θ</span>."},
+ {t:"(c) Velocidad de grupo, <span class='m'>v<sub>g</sub></span>, en unidades de 10<sup>8</sup> m/s.",v:R8.vg/1e8,u:"× 10⁸ m/s",p:"Pista: <span class='m'>v<sub>g</sub> = c <span class='r'>cos</span> θ</span>; debe ser menor que <span class='m'>c</span>."}];
+$("ejercicios").innerHTML=EJ.map((e,i)=>"<div class='ej'><div>"+e.t+"</div><div class='fila' style='margin-top:6px'><input type='number' step='any' id='r"+i+"' aria-label='Respuesta "+(i+1)+"'> <span>"+e.u+"</span> <button class='sec' data-i='"+i+"'>Verificar</button></div><div class='res' id='m"+i+"' role='status' aria-live='polite'></div></div>").join("");
+const intentos=[0,0,0];
+$("ejercicios").addEventListener("click",ev=>{ const i=ev.target.dataset&&ev.target.dataset.i; if(i==null) return;
+  const v=parseFloat($("r"+i).value), e=EJ[i], out=$("m"+i); if(!isFinite(v)){ out.innerHTML="<span class='mal'>Escriba un número.</span>"; return; }
+  if(Math.abs(v-e.v)<=0.006*Math.abs(e.v)){ out.innerHTML="<span class='bien'>Correcto.</span>"; return; }
+  intentos[i]++; out.innerHTML="<span class='mal'>Todavía no coincide (intento "+intentos[i]+").</span>"+(intentos[i]>=3?" <span class='pista'>"+e.p+"</span>":""); });
+window.__prueba={modelo,campo,S,P,get M(){return M;}};
+ponA(); requestAnimationFrame(cuadro);
+</script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
+</body>
+</html>
+<!-- navegacion:inicio -->
+<style>
+  :root{--nv-w:272px}
+  body{margin-top:0!important}
+  @media (min-width:1100px){ body{margin-left:var(--nv-w)!important} }
+  .nvside{position:fixed;top:0;left:0;bottom:0;width:var(--nv-w);z-index:9999;display:flex;flex-direction:column;
+    background:var(--card,#fff);border-right:1px solid var(--line,#e2dcc9);
+    font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:14px;color:var(--ink,#1a1a1a);
+    box-shadow:1px 0 8px rgba(0,0,0,.05);transition:transform .2s ease}
+  .nvside a{text-decoration:none;color:inherit}
+  .nv-cab{padding:14px 16px 10px;border-bottom:1px solid var(--line,#e2dcc9)}
+  .nv-marca{display:block;font-family:"Century Gothic","Questrial",Arial,sans-serif;font-weight:700;font-size:15px;
+    line-height:1.25;color:var(--navy,var(--ink,#1F3864))}
+  .nv-marca small{display:block;font-weight:400;font-size:12px;color:var(--muted,#5a5a5a);margin-top:2px}
+  .nv-pasos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .nv-paso{display:flex;flex-direction:column;gap:1px;padding:6px 8px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font-size:11px;color:var(--muted,#5a5a5a);min-width:0}
+  .nv-paso b{font-size:12.5px;color:var(--ink,#1a1a1a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nv-paso.sig{text-align:right}
+  .nv-paso:hover{background:var(--bg,#f4f1ea)}
+  .nv-paso[aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-busca{margin-top:8px;width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font:inherit;background:var(--bg,#f8f6f0);color:inherit}
+  .nv-lista{flex:1;overflow-y:auto;padding:6px 8px 10px}
+  .nv-grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8a8fa0);padding:12px 8px 4px}
+  .nv-lista a{display:block;padding:6px 8px 6px 10px;border-radius:6px;border-left:3px solid transparent;line-height:1.3}
+  .nv-lista a small{display:block;font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-lista a:hover{background:var(--bg,#f4f1ea)}
+  .nv-lista a.nv-aqui{background:var(--bg,#f4f1ea);border-left-color:var(--accent,#C1571B);font-weight:700}
+  .nv-pie{padding:8px 14px;border-top:1px solid var(--line,#e2dcc9);font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-boton{display:none;position:fixed;top:10px;left:10px;z-index:10000;gap:6px}
+  .nv-boton a,.nv-boton button{display:flex;align-items:center;justify-content:center;height:38px;min-width:38px;padding:0 10px;
+    border:1px solid var(--line,#e2dcc9);border-radius:9px;background:var(--card,#fff);color:var(--ink,#1a1a1a);
+    font:600 14px Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .nv-boton [aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-velo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:10001}
+  .nv-cierra{display:none;position:absolute;top:10px;right:10px;width:32px;height:32px;border:1px solid var(--line,#e2dcc9);border-radius:8px;background:var(--card,#fff);color:inherit;font-size:16px;cursor:pointer}
+  .nv-cab{position:relative}
+  @media (max-width:1099px){
+    body{margin-top:56px!important}
+    .nvside{transform:translateX(-102%);width:min(320px,88vw)}
+    .nvside.abierto{transform:none;z-index:10002}
+    .nv-cierra{display:block}
+    .nv-boton{display:flex}
+    .nvside.abierto ~ .nv-velo{display:block}
+  }
+  @media print{.nvside,.nv-boton,.nv-velo{display:none} body{margin:0!important}}
+</style>
+<nav class="nvside" id="nvside" aria-label="Exploradores del curso">
+  <div class="nv-cab">
+    <button class="nv-cierra" id="nv-cierra" aria-label="Cerrar el temario">✕</button>
+    <a class="nv-marca" href="index.html">Exploradores de Teoría Electromagnética<small>ENES Juriquilla, UNAM · inicio</small></a>
+    <div class="nv-pasos">
+      <a class="nv-paso" id="nv-ant" href="#" aria-label="Explorador anterior">‹ anterior<b id="nv-ant-t">…</b></a>
+      <a class="nv-paso sig" id="nv-sig" href="#" aria-label="Explorador siguiente">siguiente ›<b id="nv-sig-t">…</b></a>
+    </div>
+    <input class="nv-busca" id="nv-busca" type="search" placeholder="Buscar (tecla /)" aria-label="Buscar explorador">
+  </div>
+  <div class="nv-lista" id="nv-lista">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss<small>1.1 · P1</small></a>
+<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico<small>1.2 · P1</small></a>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito<small>1.4 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday<small>1.6 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores<small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas<small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel<small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización<small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler<small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal<small>3.2 · P8</small></a>
+<a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8 · P11</small></a>
+<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
+<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
+<a href="ImpedanciaEntrada_explorador.html" data-nv="ImpedanciaEntrada_explorador.html">Líneas cortas como reactancias<small>4.5–4.6 · P14</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7 · P15</small></a>
+<a href="Acoplamiento_explorador.html" data-nv="Acoplamiento_explorador.html">Acoplamiento λ/4 y stub<small>4.8–4.9 · P15</small></a>
+<a href="OndaQueRebota_explorador.html" data-nv="OndaQueRebota_explorador.html">Guía de onda: onda que rebota<small>4.10</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12 · P16</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>
+  </div>
+  <div class="nv-pie">Teclas: ← anterior · → siguiente · / buscar · Esc cerrar</div>
+</nav>
+<div class="nv-boton"><button id="nv-abre" aria-controls="nvside" aria-expanded="false">☰ Temario</button>
+  <a id="nv-ant2" href="#" aria-label="Anterior">‹</a><a id="nv-sig2" href="#" aria-label="Siguiente">›</a></div>
+<div class="nv-velo" id="nv-velo"></div>
+<script>
+(function(){
+  var lista=document.getElementById('nv-lista'), side=document.getElementById('nvside');
+  var l=lista.querySelectorAll('a[data-nv]'), orden=[], dat={};
+  for(var i=0;i<l.length;i++){var f=l[i].getAttribute('data-nv');orden.push(f);
+    dat[f]={el:l[i],t:l[i].childNodes[0].textContent.trim()};}
+  var aqui=(location.pathname.split('/').pop()||'index.html'), k=orden.indexOf(aqui);
+  function paso(idA,idT,j){var a=document.getElementById(idA);
+    if(j<0||j>=orden.length){a.setAttribute('aria-disabled','true');if(idT)document.getElementById(idT).textContent='';return;}
+    a.href=orden[j];a.title=dat[orden[j]].t+(j<k?' (tecla ←)':' (tecla →)');if(idT)document.getElementById(idT).textContent=dat[orden[j]].t;}
+  if(k>=0){dat[aqui].el.className='nv-aqui';dat[aqui].el.setAttribute('aria-current','page');
+    paso('nv-ant','nv-ant-t',k-1);paso('nv-sig','nv-sig-t',k+1);paso('nv-ant2',null,k-1);paso('nv-sig2',null,k+1);
+    setTimeout(function(){var r=dat[aqui].el;lista.scrollTop=r.offsetTop-lista.clientHeight/3;},0);}
+  else{paso('nv-ant','nv-ant-t',-1);paso('nv-sig','nv-sig-t',0);paso('nv-ant2',null,-1);paso('nv-sig2',null,0);}
+  var bus=document.getElementById('nv-busca');
+  bus.addEventListener('input',function(){var q=bus.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    var grp=null,vis=0;
+    Array.prototype.forEach.call(lista.children,function(c){
+      if(c.classList.contains('nv-grp')){if(grp)grp.style.display=vis?'':'none';grp=c;vis=0;return;}
+      var t=c.textContent.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      var ok=!q||t.indexOf(q)>=0;c.style.display=ok?'':'none';if(ok)vis++;});
+    if(grp)grp.style.display=vis?'':'none';});
+  bus.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=lista.querySelector('a[data-nv]:not([style*="none"])');if(v)location.href=v.href;}});
+  var abre=document.getElementById('nv-abre'), velo=document.getElementById('nv-velo');
+  function cambia(on){side.classList.toggle('abierto',on);abre.setAttribute('aria-expanded',on?'true':'false');}
+  abre.addEventListener('click',function(){cambia(!side.classList.contains('abierto'));});
+  velo.addEventListener('click',function(){cambia(false);});
+  document.getElementById('nv-cierra').addEventListener('click',function(){cambia(false);});
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toUpperCase();
+    if(e.key==='Escape'){cambia(false);if(t==='INPUT')e.target.blur();return;}
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
+    if(e.key==='/'){e.preventDefault();if(innerWidth<1100)cambia(true);bus.focus();return;}
+    if(k<0) return;
+    if(e.key==='ArrowLeft'&&k>0) location.href=orden[k-1];
+    if(e.key==='ArrowRight'&&k<orden.length-1) location.href=orden[k+1];
+  });
+})();
+</script>
+<!-- navegacion:fin -->

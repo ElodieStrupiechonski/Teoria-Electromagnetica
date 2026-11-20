@@ -47,6 +47,7 @@ NAV = [
    ("ImpedanciaEntrada_explorador.html","Líneas cortas como reactancias","4.5–4.6 · P14"),
    ("Smith_explorador.html",          "Carta de Smith",              "4.7 · P15"),
    ("Acoplamiento_explorador.html",   "Acoplamiento λ/4 y stub",     "4.8–4.9 · P15"),
+   ("OndaQueRebota_explorador.html",  "Guía de onda: onda que rebota","4.10"),
    ("GuiaOnda_explorador.html",       "Guía de onda rectangular",    "4.10–4.12 · P16"),
  ]),
  ("Transversales", [
