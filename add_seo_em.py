@@ -23,7 +23,7 @@ INI, FIN = "<!-- seo:inicio -->", "<!-- seo:fin -->"
 # archivo: (título, descripción ≤ ~160 caracteres, temas)
 PAGINAS = {
  "index.html": ("Teoría Electromagnética: exploradores interactivos (ENES Juriquilla, UNAM)",
-   "22 simuladores gratuitos de electromagnetismo en español: Gauss, inducción, ondas planas, Fresnel, líneas de transmisión, carta de Smith, acoplamiento y guías de onda.",
+   "24 simuladores gratuitos de electromagnetismo en español: Gauss, inducción, ondas planas, Fresnel, líneas de transmisión, carta de Smith, acoplamiento y guías de onda.",
    ["electromagnetismo", "ondas electromagnéticas", "líneas de transmisión"]),
  "CampoGauss_explorador.html": ("Ley de Gauss: simulador interactivo de flujo eléctrico",
    "Arrastra una superficie gaussiana alrededor de una carga puntual, una esfera cargada o una lámina y comprueba que el flujo solo depende de la carga encerrada.",
@@ -85,6 +85,9 @@ PAGINAS = {
  "OndaQueRebota_explorador.html": ("Guía de onda: el modelo de la onda que rebota, velocidad de fase y de grupo",
    "Dos ondas planas que rebotan entre dos paredes conductoras: frecuencia de corte, longitud de onda en la guía y por qué la velocidad de fase supera a c sin transportar energía.",
    ["guía de onda", "frecuencia de corte", "velocidad de fase", "velocidad de grupo"]),
+ "FEM_explorador.html": ("Método del elemento finito en una guía de onda: simulador paso a paso",
+   "Elemento finito en el navegador: malla de triángulos, matrices de rigidez y de masa, frecuencias de corte de los modos TE, convergencia de la malla y guía de doble cresta.",
+   ["método del elemento finito", "guía de onda", "frecuencia de corte", "simulación electromagnética"]),
  "GuiaOnda_explorador.html": ("Guía de onda rectangular: modos y frecuencia de corte",
    "Frecuencias de corte TE y TM, banda monomodo, longitud de onda guiada y velocidades de fase y de grupo en guías WR-90, WR-284 y WR-42.",
    ["guía de onda", "frecuencia de corte", "modo TE10"]),

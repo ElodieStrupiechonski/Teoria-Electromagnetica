@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<!-- tipografia:inicio -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root:root{
+    --f-tit:"Century Gothic","Questrial","URW Gothic","Avant Garde",sans-serif;
+    --sans:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",Calibri,sans-serif;
+    --serif:Cambria,"STIX Two Text","Times New Roman",serif;
+    --mono:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",sans-serif;
+  }
+  body,button,input,select,textarea{font-family:var(--sans)}
+  body{font-variant-numeric:tabular-nums}
+  h1,h2,h3,.ct,.eyebrow,header .sub{font-family:var(--f-tit)!important;letter-spacing:0}
+  sub,sup{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}
+  sub{bottom:-.25em} sup{top:-.45em}
+</style>
+<script>
+(function(){
+  // ---- lienzos: subíndices y superíndices escritos como Z_L, V_inc, e^(−z/δ) ----
+  var RX=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})/g;
+  var P=CanvasRenderingContext2D.prototype, F=P.fillText;
+  P.fillText=function(t,x,y,mw){
+    t=String(t);
+    if((t.indexOf('_')<0&&t.indexOf('^')<0)||/\.(html|py|png|csv|txt|svg|jpg|pdf)\b/i.test(t)) return F.call(this,t,x,y,mw);
+    var sg=[],last=0,m; RX.lastIndex=0;
+    while((m=RX.exec(t))){
+      if(m[1]){sg.push([t.slice(last,m.index)+m[1],0]);sg.push([m[2].replace(/[{}]/g,''),1]);}
+      else{sg.push([t.slice(last,m.index),0]);sg.push([m[3].replace(/[{}()]/g,''),2]);}
+      last=RX.lastIndex;
+    }
+    if(!sg.length) return F.call(this,t,x,y,mw);
+    sg.push([t.slice(last),0]);
+    var f0=this.font, mm=/(\d+(?:\.\d+)?)px/.exec(f0), px=mm?+mm[1]:12,
+        fs=mm?f0.replace(mm[0],(px*0.72).toFixed(1)+'px'):f0, W=0,i;
+    for(i=0;i<sg.length;i++){this.font=sg[i][1]?fs:f0;sg[i][2]=this.measureText(sg[i][0]).width;W+=sg[i][2];}
+    var a=this.textAlign, x0=x;
+    if(a==='center') x0=x-W/2; else if(a==='right'||a==='end') x0=x-W;
+    this.textAlign='left';
+    for(i=0;i<sg.length;i++){
+      this.font=sg[i][1]?fs:f0;
+      F.call(this,sg[i][0],x0,y+(sg[i][1]===1?0.28*px:sg[i][1]===2?-0.38*px:0));
+      x0+=sg[i][2];
+    }
+    this.font=f0; this.textAlign=a;
+  };
+  // ---- texto generado por los scripts: misma notación en <sub>/<sup> ----
+  if(/AnatomiaGrafica/.test(location.pathname)) return;
+  var US=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})|([₀-₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ]+)/g;
+  var UNI="₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ", ASC="0123456789aeoxhklmnpstiruvj";
+  var SALTA={SCRIPT:1,STYLE:1,TEXTAREA:1,OPTION:1,PRE:1,CODE:1,TITLE:1,INPUT:1,SELECT:1};
+  function arreglar(n){
+    var p=n.parentNode; if(!p||SALTA[p.nodeName]||p.namespaceURI==='http://www.w3.org/2000/svg') return;
+    var t=n.nodeValue; US.lastIndex=0; if(!US.test(t)||/\.(html|py|png|csv)\b/.test(t)) return;
+    US.lastIndex=0; var fr=document.createDocumentFragment(), last=0, m, e;
+    while((m=US.exec(t))){
+      var antes=t.slice(last,m.index);
+      if(m[1]){fr.appendChild(document.createTextNode(antes+m[1]));e=document.createElement('sub');e.textContent=m[2].replace(/[{}]/g,'');}
+      else if(m[3]){fr.appendChild(document.createTextNode(antes));e=document.createElement('sup');e.textContent=m[3].replace(/[{}()]/g,'');}
+      else{fr.appendChild(document.createTextNode(antes));e=document.createElement('sub');
+        e.textContent=m[4].split('').map(function(c){return ASC[UNI.indexOf(c)];}).join('');}
+      fr.appendChild(e); last=US.lastIndex;
+    }
+    fr.appendChild(document.createTextNode(t.slice(last)));
+    p.replaceChild(fr,n);
+  }
+  function recorrer(r){
+    if(r.nodeType===3){arreglar(r);return;}
+    if(r.nodeType!==1||SALTA[r.nodeName]) return;
+    var w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT,null), l=[], n;
+    while((n=w.nextNode())) l.push(n);
+    l.forEach(arreglar);
+  }
+  function inicio(){
+    recorrer(document.body);
+    new MutationObserver(function(ms){ms.forEach(function(m){
+      if(m.type==='characterData') arreglar(m.target); else m.addedNodes.forEach(recorrer);
+    });}).observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',inicio); else inicio();
+})();
+</script>
+<!-- tipografia:fin -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
+<title>Método del elemento finito en una guía de onda: simulador paso a paso</title>
+<!-- seo:inicio -->
+<meta name="description" content="Elemento finito en el navegador: malla de triángulos, matrices de rigidez y de masa, frecuencias de corte de los modos TE, convergencia de la malla y guía de doble cresta.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/FEM_explorador.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Método del elemento finito en una guía de onda: simulador paso a paso">
+<meta property="og:description" content="Elemento finito en el navegador: malla de triángulos, matrices de rigidez y de masa, frecuencias de corte de los modos TE, convergencia de la malla y guía de doble cresta.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/FEM_explorador.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Método del elemento finito en una guía de onda: simulador paso a paso",
+ "description": "Elemento finito en el navegador: malla de triángulos, matrices de rigidez y de masa, frecuencias de corte de los modos TE, convergencia de la malla y guía de doble cresta.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/FEM_explorador.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "método del elemento finito",
+  "guía de onda",
+  "frecuencia de corte",
+  "simulación electromagnética"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética: exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México, ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
+<meta name="description" content="Método del elemento finito paso a paso: malla, matrices de cada triángulo, frecuencias de corte de una guía de onda, convergencia y guía con crestas.">
+<style>
+:root{--navy:#1F3864;--acc:#C1571B;--verde:#2E7D32;--azul:#1F5FBF;--rojo:#B3261E;--gris:#5A5F6B;--suave:#EEF3FA;--borde:#D5DBE6;--tinta:#1b1e27}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--tinta);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:18px 16px 40px}
+.eyebrow{font:600 12px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--acc);text-transform:uppercase}
+h1{font:700 30px/1.15 Spectral,Georgia,"Times New Roman",serif;color:var(--navy);margin:6px 0 6px}
+h2{font:700 20px/1.2 Spectral,Georgia,"Times New Roman",serif;color:var(--navy);margin:26px 0 8px;border-bottom:1px solid var(--borde);padding-bottom:4px}
+p{margin:8px 0}
+.lede{color:#333;max-width:860px}
+.m{font-family:"Latin Modern Math","Cambria Math","STIX Two Math",Georgia,serif;font-style:italic;white-space:nowrap}
+.m .r{font-style:normal}
+.panel{border:1px solid var(--borde);border-radius:8px;padding:12px;margin:12px 0;background:#fff}
+.controles{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px 22px;align-items:end}
+label{display:block;font-size:14px;color:#333;font-weight:600}
+select,input[type=number]{font:inherit;padding:5px 7px;border:1px solid #AEB6C4;border-radius:5px;background:#fff;color:inherit}
+input[type=number]{width:92px}
+input[type=range]{width:100%;margin:6px 0 0}
+.fila{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:10px}
+.fila label{font-weight:400;display:inline-flex;gap:6px;align-items:center}
+button{font:inherit;padding:6px 12px;border:1px solid var(--navy);border-radius:5px;background:var(--navy);color:#fff;cursor:pointer}
+button.sec{background:#fff;color:var(--navy)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #F2B04C;outline-offset:1px}
+.lienzo{width:100%;overflow-x:auto}
+canvas{display:block;max-width:100%;height:auto}
+#cv{cursor:crosshair}
+.estado{font-weight:600;padding:6px 10px;border-radius:5px;margin:8px 0 0;font-size:15px;background:var(--suave);color:var(--navy)}
+.dos{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px}
+@media(max-width:760px){.dos{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{padding:5px 8px;border-bottom:1px solid var(--borde);text-align:right;vertical-align:baseline;font-variant-numeric:tabular-nums}
+td:first-child,th:first-child{text-align:left}
+th{font-size:13px;color:var(--gris);font-weight:600}
+tr.sel td{background:#FFF4DD}
+tbody tr.modo{cursor:pointer}
+.mat{display:inline-table;width:auto;margin:4px 14px 4px 0;font-size:14px;vertical-align:middle}
+.mat td{border:0;padding:2px 9px;text-align:right}
+.mat{border-left:2px solid #333;border-right:2px solid #333;border-radius:6px}
+.leyenda{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13.5px;color:#333;margin-top:6px}
+.leyenda i{display:inline-block;width:22px;height:4px;vertical-align:middle;margin-right:6px;border-radius:2px}
+.ej{border-left:4px solid var(--navy);background:var(--suave);padding:8px 12px;margin:10px 0;border-radius:0 6px 6px 0}
+.ej .res{font-size:14px;margin-top:4px;min-height:1.4em}
+.pista{color:#7A4B00}.bien{color:#1D5A22;font-weight:600}.mal{color:#8C1D17}
+.ref{font-size:14px;color:#333}.nota{font-size:14px;color:var(--gris)}
+ol.obs li{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">Teoría Electromagnética · Unidad 4 · temas 4.10 y 4.11 · práctica 16</div>
+<h1>Elemento finito en una guía de onda</h1>
+<p class="lede">Los programas de simulación electromagnética dividen la sección de la guía en triángulos y convierten la ecuación de onda en un problema de matrices. Aquí lo hacemos en el navegador, a la vista: la malla, las matrices de cada triángulo, las frecuencias de corte y su error. En todos los cálculos <span class="m">c</span> = 3 × 10<sup>8</sup> m/s y la guía está llena de aire.</p>
+
+<div class="panel">
+ <div class="controles">
+  <div><label for="guia">Guía</label>
+   <select id="guia">
+    <option value="22.86,10.16">WR-90 · 22.86 × 10.16 mm (banda X)</option>
+    <option value="72.136,34.036">WR-284 · 72.14 × 34.04 mm (banda S)</option>
+    <option value="10.668,4.318">WR-42 · 10.67 × 4.32 mm (banda K)</option>
+    <option value="0">Personalizada</option>
+   </select>
+   <span id="pers" hidden><br><span class="m">a</span> = <input type="number" id="aMm" min="2" max="300" step="0.01" value="30" aria-label="Lado a en milímetros"> mm&nbsp; <span class="m">b</span> = <input type="number" id="bMm" min="1" max="300" step="0.01" value="15" aria-label="Lado b en milímetros"> mm</span>
+  </div>
+  <div><label for="nx">Divisiones a lo largo de <span class="m">a</span>: <span id="nxv"></span></label>
+   <input type="range" id="nx" min="2" max="72" step="1" value="9">
+  </div>
+  <div><label for="ny">Divisiones a lo largo de <span class="m">b</span>: <span id="nyv"></span></label>
+   <input type="range" id="ny" min="1" max="40" step="1" value="4">
+  </div>
+ </div>
+ <div class="fila">
+  <label>Geometría <select id="geo"><option value="rect">rectangular</option><option value="cresta">doble cresta</option></select></label>
+  <span id="cr" hidden>
+   <label>ancho de la cresta <span class="m">s / a</span> <input type="range" id="sA" min="0.1" max="0.6" step="0.025" value="0.25" style="width:110px;margin:0"> <span id="sAv"></span></label>
+   <label>separación <span class="m">g / b</span> <input type="range" id="gB" min="0.125" max="0.875" step="0.125" value="0.5" style="width:110px;margin:0"> <span id="gBv"></span></label>
+  </span>
+ </div>
+ <div class="fila">
+  <label><input type="radio" name="vista" value="E" checked> Campo eléctrico transversal</label>
+  <label><input type="radio" name="vista" value="H"> <span class="m">H<sub>z</sub></span> en los nodos</label>
+  <label><input type="radio" name="vista" value="M"> Solo la malla</label>
+  <label><input type="checkbox" id="verMalla" checked> Dibujar los triángulos</label>
+ </div>
+ <div class="estado" id="estado" role="status" aria-live="polite"></div>
+</div>
+
+<div class="lienzo"><canvas id="cv" width="960" height="450" role="img" aria-label="Sección de la guía con la malla de triángulos y el campo del modo seleccionado"></canvas></div>
+<div class="leyenda">
+ <span><i style="background:#5B8CD2"></i>magnitud del campo eléctrico (más oscuro: más intenso)</span>
+ <span><i style="background:#A8430F"></i>dirección del campo en un instante</span>
+ <span>Un clic sobre un triángulo muestra sus matrices.</span>
+</div>
+
+<div class="dos">
+ <div>
+  <h2>Frecuencias de corte</h2>
+  <table id="tabla"><thead><tr><th>Modo</th><th>Elemento finito (GHz)</th><th>Exacta (GHz)</th><th>Error (%)</th><th>Estimado (%)</th></tr></thead><tbody></tbody></table>
+  <p class="nota" id="notaTabla"></p>
+ </div>
+ <div>
+  <h2>Triángulo seleccionado</h2>
+  <div id="elem" class="nota">Seleccionamos un triángulo de la malla para ver sus nodos, su área y sus matrices de rigidez y de masa.</div>
+ </div>
+</div>
+
+<h2>Convergencia de la malla</h2>
+<p>Ningún resultado de elemento finito es confiable hasta comprobar que no cambia al refinar la malla. El estudio repite el cálculo con mallas cada vez más finas, con la misma proporción de divisiones que la malla actual.</p>
+<div class="fila"><button id="conv">Hacer el estudio de convergencia</button><span id="convTxt" class="nota" role="status" aria-live="polite"></span></div>
+<div class="lienzo"><canvas id="cc" width="640" height="340" role="img" aria-label="Gráfica de convergencia de la frecuencia de corte del primer modo"></canvas></div>
+
+<h2>Los cinco pasos de un programa de elemento finito</h2>
+<table>
+ <thead><tr><th>Paso</th><th style="text-align:left">En un programa comercial</th><th style="text-align:left">En esta página</th></tr></thead>
+ <tbody>
+ <tr><td>1. Geometría</td><td style="text-align:left">se dibuja la sección de la guía</td><td style="text-align:left">menús «Guía» y «Geometría»</td></tr>
+ <tr><td>2. Física y frontera</td><td style="text-align:left">ecuación de onda y pared conductora perfecta</td><td style="text-align:left"><span class="m">∇<sub>t</sub></span><sup>2</sup><span class="m">ψ + k<sub>c</sub></span><sup>2</sup><span class="m">ψ</span> = 0 con <span class="m">∂ψ/∂n</span> = 0, para <span class="m">ψ = H<sub>z</sub></span> (modos TE)</td></tr>
+ <tr><td>3. Malla</td><td style="text-align:left">generador automático de triángulos</td><td style="text-align:left">deslizadores de divisiones</td></tr>
+ <tr><td>4. Solución</td><td style="text-align:left">ensamble y valores propios</td><td style="text-align:left"><span class="m">K<b>ψ</b> = k<sub>c</sub></span><sup>2</sup><span class="m">M<b>ψ</b></span>, con <span class="m">f<sub>c</sub> = c k<sub>c</sub> / (2π)</span></td></tr>
+ <tr><td>5. Posproceso</td><td style="text-align:left">mapas de campo y tablas</td><td style="text-align:left">figura, tabla de frecuencias y estudio de convergencia</td></tr>
+ </tbody>
+</table>
+<p>Dentro de cada triángulo, <span class="m">ψ</span> se aproxima por un plano que pasa por sus tres valores nodales. Para un triángulo de área <span class="m">A</span> y vértices (<span class="m">x<sub>i</sub></span>, <span class="m">y<sub>i</sub></span>), con <span class="m">b<sub>i</sub> = y<sub>j</sub> − y<sub>k</sub></span> y <span class="m">c<sub>i</sub> = x<sub>k</sub> − x<sub>j</sub></span> (índices cíclicos), las matrices son <span class="m">K<sup>e</sup><sub>ij</sub> = (b<sub>i</sub>b<sub>j</sub> + c<sub>i</sub>c<sub>j</sub>) / (4A)</span> y <span class="m">M<sup>e</sup><sub>ij</sub> = (A/12)(1 + δ<sub>ij</sub>)</span>. Ensamblar es sumar cada matriz en las filas y columnas de sus tres nodos.</p>
+
+<h2>En una dimensión, a mano</h2>
+<p>El mismo método en el caso más sencillo: <span class="m">X″ + k</span><sup>2</sup><span class="m">X</span> = 0 en 0 ≤ <span class="m">x</span> ≤ <span class="m">a</span>, con <span class="m">X′</span>(0) = <span class="m">X′</span>(<span class="m">a</span>) = 0. La solución exacta del primer modo es <span class="m">X = <span class="r">cos</span>(πx/a)</span>, con <span class="m">k = π/a</span>: es el perfil del modo TE<sub>10</sub> a lo largo de <span class="m">a</span>.</p>
+<div class="panel">
+ <label for="n1">Número de elementos: <span id="n1v"></span></label>
+ <input type="range" id="n1" min="2" max="16" step="1" value="2" style="max-width:360px">
+ <div class="lienzo"><canvas id="c1" width="900" height="250" role="img" aria-label="Solución exacta y aproximación por tramos rectos"></canvas></div>
+ <div id="uno"></div>
+</div>
+<p>Un tramo recto no puede curvarse, y la curvatura de un coseno es proporcional a 1/<span class="m">λ</span><sup>2</sup>. Por eso el error relativo de la frecuencia es aproximadamente <span class="m">(π</span><sup>2</sup><span class="m">/6)(h/λ<sub>t</sub>)</span><sup>2</sup>, donde <span class="m">λ<sub>t</sub></span> es la longitud de onda transversal: lo que importa es cuántos elementos caben en una longitud de onda. La columna «Estimado» de la tabla de frecuencias usa esta expresión.</p>
+
+<h2>Qué observar</h2>
+<ol class="obs">
+ <li>Con la guía WR-90 y 9 × 4 divisiones, el error del modo TE<sub>20</sub> es unas cuatro veces el del TE<sub>10</sub>: tiene la mitad de longitud de onda transversal y la misma malla.</li>
+ <li>Al duplicar las divisiones, el error se divide entre cuatro. En el estudio de convergencia la pendiente es cercana a 2.</li>
+ <li>La frecuencia calculada queda siempre por encima de la exacta.</li>
+ <li>Con la geometría de doble cresta no hay fórmula exacta. El campo del primer modo se concentra entre las crestas, su frecuencia de corte baja y la banda de un solo modo se amplía.</li>
+ <li>En la vista «<span class="m">H<sub>z</sub></span> en los nodos», el primer modo de la guía rectangular es medio coseno a lo largo de <span class="m">a</span>: la onda que rebota entre las dos paredes.</li>
+</ol>
+
+<h2>Comprobación</h2>
+<p>Calculamos primero en papel y después verificamos.</p>
+<div id="ejercicios"></div>
+
+<h2>Referencias</h2>
+<p class="ref">Pozar, D. M. (2012). <i>Microwave Engineering</i> (4.ª ed.). Wiley. Sección 3.3 (guía de onda rectangular).<br>
+Jin, J.-M. (2014). <i>The Finite Element Method in Electromagnetics</i> (3.ª ed.). Wiley-IEEE Press.<br>
+Strang, G., &amp; Fix, G. (1973). <i>An Analysis of the Finite Element Method</i>. Prentice-Hall. Capítulo 6 (problemas de valores propios).</p>
+<p class="ref"><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+<p class="ref"><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Elemento finito en una guía de onda: explorador interactivo</i> (Versión 1.4) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+</main>
+
+<script>
+"use strict";
+const C=3e8, $=id=>document.getElementById(id);
+// ---------------------------------------------------------------- elemento finito
+function malla(a,b,nx,ny,cresta){
+  // nodos en una rejilla; cada celda se divide en dos triángulos. cresta={s,g}: se eliminan las celdas metálicas.
+  const idx=new Int32Array((nx+1)*(ny+1)).fill(-1), celdas=[]; let sEf=0,gEf=b;
+  const dentro=(i,j)=>{ if(!cresta) return false; const xc=(i+0.5)*a/nx, yc=(j+0.5)*b/ny;
+    return Math.abs(xc-a/2)<cresta.s/2 && Math.abs(yc-b/2)>cresta.g/2; };
+  let nI=0,nJ=0;
+  for(let j=0;j<ny;j++) for(let i=0;i<nx;i++) if(!dentro(i,j)) celdas.push([i,j]);
+  if(cresta){ for(let i=0;i<nx;i++) if(dentro(i,0)) nI++; for(let j=0;j<ny;j++) if(!dentro(Math.floor(nx/2),j) && !dentro(Math.ceil(nx/2)-1,j)) nJ++;
+    sEf=nI*a/nx; gEf=nJ*b/ny; }
+  const P=[], T=[]; const nodo=(i,j)=>{ const q=j*(nx+1)+i; if(idx[q]<0){ idx[q]=-2; } return q; };
+  for(const [i,j] of celdas){ nodo(i,j); nodo(i+1,j); nodo(i+1,j+1); nodo(i,j+1); }
+  let n=0; for(let q=0;q<idx.length;q++) if(idx[q]===-2){ idx[q]=n++; P.push((q%(nx+1))*a/nx, Math.floor(q/(nx+1))*b/ny); }
+  for(const [i,j] of celdas){ const n00=idx[j*(nx+1)+i], n10=idx[j*(nx+1)+i+1], n11=idx[(j+1)*(nx+1)+i+1], n01=idx[(j+1)*(nx+1)+i];
+    T.push(n00,n10,n11, n00,n11,n01); }
+  return {P:Float64Array.from(P), T:Int32Array.from(T), nP:n, nT:T.length/3, a,b,nx,ny, sEf,gEf, cresta:!!cresta};
+}
+function matricesElemento(x,y){                          // rigidez y masa de un triángulo lineal
+  const b=[y[1]-y[2],y[2]-y[0],y[0]-y[1]], c=[x[2]-x[1],x[0]-x[2],x[1]-x[0]];
+  const A=0.5*Math.abs(x[0]*b[0]+x[1]*b[1]+x[2]*b[2]), Ke=[], Me=[];
+  for(let i=0;i<3;i++){ Ke.push([]); Me.push([]); for(let j=0;j<3;j++){ Ke[i].push((b[i]*b[j]+c[i]*c[j])/(4*A)); Me[i].push(A/12*(i===j?2:1)); } }
+  return {Ke,Me,A,b,c};
+}
+function ensambla(m){                                    // matrices simétricas en banda (triángulo inferior)
+  let bw=0; const T=m.T;
+  for(let e=0;e<m.nT;e++){ const p=T[3*e],q=T[3*e+1],r=T[3*e+2]; bw=Math.max(bw,Math.abs(p-q),Math.abs(q-r),Math.abs(p-r)); }
+  const w=bw+1, K=new Float64Array(m.nP*w), M=new Float64Array(m.nP*w), x=[0,0,0], y=[0,0,0];
+  for(let e=0;e<m.nT;e++){ const t=[T[3*e],T[3*e+1],T[3*e+2]];
+    for(let k=0;k<3;k++){ x[k]=m.P[2*t[k]]; y[k]=m.P[2*t[k]+1]; }
+    const {Ke,Me}=matricesElemento(x,y);
+    for(let p=0;p<3;p++) for(let q=0;q<3;q++){ const i=t[p], j=t[q]; if(j<=i){ K[i*w+i-j]+=Ke[p][q]; M[i*w+i-j]+=Me[p][q]; } } }
+  return {K,M,bw,w,n:m.nP};
+}
+function multBanda(A,n,w,x,y){                           // y = A x, con A simétrica en banda
+  y.fill(0); for(let i=0;i<n;i++){ const j0=Math.max(0,i-w+1); let s=A[i*w]*x[i];
+    for(let j=j0;j<i;j++){ const v=A[i*w+i-j]; s+=v*x[j]; y[j]+=v*x[i]; } y[i]+=s; } }
+function cholBanda(A,n,w){                               // A = L Lᵀ, en el mismo arreglo
+  for(let i=0;i<n;i++){ const j0=Math.max(0,i-w+1);
+    for(let j=j0;j<=i;j++){ let s=A[i*w+i-j]; const k0=Math.max(j0,j-w+1);
+      for(let k=k0;k<j;k++) s-=A[i*w+i-k]*A[j*w+j-k];
+      A[i*w+i-j]= j===i ? Math.sqrt(s) : s/A[j*w]; } } }
+function resuelveBanda(L,n,w,x){                         // resuelve L Lᵀ x = x
+  for(let i=0;i<n;i++){ let s=x[i]; for(let j=Math.max(0,i-w+1);j<i;j++) s-=L[i*w+i-j]*x[j]; x[i]=s/L[i*w]; }
+  for(let i=n-1;i>=0;i--){ x[i]/=L[i*w]; const v=x[i]; for(let j=Math.max(0,i-w+1);j<i;j++) x[j]-=L[i*w+i-j]*v; } }
+function jacobi(A,p){                                    // valores y vectores propios de una matriz simétrica pequeña
+  const V=[]; for(let i=0;i<p;i++){ V.push(new Array(p).fill(0)); V[i][i]=1; }
+  for(let it=0;it<60;it++){ let off=0; for(let i=0;i<p;i++) for(let j=0;j<i;j++) off+=A[i][j]*A[i][j]; if(off<1e-26) break;
+    for(let q=1;q<p;q++) for(let r=0;r<q;r++){ if(Math.abs(A[q][r])<1e-300) continue;
+      const th=(A[q][q]-A[r][r])/(2*A[q][r]), t=Math.sign(th||1)/(Math.abs(th)+Math.sqrt(th*th+1)), cs=1/Math.sqrt(t*t+1), sn=t*cs;
+      for(let k=0;k<p;k++){ const akr=A[k][r], akq=A[k][q]; A[k][r]=cs*akr-sn*akq; A[k][q]=sn*akr+cs*akq; }
+      for(let k=0;k<p;k++){ const ark=A[r][k], aqk=A[q][k]; A[r][k]=cs*ark-sn*aqk; A[q][k]=sn*ark+cs*aqk; }
+      for(let k=0;k<p;k++){ const vkr=V[k][r], vkq=V[k][q]; V[k][r]=cs*vkr-sn*vkq; V[k][q]=sn*vkr+cs*vkq; } } }
+  return {w:A.map((f,i)=>f[i]),V};
+}
+function modosTE(m,k){
+  // k primeros modos TE: iteración de subespacios con desplazamiento sobre K ψ = k_c² M ψ
+  const S=ensambla(m), n=S.n, w=S.w, p=Math.min(n,k+5), sig=Math.pow(Math.PI/m.a,2);
+  const L=new Float64Array(S.K.length); for(let i=0;i<L.length;i++) L[i]=S.K[i]+sig*S.M[i]; cholBanda(L,n,w);
+  let X=[], semilla=12345; const azar=()=>{ semilla=(semilla*1103515245+12345)%2147483648; return semilla/2147483648-0.5; };
+  for(let q=0;q<p;q++){ const v=new Float64Array(n); for(let i=0;i<n;i++) v[i]= q===0 ? 1 : azar(); X.push(v); }
+  const tmp=new Float64Array(n); let lam=new Array(p).fill(0), prev=null, iter=0;
+  for(;iter<300;iter++){
+    const Z=X.map(v=>{ multBanda(S.M,n,w,v,tmp); const z=Float64Array.from(tmp); resuelveBanda(L,n,w,z); return z; });
+    const KZ=Z.map(z=>{ const y=new Float64Array(n); multBanda(S.K,n,w,z,y); return y; }), MZ=Z.map(z=>{ const y=new Float64Array(n); multBanda(S.M,n,w,z,y); return y; });
+    const dot=(u,v)=>{ let s=0; for(let i=0;i<n;i++) s+=u[i]*v[i]; return s; };
+    const Kr=[], Mr=[]; for(let i=0;i<p;i++){ Kr.push([]); Mr.push([]); for(let j=0;j<p;j++){ Kr[i].push(dot(Z[i],KZ[j])); Mr[i].push(dot(Z[i],MZ[j])); } }
+    const G=[]; for(let i=0;i<p;i++){ G.push(new Array(p).fill(0)); for(let j=0;j<=i;j++){ let s=Mr[i][j]; for(let q=0;q<j;q++) s-=G[i][q]*G[j][q]; G[i][j]= i===j ? Math.sqrt(Math.max(s,1e-300)) : s/G[j][j]; } }
+    const sub=B=>{ const Y=B.map(f=>f.slice());                 // G⁻¹ B G⁻ᵀ
+      for(let c2=0;c2<p;c2++) for(let i=0;i<p;i++){ let s=Y[i][c2]; for(let q=0;q<i;q++) s-=G[i][q]*Y[q][c2]; Y[i][c2]=s/G[i][i]; }
+      for(let r2=0;r2<p;r2++) for(let i=0;i<p;i++){ let s=Y[r2][i]; for(let q=0;q<i;q++) s-=G[i][q]*Y[r2][q]; Y[r2][i]=s/G[i][i]; }
+      return Y; };
+    const A=sub(Kr); for(let i=0;i<p;i++) for(let j=0;j<i;j++){ A[i][j]=A[j][i]=0.5*(A[i][j]+A[j][i]); }
+    const ev=jacobi(A,p), ord=ev.w.map((v,i)=>[v,i]).sort((u,v)=>u[0]-v[0]);
+    const Q=ev.V.map(f=>f.slice());                              // Q = G⁻ᵀ V
+    for(let c2=0;c2<p;c2++) for(let i=p-1;i>=0;i--){ let s=Q[i][c2]; for(let q=i+1;q<p;q++) s-=G[q][i]*Q[q][c2]; Q[i][c2]=s/G[i][i]; }
+    X=ord.map(([,c2])=>{ const v=new Float64Array(n); for(let q=0;q<p;q++){ const f=Q[q][c2], z=Z[q]; for(let i=0;i<n;i++) v[i]+=f*z[i]; } return v; });
+    lam=ord.map(o=>o[0]);
+    if(prev){ let d=0; for(let q=0;q<=Math.min(k,p-1);q++) d=Math.max(d,Math.abs(lam[q]-prev[q])/(Math.abs(lam[q])+sig)); if(d<1e-12){ iter++; break; } }
+    prev=lam.slice();
+  }
+  const f=[], V=[]; for(let q=1;q<=k&&q<p;q++){ f.push(C*Math.sqrt(Math.max(lam[q],0))/(2*Math.PI)/1e9); V.push(X[q]); }
+  return {f,V,iter,bw:S.bw};
+}
+function exactas(a,b,k){ const L=[]; for(let mm=0;mm<7;mm++) for(let nn=0;nn<6;nn++) if(mm+nn>0) L.push({f:C/2*Math.hypot(mm/a,nn/b)/1e9,m:mm,n:nn});
+  L.sort((u,v)=>u.f-v.f); return L.slice(0,k); }
+function estimado(a,b,nx,ny,mm,nn){ if(mm*nn!==0) return null; const kx=mm*Math.PI/a, ky=nn*Math.PI/b, hx=a/nx, hy=b/ny;
+  return 100*(Math.pow(kx,4)*hx*hx+Math.pow(ky,4)*hy*hy)/(24*(kx*kx+ky*ky)); }
+// ---------------------------------------------------------------- estado y dibujo
+const S={a:22.86e-3,b:10.16e-3,nx:9,ny:4,geo:"rect",sA:0.25,gB:0.5,vista:"E",modo:0,sel:-1};
+let Mh=null, R=null, EX=null;
+const cv=$("cv"), g=cv.getContext("2d");
+function geom(){ const W=cv.width-80, Hm=cv.height-70, esc=Math.min(W/S.a,Hm/S.b); return {esc,x0:(cv.width-esc*S.a)/2,y0:(cv.height-10-esc*S.b)/2+esc*S.b+0}; }
+function calcula(){
+  const cr=S.geo==="cresta"?{s:S.sA*S.a,g:S.gB*S.b}:null;
+  Mh=malla(S.a,S.b,S.nx,S.ny,cr); const t0=performance.now(); R=modosTE(Mh,4); const dt=performance.now()-t0;
+  EX=exactas(S.a,S.b,4); if(S.modo>=R.f.length) S.modo=0; S.sel=-1;
+  let txt="Malla de "+S.nx+" × "+S.ny+" divisiones: "+Mh.nP+" nodos (incógnitas) y "+Mh.nT+" triángulos. Solución en "+dt.toFixed(0)+" ms.";
+  if(cr) txt+=" Cresta mallada: s = "+(Mh.sEf*1e3).toFixed(2)+" mm, g = "+(Mh.gEf*1e3).toFixed(2)+" mm.";
+  $("estado").textContent=txt; tabla(); dibuja(); elemento();
+}
+function nombre(e){ return "TE"+e.m+e.n+(e.m*e.n?" y TM"+e.m+e.n:""); }
+function tabla(){
+  const tb=$("tabla").tBodies[0]; let h="";
+  R.f.forEach((f,i)=>{ const rect=S.geo==="rect", e=EX[i], est=rect?estimado(S.a,S.b,S.nx,S.ny,e.m,e.n):null;
+    h+="<tr class='modo"+(i===S.modo?" sel":"")+"' data-i='"+i+"' tabindex='0'><td>"+(rect?nombre(e):"modo "+(i+1))+"</td><td>"+f.toFixed(3)+"</td><td>"+(rect?e.f.toFixed(3):"…")+"</td><td>"+(rect?(100*(f-e.f)/e.f).toFixed(2):"…")+"</td><td>"+(est!=null?est.toFixed(2):"…")+"</td></tr>"; });
+  tb.innerHTML=h;
+  $("notaTabla").innerHTML= S.geo==="rect" ? "Un clic en una fila muestra ese modo. Exacta: <span class='m'>f<sub>c</sub> = (c/2) [(m/a)</span><sup>2</sup><span class='m'> + (n/b)</span><sup>2</sup><span class='m'>]</span><sup>1/2</sup>. La estimación solo se da para los modos que varían en una dirección; en los demás depende de la orientación de las diagonales de la malla."
+   : "La guía de doble cresta no tiene fórmula exacta. Banda de un solo modo: de "+R.f[0].toFixed(2)+" a "+R.f[1].toFixed(2)+" GHz (razón "+(R.f[1]/R.f[0]).toFixed(2)+"; en la guía rectangular la razón es "+(EX[1].f/EX[0].f).toFixed(2)+").";
+}
+function campoE(e,psi){ const T=Mh.T,P=Mh.P,t=[T[3*e],T[3*e+1],T[3*e+2]], x=t.map(q=>P[2*q]), y=t.map(q=>P[2*q+1]);
+  const b=[y[1]-y[2],y[2]-y[0],y[0]-y[1]], c=[x[2]-x[1],x[0]-x[2],x[1]-x[0]], A2=Math.abs(x[0]*b[0]+x[1]*b[1]+x[2]*b[2]);
+  const gx=(psi[t[0]]*b[0]+psi[t[1]]*b[1]+psi[t[2]]*b[2])/A2, gy=(psi[t[0]]*c[0]+psi[t[1]]*c[1]+psi[t[2]]*c[2])/A2;
+  return [-gy,gx]; }                                       // E_t ∝ ẑ × ∇H_z
+function dibuja(){
+  const G=geom(), X=x=>G.x0+x*G.esc, Y=y=>G.y0-y*G.esc, T=Mh.T, P=Mh.P, psi=R.V[S.modo];
+  g.clearRect(0,0,cv.width,cv.height); g.fillStyle="#9AA0AD"; g.fillRect(X(0)-5,Y(S.b)-5,S.a*G.esc+10,S.b*G.esc+10);   // metal
+  let Emax=0, pmax=0; const E=[];
+  for(let e=0;e<Mh.nT;e++){ const v=campoE(e,psi); E.push(v); Emax=Math.max(Emax,Math.hypot(v[0],v[1])); }
+  for(let i=0;i<Mh.nP;i++) pmax=Math.max(pmax,Math.abs(psi[i]));
+  for(let e=0;e<Mh.nT;e++){ const t=[T[3*e],T[3*e+1],T[3*e+2]]; let col="#fff";
+    if(S.vista==="E"){ const k=Math.pow(Math.hypot(E[e][0],E[e][1])/Emax,0.85); col="rgb("+Math.round(255-170*k)+","+Math.round(255-115*k)+","+Math.round(255-45*k)+")"; }
+    else if(S.vista==="H"){ const v=(psi[t[0]]+psi[t[1]]+psi[t[2]])/(3*pmax), k=Math.pow(Math.abs(v),0.8);
+      col= v>=0 ? "rgb("+Math.round(255-62*k)+","+Math.round(255-197*k)+","+Math.round(255-212*k)+")" : "rgb("+Math.round(255-224*k)+","+Math.round(255-160*k)+","+Math.round(255-64*k)+")"; }
+    g.beginPath(); g.moveTo(X(P[2*t[0]]),Y(P[2*t[0]+1])); g.lineTo(X(P[2*t[1]]),Y(P[2*t[1]+1])); g.lineTo(X(P[2*t[2]]),Y(P[2*t[2]+1])); g.closePath();
+    g.fillStyle=col; g.fill(); g.strokeStyle=col; g.lineWidth=0.6; g.stroke();
+    if($("verMalla").checked||S.vista==="M"){ g.strokeStyle=S.vista==="M"?"#1F3864":"rgba(31,56,100,0.35)"; g.lineWidth=S.vista==="M"?1:0.6; g.stroke(); } }
+  if(S.vista==="M" && Mh.nP<=700){ g.fillStyle="#C1571B"; for(let i=0;i<Mh.nP;i++){ g.beginPath(); g.arc(X(P[2*i]),Y(P[2*i+1]),Mh.nP<200?3:1.8,0,7); g.fill(); } }
+  if(S.vista==="E"){                                       // flechas: promedio de los dos triángulos de cada celda
+    const paso=Math.max(1,Math.ceil(Math.sqrt(Mh.nT/2/220))), L=Math.min(S.a/S.nx,S.b/S.ny)*paso*G.esc*0.85; g.strokeStyle="#A8430F"; g.fillStyle="#A8430F"; g.lineWidth=2.2;
+    let c2=0; for(let e=0;e<Mh.nT;e+=2){ const t=[T[3*e],T[3*e+1],T[3*e+2]], i=Math.round(P[2*t[0]]/(S.a/S.nx)), j=Math.round(P[2*t[0]+1]/(S.b/S.ny)); c2++;
+      if(i%paso||j%paso) continue; const ex=(E[e][0]+E[e+1][0])/(2*Emax), ey=(E[e][1]+E[e+1][1])/(2*Emax), mg=Math.hypot(ex,ey); if(mg<0.06) continue;
+      const xc=X(P[2*t[0]]+S.a/S.nx/2), yc=Y(P[2*t[0]+1]+S.b/S.ny/2), dx=ex*L/2, dy=-ey*L/2, an=Math.atan2(dy,dx), h=Math.min(10,L*mg*0.4);
+      g.beginPath(); g.moveTo(xc-dx,yc-dy); g.lineTo(xc+dx,yc+dy); g.stroke();
+      g.beginPath(); g.moveTo(xc+dx,yc+dy); g.lineTo(xc+dx-h*Math.cos(an-0.45),yc+dy-h*Math.sin(an-0.45)); g.lineTo(xc+dx-h*Math.cos(an+0.45),yc+dy-h*Math.sin(an+0.45)); g.closePath(); g.fill(); } }
+  if(S.sel>=0){ const t=[T[3*S.sel],T[3*S.sel+1],T[3*S.sel+2]]; g.beginPath(); g.moveTo(X(P[2*t[0]]),Y(P[2*t[0]+1])); g.lineTo(X(P[2*t[1]]),Y(P[2*t[1]+1])); g.lineTo(X(P[2*t[2]]),Y(P[2*t[2]+1])); g.closePath();
+    g.strokeStyle="#B3261E"; g.lineWidth=2.5; g.stroke(); g.fillStyle="#B3261E"; g.font="600 13px system-ui,sans-serif"; g.textAlign="center"; g.textBaseline="middle";
+    t.forEach((q,k)=>{ const xc=(P[2*t[0]]+P[2*t[1]]+P[2*t[2]])/3, yc=(P[2*t[0]+1]+P[2*t[1]+1]+P[2*t[2]+1])/3; g.fillText(String(k+1),X(P[2*q]+(P[2*q]-xc)*0.35),Y(P[2*q+1]+(P[2*q+1]-yc)*0.35)); }); }
+  g.fillStyle="#333"; g.font="13px system-ui,sans-serif"; g.textAlign="center"; g.textBaseline="top";
+  g.fillText("x:  0 a "+(S.a*1e3).toFixed(2)+" mm  (lado a)",X(S.a/2),Y(0)+12);
+  g.save(); g.translate(X(0)-18,Y(S.b/2)); g.rotate(-Math.PI/2); g.textBaseline="bottom"; g.fillText("y:  0 a "+(S.b*1e3).toFixed(2)+" mm  (lado b)",0,0); g.restore();
+  g.textAlign="left"; g.textBaseline="bottom"; g.font="600 14px system-ui,sans-serif"; g.fillStyle="#1F3864";
+  const e=EX[S.modo]; g.fillText((S.geo==="rect"?nombre(e):"Modo "+(S.modo+1))+":  frecuencia de corte = "+R.f[S.modo].toFixed(3)+" GHz",X(0)-5,Y(S.b)-12);
+}
+function mat(Mx,dec,fac){ return "<table class='mat'>"+Mx.map(f=>"<tr>"+f.map(v=>"<td>"+(v*(fac||1)).toFixed(dec).replace("-","−")+"</td>").join("")+"</tr>").join("")+"</table>"; }
+function elemento(){
+  if(S.sel<0){ $("elem").innerHTML="Seleccionamos un triángulo de la malla para ver sus nodos, su área y sus matrices de rigidez y de masa."; return; }
+  const T=Mh.T,P=Mh.P,t=[T[3*S.sel],T[3*S.sel+1],T[3*S.sel+2]], me=matricesElemento(t.map(q=>P[2*q]),t.map(q=>P[2*q+1])), psi=R.V[S.modo];
+  $("elem").innerHTML="<p style='color:#1b1e27'><b>Triángulo "+(S.sel+1)+" de "+Mh.nT+".</b> Vértices 1, 2, 3 = nodos "+t.map(q=>q+1).join(", ")+" de la malla. Área <span class='m'>A</span> = "+(me.A*1e6).toFixed(3)+" mm².</p>"
+   +"<p style='color:#1b1e27'>Rigidez <span class='m'>K<sup>e</sup></span> (sin unidades): "+mat(me.Ke,3)+"</p><p style='color:#1b1e27'>Masa <span class='m'>M<sup>e</sup></span> (mm²): "+mat(me.Me,3,1e6)+"</p>"
+   +"<p>Cada fila de <span class='m'>K<sup>e</sup></span> suma cero: un campo constante no tiene gradiente. Los nueve términos de <span class='m'>M<sup>e</sup></span> suman el área. Estas matrices se suman en las filas y columnas "+t.map(q=>q+1).join(", ")+" de <span class='m'>K</span> y <span class='m'>M</span>, que son de "+Mh.nP+" × "+Mh.nP+".</p>";
+}
+cv.addEventListener("click",ev=>{ const r=cv.getBoundingClientRect(), G=geom(), px=(ev.clientX-r.left)*cv.width/r.width, py=(ev.clientY-r.top)*cv.height/r.height, x=(px-G.x0)/G.esc, y=(G.y0-py)/G.esc, T=Mh.T,P=Mh.P;
+  S.sel=-1; for(let e=0;e<Mh.nT;e++){ const a=T[3*e],b=T[3*e+1],c=T[3*e+2], d=(P[2*b+1]-P[2*c+1])*(P[2*a]-P[2*c])+(P[2*c]-P[2*b])*(P[2*a+1]-P[2*c+1]);
+    const l1=((P[2*b+1]-P[2*c+1])*(x-P[2*c])+(P[2*c]-P[2*b])*(y-P[2*c+1]))/d, l2=((P[2*c+1]-P[2*a+1])*(x-P[2*c])+(P[2*a]-P[2*c])*(y-P[2*c+1]))/d;
+    if(l1>=0&&l2>=0&&l1+l2<=1){ S.sel=e; break; } } dibuja(); elemento(); });
+function eligeModo(ev){ const tr=ev.target.closest("tr.modo"); if(!tr) return; if(ev.type==="keydown"&&ev.key!=="Enter"&&ev.key!==" ") return; S.modo=+tr.dataset.i; tabla(); dibuja(); elemento(); }
+$("tabla").addEventListener("click",eligeModo); $("tabla").addEventListener("keydown",eligeModo);
+// ---------------------------------------------------------------- convergencia
+const cc=$("cc"), h2=cc.getContext("2d");
+function ejesConv(msg){ h2.clearRect(0,0,cc.width,cc.height); h2.fillStyle="#5A5F6B"; h2.font="14px system-ui,sans-serif"; h2.textAlign="center"; h2.textBaseline="middle"; if(msg) h2.fillText(msg,cc.width/2,cc.height/2); }
+function convergencia(){
+  const cr=S.geo==="cresta"?{s:S.sA*S.a,g:S.gB*S.b}:null, rel=S.ny/S.nx, serie=cr?[8,16,24,32,48,64]:[6,9,12,18,24,36,48,72], pts=[];
+  for(const nx of serie){ const ny=cr?Math.max(4,Math.round(nx*rel/4)*4):Math.max(1,Math.round(nx*rel)); const m=malla(S.a,S.b,nx,ny,cr), r=modosTE(m,1); pts.push({nx,ny,n:m.nP,h:S.a/nx*1e3,f:r.f[0]}); }
+  const W=cc.width,H=cc.height,x0=70,y0=H-52,w=W-100,hh=H-90; h2.clearRect(0,0,W,H); h2.font="12.5px system-ui,sans-serif"; h2.lineWidth=1;
+  let txt="";
+  if(!cr){ const fe=exactas(S.a,S.b,1)[0].f; pts.forEach(p=>p.e=100*Math.abs(p.f-fe)/fe);
+    const lx=pts.map(p=>Math.log10(p.h)), ly=pts.map(p=>Math.log10(p.e)), n=pts.length, mx=lx.reduce((u,v)=>u+v)/n, my=ly.reduce((u,v)=>u+v)/n;
+    const pend=lx.reduce((s2,v,i)=>s2+(v-mx)*(ly[i]-my),0)/lx.reduce((s2,v)=>s2+(v-mx)*(v-mx),0);
+    const xa=Math.min(...lx)-0.08, xb=Math.max(...lx)+0.08, ya=Math.floor(Math.min(...ly)), yb=Math.ceil(Math.max(...ly)), X=v=>x0+(v-xa)/(xb-xa)*w, Y=v=>y0-(v-ya)/(yb-ya)*hh;
+    h2.strokeStyle="#C9CFDA"; h2.fillStyle="#333"; h2.textAlign="right"; h2.textBaseline="middle";
+    for(let k=ya;k<=yb;k++){ h2.beginPath(); h2.moveTo(x0,Y(k)); h2.lineTo(x0+w,Y(k)); h2.stroke(); h2.fillText(String(+Math.pow(10,k).toPrecision(1)),x0-8,Y(k)); }
+    h2.textAlign="center"; h2.textBaseline="top"; pts.forEach((p,i)=>{ h2.beginPath(); h2.moveTo(X(lx[i]),y0); h2.lineTo(X(lx[i]),y0-hh); h2.stroke(); if(i%2===0||i===n-1) h2.fillText(p.h.toFixed(2),X(lx[i]),y0+6); });
+    h2.strokeStyle="#333"; h2.strokeRect(x0,y0-hh,w,hh);
+    h2.strokeStyle="#C1571B"; h2.setLineDash([6,4]); h2.lineWidth=1.6; h2.beginPath(); h2.moveTo(X(lx[0]),Y(ly[0])); h2.lineTo(X(lx[n-1]),Y(ly[0]+2*(lx[n-1]-lx[0]))); h2.stroke(); h2.setLineDash([]);
+    h2.strokeStyle="#1F3864"; h2.lineWidth=2.2; h2.beginPath(); pts.forEach((p,i)=>{ i?h2.lineTo(X(lx[i]),Y(ly[i])):h2.moveTo(X(lx[i]),Y(ly[i])); }); h2.stroke();
+    h2.fillStyle="#1F3864"; pts.forEach((p,i)=>{ h2.beginPath(); h2.arc(X(lx[i]),Y(ly[i]),4.5,0,7); h2.fill(); });
+    h2.fillStyle="#333"; h2.font="13px system-ui,sans-serif"; h2.fillText("tamaño del elemento, h (mm), escala logarítmica",x0+w/2,H-22);
+    h2.save(); h2.translate(16,y0-hh/2); h2.rotate(-Math.PI/2); h2.fillText("error del primer modo (%)",0,0); h2.restore();
+    h2.textAlign="left"; h2.fillStyle="#1F3864"; h2.fillText("elemento finito",x0+12,y0-hh+8); h2.fillStyle="#C1571B"; h2.fillText("referencia: error proporcional a h²",x0+12,y0-hh+26);
+    txt="Pendiente ajustada: "+pend.toFixed(2)+". De "+pts[0].n+" a "+pts[n-1].n+" nodos, el error baja de "+pts[0].e.toFixed(3)+" % a "+pts[n-1].e.toFixed(4)+" %.";
+    window.__conv={pts,pend};
+  } else { const fs=pts.map(p=>p.f), fa=Math.min(...fs), fb=Math.max(...fs), d=(fb-fa)||0.01, ya=fa-0.25*d, yb=fb+0.25*d, n=pts.length, X=i=>x0+(i+0.5)/n*w, Y=v=>y0-(v-ya)/(yb-ya)*hh;
+    h2.strokeStyle="#333"; h2.strokeRect(x0,y0-hh,w,hh); h2.fillStyle="#333"; h2.textAlign="center"; h2.textBaseline="top";
+    pts.forEach((p,i)=>{ h2.fillText(p.nx+" × "+p.ny,X(i),y0+6); }); h2.textAlign="right"; h2.textBaseline="middle"; for(let k=0;k<=4;k++){ const v=ya+(yb-ya)*k/4; h2.fillText(v.toFixed(3),x0-8,Y(v)); }
+    h2.strokeStyle="#1F3864"; h2.lineWidth=2.2; h2.beginPath(); pts.forEach((p,i)=>{ i?h2.lineTo(X(i),Y(p.f)):h2.moveTo(X(i),Y(p.f)); }); h2.stroke(); h2.fillStyle="#1F3864"; pts.forEach((p,i)=>{ h2.beginPath(); h2.arc(X(i),Y(p.f),4.5,0,7); h2.fill(); });
+    h2.fillStyle="#333"; h2.font="13px system-ui,sans-serif"; h2.textAlign="center"; h2.textBaseline="top"; h2.fillText("divisiones de la malla",x0+w/2,H-22);
+    h2.save(); h2.translate(16,y0-hh/2); h2.rotate(-Math.PI/2); h2.fillText("frecuencia de corte del primer modo (GHz)",0,0); h2.restore();
+    txt="Sin solución exacta, observamos cómo se estabiliza el valor: de "+pts[0].f.toFixed(3)+" a "+pts[n-1].f.toFixed(3)+" GHz. Las esquinas de las crestas hacen más lenta la convergencia.";
+    window.__conv={pts};
+  }
+  $("convTxt").textContent=txt;
+}
+$("conv").addEventListener("click",()=>{ $("convTxt").textContent="Calculando…"; setTimeout(convergencia,30); });
+// ---------------------------------------------------------------- una dimensión
+function unaD(){
+  const N=+$("n1").value, c1=$("c1"), q=c1.getContext("2d"), W=c1.width,H=c1.height, x0=60, w=W-120, yc=H/2-8, amp=82, X=t=>x0+t*w, Y=v=>yc-v*amp; $("n1v").textContent=N;
+  q.clearRect(0,0,W,H); q.strokeStyle="#C9CFDA"; q.lineWidth=1; q.beginPath(); q.moveTo(x0,yc); q.lineTo(x0+w,yc); q.stroke();
+  q.strokeStyle="#2E7D32"; q.lineWidth=2.4; q.beginPath(); for(let i=0;i<=200;i++){ const t=i/200; i?q.lineTo(X(t),Y(Math.cos(Math.PI*t))):q.moveTo(X(t),Y(Math.cos(Math.PI*t))); } q.stroke();
+  q.strokeStyle="#C1571B"; q.lineWidth=2; q.setLineDash([7,4]); q.beginPath(); for(let i=0;i<=N;i++){ const t=i/N; i?q.lineTo(X(t),Y(Math.cos(Math.PI*t))):q.moveTo(X(t),Y(Math.cos(Math.PI*t))); } q.stroke(); q.setLineDash([]);
+  q.fillStyle="#C1571B"; for(let i=0;i<=N;i++){ q.beginPath(); q.arc(X(i/N),Y(Math.cos(Math.PI*i/N)),4,0,7); q.fill(); }
+  q.fillStyle="#333"; q.font="13px system-ui,sans-serif"; q.textAlign="center"; q.textBaseline="top"; q.fillText("x = 0",X(0),yc+amp+16); q.fillText("x = a",X(1),yc+amp+16);
+  q.textAlign="left"; q.textBaseline="middle"; q.fillStyle="#2E7D32"; q.fillText("exacta: cos(πx/a)",X(0.08),Y(1.12)); q.fillStyle="#C1571B"; q.fillText("elemento finito: tramos rectos entre nodos",X(0.42),Y(1.12));
+  const th=Math.PI/N, ka=N*Math.sqrt(6*(1-Math.cos(th))/(2+Math.cos(th))), err=100*(ka-Math.PI)/Math.PI, est=100*Math.PI*Math.PI/6/Math.pow(2*N,2);
+  let h="<p><b>"+N+" elementos</b> de longitud <span class='m'>h = a/"+N+"</span>, "+(N+1)+" nodos. Resultado: <span class='m'>k</span> = "+ka.toFixed(4)+"/<span class='m'>a</span>; exacto: 3.1416/<span class='m'>a</span>; error: <b>"+err.toFixed(2)+" %</b>. Estimación <span class='m'>(π</span><sup>2</sup><span class='m'>/6)(h/λ<sub>t</sub>)</span><sup>2</sup> con <span class='m'>λ<sub>t</sub> = 2a</span>: "+est.toFixed(2)+" %.</p>";
+  if(N<=4){ const K=[],M=[]; for(let i=0;i<=N;i++){ K.push(new Array(N+1).fill(0)); M.push(new Array(N+1).fill(0)); }
+    for(let e=0;e<N;e++){ K[e][e]+=1; K[e][e+1]-=1; K[e+1][e]-=1; K[e+1][e+1]+=1; M[e][e]+=2; M[e][e+1]+=1; M[e+1][e]+=1; M[e+1][e+1]+=2; }
+    h+="<p>Matrices ensambladas: <span class='m'>K</span> = (1/<span class='m'>h</span>) "+mat(K,0)+" <span class='m'>M</span> = (<span class='m'>h</span>/6) "+mat(M,0)+"</p>";
+    if(N===2) h+="<p class='nota'>Con <span class='m'><b>ψ</b></span> = (1, 0, −1): <span class='m'>K<b>ψ</b></span> = (1/<span class='m'>h</span>)(1, 0, −1) y <span class='m'>M<b>ψ</b></span> = (<span class='m'>h</span>/3)(1, 0, −1), de modo que <span class='m'>k</span><sup>2</sup> = 3/<span class='m'>h</span><sup>2</sup> = 12/<span class='m'>a</span><sup>2</sup>.</p>"; }
+  else h+="<p class='nota'>Las matrices se muestran con cuatro elementos o menos.</p>";
+  $("uno").innerHTML=h; window.__uno={N,ka,err,est};
+}
+$("n1").addEventListener("input",unaD);
+// ---------------------------------------------------------------- controles
+function lee(){ const v=$("guia").value; $("pers").hidden=v!=="0";
+  if(v!=="0"){ const p=v.split(","); S.a=+p[0]*1e-3; S.b=+p[1]*1e-3; } else { S.a=Math.min(300,Math.max(2,+$("aMm").value||30))*1e-3; S.b=Math.min(300,Math.max(1,+$("bMm").value||15))*1e-3; }
+  S.nx=+$("nx").value; S.ny=+$("ny").value; S.geo=$("geo").value; $("cr").hidden=S.geo!=="cresta"; S.sA=+$("sA").value; S.gB=+$("gB").value;
+  $("nxv").textContent=S.nx; $("nyv").textContent=S.ny; $("sAv").textContent=S.sA.toFixed(3); $("gBv").textContent=S.gB.toFixed(3);
+  calcula(); ejesConv("Pulsamos el botón para calcular la serie de mallas."); $("convTxt").textContent=""; }
+for(const id of ["guia","nx","ny","geo","sA","gB","aMm","bMm"]) $(id).addEventListener(id==="nx"||id==="ny"||id==="sA"||id==="gB"?"input":"change",lee);
+$("geo").addEventListener("change",()=>{ if($("geo").value==="cresta" && +$("nx").value<16){ $("nx").value=32; $("ny").value=16; lee(); } });
+for(const r of document.querySelectorAll("input[name=vista]")) r.addEventListener("change",e=>{ S.vista=e.target.value; dibuja(); });
+$("verMalla").addEventListener("change",dibuja);
+// ---------------------------------------------------------------- comprobación
+const EJ=[
+ {t:"(a) Frecuencia de corte del modo TE<sub>10</sub> de la guía WR-284 (<span class='m'>a</span> = 72.14 mm), en GHz.",v:C/(2*72.136e-3)/1e9,u:"GHz",tol:0.006,p:"Pista: <span class='m'>f<sub>c</sub> = c/(2a)</span>."},
+ {t:"(b) Una malla tiene 8 elementos a lo largo de <span class='m'>a</span>. Error estimado de la frecuencia de corte del modo TE<sub>20</sub>, en por ciento.",v:100*Math.PI*Math.PI/6/64,u:"%",tol:0.04,p:"Pista: en el modo TE<sub>20</sub>, <span class='m'>λ<sub>t</sub> = a</span>, así que caben 8 elementos por longitud de onda; error ≈ <span class='m'>(π</span><sup>2</sup><span class='m'>/6)/8</span><sup>2</sup>."},
+ {t:"(c) Número mínimo de elementos a lo largo de <span class='m'>a</span> para que el error del modo TE<sub>10</sub> sea menor que 0.1 %.",v:21,u:"elementos",tol:0.001,p:"Pista: se necesitan √[(π<sup>2</sup>/6)/0.001] = 40.6 elementos por longitud de onda, y en <span class='m'>a</span> cabe media longitud de onda."}];
+$("ejercicios").innerHTML=EJ.map((e,i)=>"<div class='ej'><div>"+e.t+"</div><div class='fila' style='margin-top:6px'><input type='number' step='any' id='r"+i+"' aria-label='Respuesta "+(i+1)+"'> <span>"+e.u+"</span> <button class='sec' data-i='"+i+"'>Verificar</button></div><div class='res' id='m"+i+"' role='status' aria-live='polite'></div></div>").join("");
+const intentos=[0,0,0];
+$("ejercicios").addEventListener("click",ev=>{ const i=ev.target.dataset&&ev.target.dataset.i; if(i==null) return;
+  const v=parseFloat($("r"+i).value), e=EJ[i], out=$("m"+i); if(!isFinite(v)){ out.innerHTML="<span class='mal'>Escriba un número.</span>"; return; }
+  if(Math.abs(v-e.v)<=e.tol*Math.abs(e.v)){ out.innerHTML="<span class='bien'>Correcto.</span>"; return; }
+  intentos[i]++; out.innerHTML="<span class='mal'>Todavía no coincide (intento "+intentos[i]+").</span>"+(intentos[i]>=3?" <span class='pista'>"+e.p+"</span>":""); });
+window.__fem={malla,modosTE,exactas,estimado,matricesElemento,S,get R(){return R;},get Mh(){return Mh;}};
+lee(); unaD();
+</script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
+</body>
+</html>
+<!-- navegacion:inicio -->
+<style>
+  :root{--nv-w:272px}
+  body{margin-top:0!important}
+  @media (min-width:1100px){ body{margin-left:var(--nv-w)!important} }
+  .nvside{position:fixed;top:0;left:0;bottom:0;width:var(--nv-w);z-index:9999;display:flex;flex-direction:column;
+    background:var(--card,#fff);border-right:1px solid var(--line,#e2dcc9);
+    font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:14px;color:var(--ink,#1a1a1a);
+    box-shadow:1px 0 8px rgba(0,0,0,.05);transition:transform .2s ease}
+  .nvside a{text-decoration:none;color:inherit}
+  .nv-cab{padding:14px 16px 10px;border-bottom:1px solid var(--line,#e2dcc9)}
+  .nv-marca{display:block;font-family:"Century Gothic","Questrial",Arial,sans-serif;font-weight:700;font-size:15px;
+    line-height:1.25;color:var(--navy,var(--ink,#1F3864))}
+  .nv-marca small{display:block;font-weight:400;font-size:12px;color:var(--muted,#5a5a5a);margin-top:2px}
+  .nv-pasos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .nv-paso{display:flex;flex-direction:column;gap:1px;padding:6px 8px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font-size:11px;color:var(--muted,#5a5a5a);min-width:0}
+  .nv-paso b{font-size:12.5px;color:var(--ink,#1a1a1a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nv-paso.sig{text-align:right}
+  .nv-paso:hover{background:var(--bg,#f4f1ea)}
+  .nv-paso[aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-busca{margin-top:8px;width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font:inherit;background:var(--bg,#f8f6f0);color:inherit}
+  .nv-lista{flex:1;overflow-y:auto;padding:6px 8px 10px}
+  .nv-grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8a8fa0);padding:12px 8px 4px}
+  .nv-lista a{display:block;padding:6px 8px 6px 10px;border-radius:6px;border-left:3px solid transparent;line-height:1.3}
+  .nv-lista a small{display:block;font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-lista a:hover{background:var(--bg,#f4f1ea)}
+  .nv-lista a.nv-aqui{background:var(--bg,#f4f1ea);border-left-color:var(--accent,#C1571B);font-weight:700}
+  .nv-pie{padding:8px 14px;border-top:1px solid var(--line,#e2dcc9);font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-boton{display:none;position:fixed;top:10px;left:10px;z-index:10000;gap:6px}
+  .nv-boton a,.nv-boton button{display:flex;align-items:center;justify-content:center;height:38px;min-width:38px;padding:0 10px;
+    border:1px solid var(--line,#e2dcc9);border-radius:9px;background:var(--card,#fff);color:var(--ink,#1a1a1a);
+    font:600 14px Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .nv-boton [aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-velo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:10001}
+  .nv-cierra{display:none;position:absolute;top:10px;right:10px;width:32px;height:32px;border:1px solid var(--line,#e2dcc9);border-radius:8px;background:var(--card,#fff);color:inherit;font-size:16px;cursor:pointer}
+  .nv-cab{position:relative}
+  @media (max-width:1099px){
+    body{margin-top:56px!important}
+    .nvside{transform:translateX(-102%);width:min(320px,88vw)}
+    .nvside.abierto{transform:none;z-index:10002}
+    .nv-cierra{display:block}
+    .nv-boton{display:flex}
+    .nvside.abierto ~ .nv-velo{display:block}
+  }
+  @media print{.nvside,.nv-boton,.nv-velo{display:none} body{margin:0!important}}
+</style>
+<nav class="nvside" id="nvside" aria-label="Exploradores del curso">
+  <div class="nv-cab">
+    <button class="nv-cierra" id="nv-cierra" aria-label="Cerrar el temario">✕</button>
+    <a class="nv-marca" href="index.html">Exploradores de Teoría Electromagnética<small>ENES Juriquilla, UNAM · inicio</small></a>
+    <div class="nv-pasos">
+      <a class="nv-paso" id="nv-ant" href="#" aria-label="Explorador anterior">‹ anterior<b id="nv-ant-t">…</b></a>
+      <a class="nv-paso sig" id="nv-sig" href="#" aria-label="Explorador siguiente">siguiente ›<b id="nv-sig-t">…</b></a>
+    </div>
+    <input class="nv-busca" id="nv-busca" type="search" placeholder="Buscar (tecla /)" aria-label="Buscar explorador">
+  </div>
+  <div class="nv-lista" id="nv-lista">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss<small>1.1 · P1</small></a>
+<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico<small>1.2 · P1</small></a>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito<small>1.4 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday<small>1.6 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores<small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas<small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel<small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización<small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler<small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal<small>3.2 · P8</small></a>
+<a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8 · P11</small></a>
+<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
+<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
+<a href="ImpedanciaEntrada_explorador.html" data-nv="ImpedanciaEntrada_explorador.html">Líneas cortas como reactancias<small>4.5–4.6 · P14</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7 · P15</small></a>
+<a href="Acoplamiento_explorador.html" data-nv="Acoplamiento_explorador.html">Acoplamiento λ/4 y stub<small>4.8–4.9 · P15</small></a>
+<a href="OndaQueRebota_explorador.html" data-nv="OndaQueRebota_explorador.html">Guía de onda: onda que rebota<small>4.10</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12 · P16</small></a>
+<a href="FEM_explorador.html" data-nv="FEM_explorador.html">Elemento finito en una guía<small>4.10–4.11 · P16</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>
+  </div>
+  <div class="nv-pie">Teclas: ← anterior · → siguiente · / buscar · Esc cerrar</div>
+</nav>
+<div class="nv-boton"><button id="nv-abre" aria-controls="nvside" aria-expanded="false">☰ Temario</button>
+  <a id="nv-ant2" href="#" aria-label="Anterior">‹</a><a id="nv-sig2" href="#" aria-label="Siguiente">›</a></div>
+<div class="nv-velo" id="nv-velo"></div>
+<script>
+(function(){
+  var lista=document.getElementById('nv-lista'), side=document.getElementById('nvside');
+  var l=lista.querySelectorAll('a[data-nv]'), orden=[], dat={};
+  for(var i=0;i<l.length;i++){var f=l[i].getAttribute('data-nv');orden.push(f);
+    dat[f]={el:l[i],t:l[i].childNodes[0].textContent.trim()};}
+  var aqui=(location.pathname.split('/').pop()||'index.html'), k=orden.indexOf(aqui);
+  function paso(idA,idT,j){var a=document.getElementById(idA);
+    if(j<0||j>=orden.length){a.setAttribute('aria-disabled','true');if(idT)document.getElementById(idT).textContent='';return;}
+    a.href=orden[j];a.title=dat[orden[j]].t+(j<k?' (tecla ←)':' (tecla →)');if(idT)document.getElementById(idT).textContent=dat[orden[j]].t;}
+  if(k>=0){dat[aqui].el.className='nv-aqui';dat[aqui].el.setAttribute('aria-current','page');
+    paso('nv-ant','nv-ant-t',k-1);paso('nv-sig','nv-sig-t',k+1);paso('nv-ant2',null,k-1);paso('nv-sig2',null,k+1);
+    setTimeout(function(){var r=dat[aqui].el;lista.scrollTop=r.offsetTop-lista.clientHeight/3;},0);}
+  else{paso('nv-ant','nv-ant-t',-1);paso('nv-sig','nv-sig-t',0);paso('nv-ant2',null,-1);paso('nv-sig2',null,0);}
+  var bus=document.getElementById('nv-busca');
+  bus.addEventListener('input',function(){var q=bus.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    var grp=null,vis=0;
+    Array.prototype.forEach.call(lista.children,function(c){
+      if(c.classList.contains('nv-grp')){if(grp)grp.style.display=vis?'':'none';grp=c;vis=0;return;}
+      var t=c.textContent.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      var ok=!q||t.indexOf(q)>=0;c.style.display=ok?'':'none';if(ok)vis++;});
+    if(grp)grp.style.display=vis?'':'none';});
+  bus.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=lista.querySelector('a[data-nv]:not([style*="none"])');if(v)location.href=v.href;}});
+  var abre=document.getElementById('nv-abre'), velo=document.getElementById('nv-velo');
+  function cambia(on){side.classList.toggle('abierto',on);abre.setAttribute('aria-expanded',on?'true':'false');}
+  abre.addEventListener('click',function(){cambia(!side.classList.contains('abierto'));});
+  velo.addEventListener('click',function(){cambia(false);});
+  document.getElementById('nv-cierra').addEventListener('click',function(){cambia(false);});
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toUpperCase();
+    if(e.key==='Escape'){cambia(false);if(t==='INPUT')e.target.blur();return;}
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
+    if(e.key==='/'){e.preventDefault();if(innerWidth<1100)cambia(true);bus.focus();return;}
+    if(k<0) return;
+    if(e.key==='ArrowLeft'&&k>0) location.href=orden[k-1];
+    if(e.key==='ArrowRight'&&k<orden.length-1) location.href=orden[k+1];
+  });
+})();
+</script>
+<!-- navegacion:fin -->

@@ -38,6 +38,7 @@ Para que los enlaces de la portada funcionen, **mantén todos los archivos en la
 | `Smith_explorador.html` | Carta de Smith: la carga como punto, giro hacia el generador, VSWR, admitancias, V_máx/V_mín, escala en λ y modo práctica | U4 · 4.7 · P15 |
 | `Acoplamiento_explorador.html` | Acoplamiento de impedancias: transformador λ/4 y stub en paralelo, recorrido en la carta de Smith y ancho de banda | U4 · 4.8–4.9 · P15 |
 | `OndaQueRebota_explorador.html` | Guía de onda, modelo de la onda que rebota: campo animado, ondas planas componentes, rayos, λ_g, régimen bajo el corte, velocidades de fase y de grupo y pulso con la cresta marcada | U4 · 4.10 |
+| `FEM_explorador.html` | Método del elemento finito en una guía de onda: malla de triángulos, matrices de cada elemento, modos TE, convergencia, guía de doble cresta y caso de una dimensión | U4 · 4.10–4.11 · P16 |
 | `GuiaOnda_explorador.html` | Guía de onda rectangular: cortes TE/TM, tabla de modos, Z_TE y Z_TM, atenuación bajo el corte, diagrama de dispersión, patrones de campo | U4 · 4.10–4.12 · P16 |
 | `Espectro_explorador.html` | Espectro electromagnético: cuatro ejes (λ, f, energía, número de onda), zoom del visible | transversal |
 | `AnatomiaGrafica_explorador.html` | Anatomía de una gráfica científica, con el código matplotlib equivalente | transversal · P6 |
