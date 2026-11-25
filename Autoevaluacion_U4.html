@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<!-- tipografia:inicio -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root:root{
+    --f-tit:"Century Gothic","Questrial","URW Gothic","Avant Garde",sans-serif;
+    --sans:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",Calibri,sans-serif;
+    --serif:Cambria,"STIX Two Text","Times New Roman",serif;
+    --mono:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",sans-serif;
+  }
+  body,button,input,select,textarea{font-family:var(--sans)}
+  body{font-variant-numeric:tabular-nums}
+  h1,h2,h3,.ct,.eyebrow,header .sub{font-family:var(--f-tit)!important;letter-spacing:0}
+  sub,sup{font-size:.72em;line-height:0;position:relative;vertical-align:baseline}
+  sub{bottom:-.25em} sup{top:-.45em}
+</style>
+<script>
+(function(){
+  // ---- lienzos: subíndices y superíndices escritos como Z_L, V_inc, e^(−z/δ) ----
+  var RX=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})/g;
+  var P=CanvasRenderingContext2D.prototype, F=P.fillText;
+  P.fillText=function(t,x,y,mw){
+    t=String(t);
+    if((t.indexOf('_')<0&&t.indexOf('^')<0)||/\.(html|py|png|csv|txt|svg|jpg|pdf)\b/i.test(t)) return F.call(this,t,x,y,mw);
+    var sg=[],last=0,m; RX.lastIndex=0;
+    while((m=RX.exec(t))){
+      if(m[1]){sg.push([t.slice(last,m.index)+m[1],0]);sg.push([m[2].replace(/[{}]/g,''),1]);}
+      else{sg.push([t.slice(last,m.index),0]);sg.push([m[3].replace(/[{}()]/g,''),2]);}
+      last=RX.lastIndex;
+    }
+    if(!sg.length) return F.call(this,t,x,y,mw);
+    sg.push([t.slice(last),0]);
+    var f0=this.font, mm=/(\d+(?:\.\d+)?)px/.exec(f0), px=mm?+mm[1]:12,
+        fs=mm?f0.replace(mm[0],(px*0.72).toFixed(1)+'px'):f0, W=0,i;
+    for(i=0;i<sg.length;i++){this.font=sg[i][1]?fs:f0;sg[i][2]=this.measureText(sg[i][0]).width;W+=sg[i][2];}
+    var a=this.textAlign, x0=x;
+    if(a==='center') x0=x-W/2; else if(a==='right'||a==='end') x0=x-W;
+    this.textAlign='left';
+    for(i=0;i<sg.length;i++){
+      this.font=sg[i][1]?fs:f0;
+      F.call(this,sg[i][0],x0,y+(sg[i][1]===1?0.28*px:sg[i][1]===2?-0.38*px:0));
+      x0+=sg[i][2];
+    }
+    this.font=f0; this.textAlign=a;
+  };
+  // ---- texto generado por los scripts: misma notación en <sub>/<sup> ----
+  if(/AnatomiaGrafica/.test(location.pathname)) return;
+  var US=/([A-Za-zΑ-Ωα-ω])_(\{[^}]+\}|[A-Za-z0-9áéíóúñ]{1,6})|\^(\{[^}]+\}|\([^)]+\)|−?\d{1,3})|([₀-₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ]+)/g;
+  var UNI="₀₁₂₃₄₅₆₇₈₉ₐₑₒₓₕₖₗₘₙₚₛₜᵢᵣᵤᵥⱼ", ASC="0123456789aeoxhklmnpstiruvj";
+  var SALTA={SCRIPT:1,STYLE:1,TEXTAREA:1,OPTION:1,PRE:1,CODE:1,TITLE:1,INPUT:1,SELECT:1};
+  function arreglar(n){
+    var p=n.parentNode; if(!p||SALTA[p.nodeName]||p.namespaceURI==='http://www.w3.org/2000/svg') return;
+    var t=n.nodeValue; US.lastIndex=0; if(!US.test(t)||/\.(html|py|png|csv)\b/.test(t)) return;
+    US.lastIndex=0; var fr=document.createDocumentFragment(), last=0, m, e;
+    while((m=US.exec(t))){
+      var antes=t.slice(last,m.index);
+      if(m[1]){fr.appendChild(document.createTextNode(antes+m[1]));e=document.createElement('sub');e.textContent=m[2].replace(/[{}]/g,'');}
+      else if(m[3]){fr.appendChild(document.createTextNode(antes));e=document.createElement('sup');e.textContent=m[3].replace(/[{}()]/g,'');}
+      else{fr.appendChild(document.createTextNode(antes));e=document.createElement('sub');
+        e.textContent=m[4].split('').map(function(c){return ASC[UNI.indexOf(c)];}).join('');}
+      fr.appendChild(e); last=US.lastIndex;
+    }
+    fr.appendChild(document.createTextNode(t.slice(last)));
+    p.replaceChild(fr,n);
+  }
+  function recorrer(r){
+    if(r.nodeType===3){arreglar(r);return;}
+    if(r.nodeType!==1||SALTA[r.nodeName]) return;
+    var w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT,null), l=[], n;
+    while((n=w.nextNode())) l.push(n);
+    l.forEach(arreglar);
+  }
+  function inicio(){
+    recorrer(document.body);
+    new MutationObserver(function(ms){ms.forEach(function(m){
+      if(m.type==='characterData') arreglar(m.target); else m.addedNodes.forEach(recorrer);
+    });}).observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',inicio); else inicio();
+})();
+</script>
+<!-- tipografia:fin -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- movil:inicio -->
+<style>
+  .card{min-width:0}
+  pre{overflow-x:auto;max-width:100%}
+  /* evitar que inputs/selects fijen un ancho mínimo que desborde en teléfono */
+  .calc-grid label,.inrow,.inbox,.ctl,.controls>*{min-width:0}
+  .calc-grid input,.calc-grid select{width:100%;min-width:0;box-sizing:border-box}
+  input[type=number],select{max-width:100%;min-width:0}
+  @media (max-width:480px){
+    .eq{font-size:14px;overflow-wrap:anywhere;white-space:normal}
+    .tiles{grid-template-columns:1fr 1fr}
+  }
+</style>
+<!-- movil:fin -->
+<title>Autoevaluación de líneas de transmisión y guías de onda: problemas con solución paso a paso</title>
+<!-- seo:inicio -->
+<meta name="description" content="Diecisiete problemas con datos nuevos cada vez, comprobación inmediata y solución paso a paso: línea sin pérdidas, reflexión y potencia, carta de Smith, transformador de cuarto de onda y guías de onda.">
+<link rel="canonical" href="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Autoevaluacion_U4.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Exploradores de Teoría Electromagnética (UNAM)">
+<meta property="og:title" content="Autoevaluación de líneas de transmisión y guías de onda: problemas con solución paso a paso">
+<meta property="og:description" content="Diecisiete problemas con datos nuevos cada vez, comprobación inmediata y solución paso a paso: línea sin pérdidas, reflexión y potencia, carta de Smith, transformador de cuarto de onda y guías de onda.">
+<meta property="og:url" content="https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Autoevaluacion_U4.html">
+<meta property="og:locale" content="es_MX">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "LearningResource",
+ "name": "Autoevaluación de líneas de transmisión y guías de onda: problemas con solución paso a paso",
+ "description": "Diecisiete problemas con datos nuevos cada vez, comprobación inmediata y solución paso a paso: línea sin pérdidas, reflexión y potencia, carta de Smith, transformador de cuarto de onda y guías de onda.",
+ "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/Autoevaluacion_U4.html",
+ "inLanguage": "es",
+ "isAccessibleForFree": true,
+ "learningResourceType": "simulación interactiva",
+ "educationalLevel": "Licenciatura",
+ "about": [
+  "líneas de transmisión",
+  "carta de Smith",
+  "guía de onda",
+  "problemas resueltos",
+  "autoevaluación"
+ ],
+ "license": "https://creativecommons.org/licenses/by/4.0/",
+ "identifier": "https://doi.org/10.5281/zenodo.23423156",
+ "isPartOf": {
+  "@type": "Collection",
+  "name": "Teoría Electromagnética: exploradores interactivos",
+  "url": "https://elodiestrupiechonski.github.io/Teoria-Electromagnetica/"
+ },
+ "author": [
+  {
+   "@type": "Person",
+   "name": "Elodie Strupiechonski",
+   "sameAs": "https://orcid.org/0000-0001-8991-8499"
+  },
+  {
+   "@type": "Person",
+   "name": "Andrés de Luna Bugallo",
+   "sameAs": "https://orcid.org/0000-0002-7591-5235"
+  }
+ ],
+ "provider": {
+  "@type": "CollegeOrUniversity",
+  "name": "Universidad Nacional Autónoma de México, ENES Juriquilla"
+ }
+}
+</script>
+<!-- seo:fin -->
+<meta name="description" content="Problemas de la Unidad 4 con datos nuevos cada vez, comprobación inmediata y solución paso a paso: líneas de transmisión, carta de Smith, transformador de cuarto de onda y guías de onda.">
+<style>
+:root{--navy:#1F3864;--acc:#C1571B;--verde:#2E7D32;--azul:#1F5FBF;--rojo:#B3261E;--gris:#5A5F6B;--suave:#EEF3FA;--borde:#D5DBE6;--tinta:#1b1e27}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--tinta);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:18px 16px 40px}
+.eyebrow{font:600 12px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--acc);text-transform:uppercase}
+h1{font:700 30px/1.15 Spectral,Georgia,"Times New Roman",serif;color:var(--navy);margin:6px 0 6px}
+h2{font:700 20px/1.2 Spectral,Georgia,"Times New Roman",serif;color:var(--navy);margin:26px 0 8px;border-bottom:1px solid var(--borde);padding-bottom:4px}
+p{margin:8px 0}
+.lede{color:#333;max-width:860px}
+.panel{border:1px solid var(--borde);border-radius:8px;padding:12px;margin:12px 0;background:#fff}
+.barra{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:14.5px;padding:6px 12px;border:1px solid var(--navy);border-radius:6px;background:#fff;color:var(--navy);cursor:pointer}
+button.on,button.pri{background:var(--navy);color:#fff}
+button:focus-visible,input:focus-visible{outline:3px solid #F2B04C;outline-offset:1px}
+.msg{font-size:14px;margin-top:8px;color:var(--gris)}
+.prob{border:1px solid var(--borde);border-radius:10px;padding:12px 14px;margin:0 0 12px;background:#fff}
+.prob h3{margin:0 0 4px;font-size:17px;color:var(--navy)}
+.prob .t{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);font-weight:700}
+.prob .enun{margin:6px 0 10px;line-height:1.55}
+.campos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px 14px}
+.campo label{display:block;font-size:13.5px;color:#333;margin-bottom:3px}
+.campo .in{display:flex;align-items:center;gap:6px}
+.campo input{width:124px;font:inherit;font-size:15px;padding:5px 7px;border:1px solid #AEB6C4;border-radius:6px;font-variant-numeric:tabular-nums}
+.campo .un{font-size:13.5px;color:var(--gris)}
+.campo .mk{font-weight:700;min-width:1.2em}
+.campo.ok input{border-color:var(--verde);background:#EEF7F0}
+.campo.mal input{border-color:var(--rojo);background:#FBEFEF}
+.mk.ok{color:var(--verde)} .mk.mal{color:var(--rojo)}
+.acc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.sol{display:none;margin-top:10px;padding:10px 12px;border-left:4px solid var(--azul);background:var(--suave);border-radius:0 8px 8px 0;line-height:1.6;font-size:15px}
+.sol.on{display:block}
+.sol ol{margin:4px 0 0;padding-left:22px}
+.sol li{margin:3px 0}
+.sol canvas{display:block;max-width:100%;height:auto;margin:10px 0 2px;background:#fff;border:1px solid var(--borde);border-radius:6px}
+.sol .pie{font-size:13px;color:var(--gris)}
+.pmsg{font-size:14px;margin-top:6px;color:var(--gris);min-height:1.4em}
+.m{font-family:"Latin Modern Math","Cambria Math","STIX Two Math",Georgia,serif;font-style:italic;white-space:nowrap}
+.ref{font-size:14px;color:#333}
+ol.uso li{margin:5px 0}
+</style>
+</head>
+<body>
+<main>
+<div class="eyebrow">Teoría Electromagnética · Repaso · Unidad 4</div>
+<h1>Autoevaluación para el examen final</h1>
+<p class="lede">Problemas de líneas de transmisión y guías de onda con datos nuevos cada vez, comprobación inmediata y solución paso a paso con los números del problema. Siguen los cinco tipos de problema del examen final. En todos los casos <span class="m">c</span> = 3 × 10<sup>8</sup> m/s, las líneas no tienen pérdidas y las guías están llenas de aire.</p>
+
+<div class="panel">
+ <p style="margin-top:0"><b>¿Para qué sirve?</b> Para practicar el examen final. Se escriben los resultados, se pulsa «Comprobar» y la página marca cada casilla como correcta o incorrecta con una tolerancia de 2 % (0.2 dB en decibeles; en los problemas de la carta de Smith, la tolerancia de una lectura gráfica). «Ver solución» muestra el procedimiento completo con los números del problema. Los resultados se escriben con punto o coma decimal, en las unidades indicadas.</p>
+ <div class="barra" role="group" aria-label="Tipo de problema">
+  <b style="margin-right:4px">Tipo de problema:</b>
+  <button class="on" data-f="0">Todos</button><button data-f="1">1 · Línea sin pérdidas</button><button data-f="2">2 · Reflexión y potencia</button><button data-f="3">3 · Carta de Smith</button><button data-f="4">4 · Transformador λ/4</button><button data-f="5">5 · Guía de onda</button>
+  <button id="todo-nuevo" class="pri" style="margin-left:auto">Datos nuevos en todos</button>
+ </div>
+ <div class="msg" id="marcador" role="status" aria-live="polite"></div>
+</div>
+
+<div id="lista"></div>
+
+<h2>Cómo usarla para estudiar</h2>
+<ol class="uso">
+ <li>Resolver primero con lápiz, papel, calculadora y el formulario oficial, como en el examen.</li>
+ <li>Comprobar. Si una casilla sale mal, revisar las unidades y el paso donde el resultado se separa del procedimiento, sin abrir todavía la solución.</li>
+ <li>Abrir la solución solo después de dos intentos.</li>
+ <li>Pedir «Datos nuevos» y repetir hasta acertar a la primera.</li>
+ <li>Los problemas del tipo 3 se resuelven con la carta de Smith impresa y regla; la solución muestra la construcción sobre la carta y la comprobación con la fórmula.</li>
+</ol>
+<p class="ref">Los problemas son de práctica: no reproducen el examen ni sustituyen la serie de preparación, las tareas y los exploradores de cada tema. No se incluyen el acoplamiento con stub ni el elemento finito, que no se evalúan en el examen final. El avance se guarda solo en este navegador.</p>
+
+<h2>Referencias</h2>
+<p class="ref">Ulaby, F. T., &amp; Ravaioli, U. (2015). <i>Fundamentals of Applied Electromagnetics</i> (7.ª ed.). Pearson. Capítulos 2 y 8.<br>
+Pozar, D. M. (2012). <i>Microwave Engineering</i> (4.ª ed.). Wiley. Capítulos 2, 3 y 5.<br>
+Cheng, D. K. (1989). <i>Field and Wave Electromagnetics</i> (2.ª ed.). Addison-Wesley. Capítulos 9 y 10.</p>
+<p class="ref"><b>Créditos y cómo citar.</b> Autoría: Elodie Strupiechonski (ENES Juriquilla, UNAM · ORCID <a href="https://orcid.org/0000-0001-8991-8499" target="_blank" rel="noopener">0000-0001-8991-8499</a>) y Andrés de Luna Bugallo (CFATA, UNAM · ORCID <a href="https://orcid.org/0000-0002-7591-5235" target="_blank" rel="noopener">0000-0002-7591-5235</a>). Licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+<p class="ref"><b>Cómo citar:</b> Strupiechonski, E., &amp; de Luna Bugallo, A. (2026). <i>Autoevaluación de la Unidad 4: líneas de transmisión y guías de onda</i> (Versión 1.4) [Recurso educativo abierto]. UNAM, ENES Juriquilla. DOI: <a href="https://doi.org/10.5281/zenodo.23423156" target="_blank" rel="noopener">10.5281/zenodo.23423156</a></p>
+</main>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const TOL=0.02, C=3e8, TP=2*Math.PI, NOMBRES=["","Línea sin pérdidas","Reflexión y potencia","Carta de Smith","Transformador λ/4","Guía de onda"];
+function rng(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+const uni=(r,a,b,p)=>{ const v=a+(b-a)*r(), f=Math.pow(10,p); return Math.round(v*f)/f; };
+const pick=(r,L)=>L[Math.floor(r()*L.length)];
+const s3=v=>{ if(!isFinite(v)) return "∞"; const a=Math.abs(v); if(a===0) return "0"; const e=Math.floor(Math.log10(a));
+  const t=(a>=1e5||a<1e-3)?(v/Math.pow(10,e)).toPrecision(3)+" × 10<sup>"+e+"</sup>":String(+v.toPrecision(3)); return t.replace("-","−"); };
+const f2=(v,d)=>(+v).toFixed(d).replace("-","−");
+const cj=(re,im,d)=>f2(re,d)+(im>=0?" + j":" − j")+f2(Math.abs(im),d);
+// ---- números complejos mínimos
+const cdiv=(a,b)=>{ const d=b[0]*b[0]+b[1]*b[1]; return [(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d]; };
+const gam=z=>cdiv([z[0]-1,z[1]],[z[0]+1,z[1]]);
+const wtg=G=>{ let w=(180-Math.atan2(G[1],G[0])*180/Math.PI)/720; w=((w%0.5)+0.5)%0.5; return w; };
+const zin=(z,d)=>{ const t=Math.tan(TP*d); return cdiv([z[0],z[1]+t],[1-z[1]*t,z[0]*t]); };
+const carga=r=>{ let R,X; do{ R=Math.round(uni(r,10,200,0)/5)*5; X=Math.round(uni(r,-150,150,0)/5)*5; }while(Math.abs(X)<15||Math.hypot(R-50,X)<25); return {R,X}; };
+const ZL=D=>"<b>"+D.R+(D.X>=0?" + j":" − j")+Math.abs(D.X)+" Ω</b>";
+// ---------------------------------------------------------------- problemas
+// cada problema: t (tipo), tit, gen(r) -> D, enun(D), res(D) -> [{lab,un,v,abs?}], pasos(D,R) -> [html], fig?(D)
+const P=[
+{t:1, tit:"Impedancia característica y velocidad de fase", gen:r=>({L:Math.round(uni(r,150,400,0)/5)*5, Cp:Math.round(uni(r,40,140,0)), f:Math.round(uni(r,50,900,0)/10)*10}),
+ enun:D=>`Un cable sin pérdidas tiene <span class="m">L′</span> = <b>${D.L} nH/m</b> y <span class="m">C′</span> = <b>${D.Cp} pF/m</b>, y lleva una señal de <b>${D.f} MHz</b>. Calculen su impedancia característica, su velocidad de fase como fracción de <span class="m">c</span> y la longitud de onda en el cable.`,
+ res:D=>{ const L=D.L*1e-9, Cp=D.Cp*1e-12, vp=1/Math.sqrt(L*Cp); return [{lab:"<i>Z</i><sub>0</sub>",un:"Ω",v:Math.sqrt(L/Cp)},{lab:"<i>v</i><sub>p</sub> / <i>c</i>",un:"",v:vp/C},{lab:"Longitud de onda λ",un:"m",v:vp/(D.f*1e6)}]; },
+ pasos:(D,R)=>[`Pasamos al SI: <i>L′</i> = ${D.L} × 10<sup>−9</sup> H/m y <i>C′</i> = ${D.Cp} × 10<sup>−12</sup> F/m.`,`<i>Z</i><sub>0</sub> = √(<i>L′</i>/<i>C′</i>) = ${s3(R[0].v)} Ω.`,`<i>v</i><sub>p</sub> = 1/√(<i>L′C′</i>) = ${s3(R[1].v*C)} m/s = ${s3(R[1].v)} <i>c</i>.`,`λ = <i>v</i><sub>p</sub>/<i>f</i> = ${s3(R[1].v*C)}/${s3(D.f*1e6)} = ${s3(R[2].v)} m. Es menor que en el vacío (${s3(C/(D.f*1e6))} m).`]},
+{t:1, tit:"Parámetros del cable a partir de Z₀ y de la velocidad", gen:r=>({Z0:pick(r,[50,75,93,300]), vc:uni(r,0.55,0.95,2)}),
+ enun:D=>`Un cable sin pérdidas tiene <i>Z</i><sub>0</sub> = <b>${D.Z0} Ω</b> y <i>v</i><sub>p</sub> = <b>${f2(D.vc,2)} <i>c</i></b>. Calculen su inductancia y su capacitancia por unidad de longitud.`,
+ res:D=>{ const vp=D.vc*C; return [{lab:"<i>L′</i>",un:"nH/m",v:D.Z0/vp*1e9},{lab:"<i>C′</i>",un:"pF/m",v:1/(D.Z0*vp)*1e12}]; },
+ pasos:(D,R)=>[`De <i>Z</i><sub>0</sub> = √(<i>L′</i>/<i>C′</i>) y <i>v</i><sub>p</sub> = 1/√(<i>L′C′</i>): el producto da <i>Z</i><sub>0</sub><i>v</i><sub>p</sub> = 1/<i>C′</i> y el cociente <i>Z</i><sub>0</sub>/<i>v</i><sub>p</sub> = <i>L′</i>.`,`<i>v</i><sub>p</sub> = ${f2(D.vc,2)} × 3 × 10<sup>8</sup> = ${s3(D.vc*C)} m/s.`,`<i>L′</i> = <i>Z</i><sub>0</sub>/<i>v</i><sub>p</sub> = ${D.Z0}/${s3(D.vc*C)} = ${s3(R[0].v)} nH/m.`,`<i>C′</i> = 1/(<i>Z</i><sub>0</sub><i>v</i><sub>p</sub>) = ${s3(R[1].v)} pF/m.`]},
+{t:1, tit:"Retardo y longitud eléctrica", gen:r=>({vc:uni(r,0.6,0.9,2), f:Math.round(uni(r,30,600,0)/10)*10, l:uni(r,0.5,12,1)}),
+ enun:D=>`Un tramo de <b>${f2(D.l,1)} m</b> de cable con <i>v</i><sub>p</sub> = <b>${f2(D.vc,2)} <i>c</i></b> lleva una señal de <b>${D.f} MHz</b>. Calculen el tiempo de recorrido, la constante de fase y la longitud eléctrica del tramo.`,
+ res:D=>{ const vp=D.vc*C, lam=vp/(D.f*1e6); return [{lab:"Tiempo de recorrido",un:"ns",v:D.l/vp*1e9},{lab:"Constante de fase β",un:"rad/m",v:TP/lam},{lab:"ℓ / λ",un:"",v:D.l/lam}]; },
+ pasos:(D,R)=>{ const vp=D.vc*C, lam=vp/(D.f*1e6); return [`<i>v</i><sub>p</sub> = ${s3(vp)} m/s; <i>t</i> = ℓ/<i>v</i><sub>p</sub> = ${f2(D.l,1)}/${s3(vp)} = ${s3(R[0].v)} ns.`,`λ = <i>v</i><sub>p</sub>/<i>f</i> = ${s3(lam)} m; β = 2π/λ = ${s3(R[1].v)} rad/m.`,`ℓ/λ = ${f2(D.l,1)}/${s3(lam)} = ${s3(R[2].v)}. ${R[2].v>0.1?"Es mayor que 1/10: el tramo debe tratarse como línea de transmisión.":"Es menor que 1/10: basta la teoría de circuitos."}`]; }},
+{t:2, tit:"Carga resistiva: Γ, S y potencia reflejada", gen:r=>{ const Z0=pick(r,[50,75]); let RL; do{ RL=Math.round(uni(r,10,300,0)/5)*5; }while(Math.abs(RL-Z0)<0.12*Z0); return {Z0,RL}; },
+ enun:D=>`Una carga resistiva de <b>${D.RL} Ω</b> termina una línea de <i>Z</i><sub>0</sub> = <b>${D.Z0} Ω</b>. Calculen el coeficiente de reflexión (con su signo), la razón de onda estacionaria y el porcentaje de potencia reflejada.`,
+ res:D=>{ const G=(D.RL-D.Z0)/(D.RL+D.Z0); return [{lab:"Γ (con signo)",un:"",v:G},{lab:"<i>S</i>",un:"",v:(1+Math.abs(G))/(1-Math.abs(G))},{lab:"Potencia reflejada",un:"%",v:100*G*G}]; },
+ pasos:(D,R)=>[`Γ = (<i>R</i><sub>L</sub> − <i>Z</i><sub>0</sub>)/(<i>R</i><sub>L</sub> + <i>Z</i><sub>0</sub>) = (${D.RL} − ${D.Z0})/(${D.RL} + ${D.Z0}) = ${s3(R[0].v)}.`,`<i>S</i> = (1 + |Γ|)/(1 − |Γ|) = ${s3(R[1].v)}. Comprobación para carga resistiva: <i>S</i> = ${D.RL>D.Z0?`<i>R</i><sub>L</sub>/<i>Z</i><sub>0</sub> = ${D.RL}/${D.Z0}`:`<i>Z</i><sub>0</sub>/<i>R</i><sub>L</sub> = ${D.Z0}/${D.RL}`}.`,`Fracción reflejada |Γ|² = ${s3(R[0].v*R[0].v)}, es decir ${s3(R[2].v)} %. Se usa |Γ|², no |Γ|.`,`Como Γ ${R[0].v>0?"&gt; 0, en la carga hay un máximo":"&lt; 0, en la carga hay un mínimo"} de |<i>V</i>|.`]},
+{t:2, tit:"Pérdida de retorno y potencia en la carga", gen:r=>{ const Z0=pick(r,[50,75]); let RL; do{ RL=Math.round(uni(r,10,300,0)/5)*5; }while(Math.abs(RL-Z0)<0.12*Z0); return {Z0,RL,P:uni(r,1,50,1)}; },
+ enun:D=>`Por una línea de <i>Z</i><sub>0</sub> = <b>${D.Z0} Ω</b> viaja hacia una antena resistiva de <b>${D.RL} Ω</b> una potencia incidente de <b>${f2(D.P,1)} W</b>. Calculen la pérdida de retorno, la potencia reflejada y la potencia que recibe la antena.`,
+ res:D=>{ const G=Math.abs((D.RL-D.Z0)/(D.RL+D.Z0)); return [{lab:"Pérdida de retorno <i>RL</i>",un:"dB",v:-20*Math.log10(G),abs:0.2},{lab:"Potencia reflejada",un:"W",v:D.P*G*G},{lab:"Potencia en la antena",un:"W",v:D.P*(1-G*G)}]; },
+ pasos:(D,R)=>{ const G=Math.abs((D.RL-D.Z0)/(D.RL+D.Z0)); return [`|Γ| = |${D.RL} − ${D.Z0}|/(${D.RL} + ${D.Z0}) = ${s3(G)}.`,`<i>RL</i> = −20 log|Γ| = ${f2(R[0].v,2)} dB. Con 10 log se obtendría la mitad: el logaritmo es de una amplitud.`,`<i>P</i><sub>ref</sub> = |Γ|²<i>P</i><sub>inc</sub> = ${s3(G*G)} × ${f2(D.P,1)} = ${s3(R[1].v)} W.`,`<i>P</i><sub>L</sub> = <i>P</i><sub>inc</sub>(1 − |Γ|²) = ${s3(R[2].v)} W. Las dos suman la potencia incidente.`]; }},
+{t:2, tit:"Posición del primer extremo de voltaje", gen:r=>{ const Z0=pick(r,[50,75]); let RL; do{ RL=Math.round(uni(r,10,300,0)/5)*5; }while(Math.abs(RL-Z0)<0.12*Z0); return {Z0,RL,f:Math.round(uni(r,80,1500,0)/10)*10,vc:pick(r,[0.6,0.66,0.7,0.8])}; },
+ enun:D=>`Una antena resistiva de <b>${D.RL} Ω</b> termina una línea de <i>Z</i><sub>0</sub> = <b>${D.Z0} Ω</b> con <i>v</i><sub>p</sub> = <b>${f2(D.vc,2)} <i>c</i></b>, a <b>${D.f} MHz</b>. Calculen la longitud de onda en la línea y la distancia de la carga al primer <b>${D.RL>D.Z0?"mínimo":"máximo"}</b> de |<i>V</i>|.`,
+ res:D=>{ const lam=D.vc*C/(D.f*1e6); return [{lab:"Longitud de onda λ",un:"m",v:lam},{lab:"Distancia al primer "+(D.RL>D.Z0?"mínimo":"máximo"),un:"cm",v:lam/4*100}]; },
+ pasos:(D,R)=>[`λ = <i>v</i><sub>p</sub>/<i>f</i> = ${s3(D.vc*C)}/${s3(D.f*1e6)} = ${s3(R[0].v)} m. Se usa la velocidad en la línea, no <i>c</i>.`,`Γ = (${D.RL} − ${D.Z0})/(${D.RL} + ${D.Z0}) = ${s3((D.RL-D.Z0)/(D.RL+D.Z0))}: ${D.RL>D.Z0?"positivo, así que en la carga hay un máximo":"negativo, así que en la carga hay un mínimo"} de |<i>V</i>|.`,`Entre un máximo y el mínimo vecino hay λ/4: la distancia pedida es ${s3(R[0].v)}/4 = ${s3(R[1].v)} cm.`]},
+{t:2, tit:"De la onda estacionaria a la carga", gen:r=>({Z0:pick(r,[50,75]), S:uni(r,1.3,5,1), may:r()<0.5}),
+ enun:D=>`En una línea de <i>Z</i><sub>0</sub> = <b>${D.Z0} Ω</b> se mide <i>S</i> = <b>${f2(D.S,1)}</b>. Se sabe que la carga es resistiva y <b>${D.may?"mayor":"menor"}</b> que <i>Z</i><sub>0</sub>. Calculen la resistencia de la carga, la magnitud del coeficiente de reflexión y el porcentaje de potencia reflejada.`,
+ res:D=>{ const G=(D.S-1)/(D.S+1); return [{lab:"<i>R</i><sub>L</sub>",un:"Ω",v:D.may?D.Z0*D.S:D.Z0/D.S},{lab:"|Γ|",un:"",v:G},{lab:"Potencia reflejada",un:"%",v:100*G*G}]; },
+ pasos:(D,R)=>[`Para una carga resistiva ${D.may?`mayor que <i>Z</i><sub>0</sub>, <i>S</i> = <i>R</i><sub>L</sub>/<i>Z</i><sub>0</sub>: <i>R</i><sub>L</sub> = ${f2(D.S,1)} × ${D.Z0}`:`menor que <i>Z</i><sub>0</sub>, <i>S</i> = <i>Z</i><sub>0</sub>/<i>R</i><sub>L</sub>: <i>R</i><sub>L</sub> = ${D.Z0}/${f2(D.S,1)}`} = ${s3(R[0].v)} Ω.`,`|Γ| = (<i>S</i> − 1)/(<i>S</i> + 1) = ${s3(R[1].v)}.`,`Potencia reflejada: |Γ|² = ${s3(R[2].v)} %.`]},
+{t:3, tit:"Carga compleja: magnitud y ángulo de Γ", gen:r=>carga(r),
+ enun:D=>`Una antena de impedancia <i>Z</i><sub>L</sub> = ${ZL(D)} termina una línea de <b>50 Ω</b>. Calculen la magnitud y el ángulo del coeficiente de reflexión y la razón de onda estacionaria.`,
+ res:D=>{ const G=gam([D.R/50,D.X/50]), m=Math.hypot(G[0],G[1]); return [{lab:"|Γ|",un:"",v:m},{lab:"Ángulo de Γ",un:"°",v:Math.atan2(G[1],G[0])*180/Math.PI,abs:1.5},{lab:"<i>S</i>",un:"",v:(1+m)/(1-m)}]; },
+ pasos:(D,R)=>{ const z=[D.R/50,D.X/50]; return [`Normalizamos: <i>z</i><sub>L</sub> = <i>Z</i><sub>L</sub>/50 = ${cj(z[0],z[1],2)}.`,`Γ = (<i>z</i><sub>L</sub> − 1)/(<i>z</i><sub>L</sub> + 1) = (${cj(z[0]-1,z[1],2)})/(${cj(z[0]+1,z[1],2)}).`,`|Γ| = ${s3(Math.hypot(z[0]-1,z[1]))}/${s3(Math.hypot(z[0]+1,z[1]))} = ${s3(R[0].v)}; ángulo = ${f2(Math.atan2(z[1],z[0]-1)*180/Math.PI,1)}° − ${f2(Math.atan2(z[1],z[0]+1)*180/Math.PI,1)}° = ${f2(R[1].v,1)}°.`,`<i>S</i> = (1 + |Γ|)/(1 − |Γ|) = ${s3(R[2].v)}.`,`En la carta: el punto <i>z</i><sub>L</sub> queda a una distancia |Γ| del centro, en la mitad ${D.X>0?"superior (reactancia inductiva)":"inferior (reactancia capacitiva)"}.`]; },
+ fig:D=>({z:[D.R/50,D.X/50],d:0})},
+{t:3, tit:"Impedancia de entrada con la carta de Smith", gen:r=>({...carga(r), d:Math.round(uni(r,0.05,0.45,3)/0.005)*0.005}),
+ enun:D=>`Una antena de <i>Z</i><sub>L</sub> = ${ZL(D)} termina una línea de <b>50 Ω</b>. Obtengan, con la carta de Smith o con la fórmula, la impedancia de entrada a una distancia <span class="m">d</span> = <b>${f2(D.d,3)} λ</b> de la carga.`,
+ res:D=>{ const zi=zin([D.R/50,D.X/50],D.d), t=50*Math.max(0.02,0.01*((1+zi[0])*(1+zi[0])+zi[1]*zi[1])); return [{lab:"Parte real de <i>Z</i><sub>in</sub>",un:"Ω",v:50*zi[0],abs:t},{lab:"Parte imaginaria de <i>Z</i><sub>in</sub>",un:"Ω",v:50*zi[1],abs:t}]; },
+ pasos:(D,R)=>{ const z=[D.R/50,D.X/50], G=gam(z), w=wtg(G), w2=(w+D.d)%0.5, zi=zin(z,D.d), tg=Math.tan(TP*D.d); return [`Normalizamos: <i>z</i><sub>L</sub> = ${cj(z[0],z[1],2)} y lo ubicamos en la carta.`,`El radio que pasa por <i>z</i><sub>L</sub> corta la escala «longitudes de onda hacia el generador» en ${f2(w,3)}.`,`Sumamos <i>d</i>/λ: ${f2(w,3)} + ${f2(D.d,3)} = ${f2(w+D.d,3)}${w+D.d>=0.5?` → ${f2(w2,3)} (se resta 0.500: una vuelta completa es λ/2)`:""}.`,`Sobre el nuevo radio, a la misma distancia del centro, leemos <i>z</i><sub>in</sub> = ${cj(zi[0],zi[1],2)}.`,`Desnormalizamos: <i>Z</i><sub>in</sub> = 50 <i>z</i><sub>in</sub> = ${cj(50*zi[0],50*zi[1],1)} Ω.`,`Comprobación con la fórmula: β<i>d</i> = 360° × ${f2(D.d,3)} = ${f2(360*D.d,1)}°, tan β<i>d</i> = ${s3(tg)}; <i>z</i><sub>in</sub> = (<i>z</i><sub>L</sub> + j tan β<i>d</i>)/(1 + j <i>z</i><sub>L</sub> tan β<i>d</i>) da el mismo valor. La comprobación acepta el error propio de una lectura en la carta, que es mayor cerca del extremo derecho.`]; },
+ fig:D=>({z:[D.R/50,D.X/50],d:D.d})},
+{t:3, tit:"Primer máximo y primer mínimo de voltaje", gen:r=>carga(r),
+ enun:D=>`Una antena de <i>Z</i><sub>L</sub> = ${ZL(D)} termina una línea de <b>50 Ω</b>. Lean en la carta la posición de <i>z</i><sub>L</sub> en la escala «longitudes de onda hacia el generador» y las distancias de la carga al primer máximo y al primer mínimo de voltaje.`,
+ res:D=>{ const w=wtg(gam([D.R/50,D.X/50])); return [{lab:"Lectura de <i>z</i><sub>L</sub> en la escala exterior",un:"",v:w,abs:0.008},{lab:"<i>d</i><sub>máx</sub>",un:"λ",v:((0.25-w)%0.5+0.5)%0.5,abs:0.008},{lab:"<i>d</i><sub>mín</sub>",un:"λ",v:((0.5-w)%0.5+0.5)%0.5,abs:0.008}]; },
+ pasos:(D,R)=>{ const z=[D.R/50,D.X/50], G=gam(z); return [`<i>z</i><sub>L</sub> = ${cj(z[0],z[1],2)}; el radio que pasa por él corta la escala exterior en ${f2(R[0].v,3)}.`,`El máximo de voltaje está donde el círculo de <i>S</i> constante corta al eje real a la derecha (lectura 0.250): <i>d</i><sub>máx</sub> = 0.250 − ${f2(R[0].v,3)}${R[0].v>0.25?" + 0.500":""} = ${f2(R[1].v,3)} λ.`,`El mínimo está en el eje real a la izquierda (lectura 0.500): <i>d</i><sub>mín</sub> = 0.500 − ${f2(R[0].v,3)} = ${f2(R[2].v,3)} λ.`,`Los dos distan λ/4. Como la carga es ${D.X>0?"inductiva, el primer extremo que aparece al alejarse de la carga es el máximo":"capacitiva, el primer extremo que aparece al alejarse de la carga es el mínimo"}.`,`Comprobación con la fórmula: <i>d</i><sub>máx</sub> = θ<sub>r</sub>λ/(4π), con θ<sub>r</sub> = ${f2(Math.atan2(G[1],G[0])*180/Math.PI,1)}°${G[1]<0?" (si resulta negativo se suma λ/2)":""}.`]; },
+ fig:D=>({z:[D.R/50,D.X/50],d:0,ext:true})},
+{t:3, tit:"Un cuarto de onda y media onda", gen:r=>carga(r),
+ enun:D=>`Una carga de <i>Z</i><sub>L</sub> = ${ZL(D)} termina una línea de <b>50 Ω</b>. Calculen la impedancia de entrada a un cuarto de longitud de onda de la carga.`,
+ res:D=>{ const zi=cdiv([1,0],[D.R/50,D.X/50]), t=Math.max(1.5,0.02*50*Math.hypot(zi[0],zi[1])); return [{lab:"Parte real de <i>Z</i><sub>in</sub>(λ/4)",un:"Ω",v:50*zi[0],abs:t},{lab:"Parte imaginaria de <i>Z</i><sub>in</sub>(λ/4)",un:"Ω",v:50*zi[1],abs:t}]; },
+ pasos:(D,R)=>{ const m2=D.R*D.R+D.X*D.X; return [`A λ/4, <i>Z</i><sub>in</sub> = <i>Z</i><sub>0</sub>²/<i>Z</i><sub>L</sub> = 2500/(${D.R}${D.X>=0?" + j":" − j"}${Math.abs(D.X)}).`,`Multiplicamos por el conjugado: 2500 (${D.R}${D.X>=0?" − j":" + j"}${Math.abs(D.X)})/(${D.R}² + ${Math.abs(D.X)}²) = 2500 (${D.R}${D.X>=0?" − j":" + j"}${Math.abs(D.X)})/${m2}.`,`<i>Z</i><sub>in</sub> = ${cj(R[0].v,R[1].v,1)} Ω. Una carga ${D.X>0?"inductiva se ve capacitiva":"capacitiva se ve inductiva"} a un cuarto de onda.`,`En la carta es el punto diametralmente opuesto a <i>z</i><sub>L</sub> (media vuelta). A media onda (una vuelta completa) se regresa a <i>Z</i><sub>L</sub>.`]; },
+ fig:D=>({z:[D.R/50,D.X/50],d:0.25})},
+{t:4, tit:"Diseño de un transformador de un cuarto de onda", gen:r=>{ let RL; do{ RL=Math.round(uni(r,8,400,0)/2)*2; }while(Math.abs(RL-50)<12); return {RL,f:uni(r,0.4,6,1),vc:pick(r,[0.6,0.66,0.7])}; },
+ enun:D=>`Una antena resistiva de <b>${D.RL} Ω</b> se acopla a una línea de <b>50 Ω</b> a <b>${f2(D.f,1)} GHz</b> con un transformador de un cuarto de onda. En todas las líneas <i>v</i><sub>p</sub> = <b>${f2(D.vc,2)} <i>c</i></b>. Calculen la impedancia del transformador, su longitud y la razón de onda estacionaria dentro del tramo.`,
+ res:D=>{ const ZT=Math.sqrt(50*D.RL); return [{lab:"<i>Z</i><sub>T</sub>",un:"Ω",v:ZT},{lab:"Longitud del tramo",un:"cm",v:D.vc*C/(D.f*1e9)/4*100},{lab:"<i>S</i> en el tramo",un:"",v:Math.max(D.RL,ZT)/Math.min(D.RL,ZT)}]; },
+ pasos:(D,R)=>[`<i>Z</i><sub>T</sub> = √(<i>Z</i><sub>0</sub><i>R</i><sub>L</sub>) = √(50 × ${D.RL}) = ${s3(R[0].v)} Ω. Es la media geométrica, no el promedio.`,`λ en el tramo = <i>v</i><sub>p</sub>/<i>f</i> = ${s3(D.vc*C)}/${s3(D.f*1e9)} = ${s3(D.vc*C/(D.f*1e9)*100)} cm; longitud = λ/4 = ${s3(R[1].v)} cm.`,`Dentro del tramo, la carga <i>R</i><sub>L</sub> termina una línea de <i>Z</i><sub>T</sub>: <i>S</i> = ${D.RL>R[0].v?`<i>R</i><sub>L</sub>/<i>Z</i><sub>T</sub>`:`<i>Z</i><sub>T</sub>/<i>R</i><sub>L</sub>`} = ${s3(R[2].v)}.`,`En la línea principal <i>Z</i><sub>in</sub> = <i>Z</i><sub>T</sub>²/<i>R</i><sub>L</sub> = 50 Ω y <i>S</i> = 1.`]},
+{t:4, tit:"El transformador fuera de su frecuencia", gen:r=>{ let RL; do{ RL=Math.round(uni(r,8,400,0)/2)*2; }while(Math.abs(RL-50)<12); return {RL,f:uni(r,0.4,3,1)}; },
+ enun:D=>`Un transformador de un cuarto de onda acopla una antena resistiva de <b>${D.RL} Ω</b> a una línea de <b>50 Ω</b> a <b>${f2(D.f,1)} GHz</b>. Se usa el mismo transformador a <b>${f2(2*D.f,1)} GHz</b>. Calculen la impedancia de entrada que presenta a esa frecuencia, la magnitud del coeficiente de reflexión en la línea principal y el porcentaje de potencia reflejada.`,
+ res:D=>{ const G=Math.abs((D.RL-50)/(D.RL+50)); return [{lab:"<i>Z</i><sub>in</sub>",un:"Ω",v:D.RL},{lab:"|Γ|",un:"",v:G},{lab:"Potencia reflejada",un:"%",v:100*G*G}]; },
+ pasos:(D,R)=>[`Al doble de frecuencia la longitud de onda es la mitad: el tramo, que medía λ/4, ahora mide λ/2.`,`Un tramo de media onda repite la carga: <i>Z</i><sub>in</sub> = <i>R</i><sub>L</sub> = ${D.RL} Ω, sea cual sea <i>Z</i><sub>T</sub>.`,`|Γ| = |${D.RL} − 50|/(${D.RL} + 50) = ${s3(R[1].v)}.`,`Potencia reflejada: |Γ|² = ${s3(R[2].v)} %, la misma que sin transformador. El acoplamiento solo funciona a la frecuencia de diseño.`]},
+{t:5, tit:"Frecuencia de corte y ángulo de los rayos", gen:r=>{ const a=uni(r,8,90,1), fc=C/(2*a*1e-3)/1e9; return {a,f:+(fc*uni(r,1.2,1.85,2)).toPrecision(3)}; },
+ enun:D=>`Una guía de onda rectangular tiene un lado ancho <span class="m">a</span> = <b>${f2(D.a,1)} mm</b> y lleva una señal de <b>${D.f} GHz</b>. Calculen la frecuencia de corte del modo fundamental, el ángulo θ entre los rayos y el eje de la guía, y cos θ.`,
+ res:D=>{ const fc=C/(2*D.a*1e-3)/1e9, s=fc/D.f; return [{lab:"<i>f</i><sub>c</sub>",un:"GHz",v:fc},{lab:"θ",un:"°",v:Math.asin(s)*180/Math.PI},{lab:"cos θ",un:"",v:Math.sqrt(1-s*s)}]; },
+ pasos:(D,R)=>[`<i>f</i><sub>c</sub> = <i>c</i>/(2<i>a</i>) = 3 × 10<sup>8</sup>/(2 × ${s3(D.a*1e-3)}) = ${s3(R[0].v)} GHz. Como ${D.f} GHz es mayor, hay propagación.`,`sen θ = <i>f</i><sub>c</sub>/<i>f</i> = ${s3(R[0].v)}/${D.f} = ${s3(R[0].v/D.f)}; θ = ${f2(R[1].v,1)}°.`,`cos θ = √(1 − (<i>f</i><sub>c</sub>/<i>f</i>)²) = ${s3(R[2].v)}.`]},
+{t:5, tit:"Longitud de onda en la guía y velocidades", gen:r=>{ const a=uni(r,8,90,1), fc=C/(2*a*1e-3)/1e9; return {a,f:+(fc*uni(r,1.2,1.85,2)).toPrecision(3)}; },
+ enun:D=>`Una guía rectangular con <span class="m">a</span> = <b>${f2(D.a,1)} mm</b> lleva una señal de <b>${D.f} GHz</b> en el modo fundamental. Calculen la longitud de onda en la guía, la velocidad de fase y la velocidad de grupo.`,
+ res:D=>{ const fc=C/(2*D.a*1e-3)/1e9, cs=Math.sqrt(1-Math.pow(fc/D.f,2)); return [{lab:"λ<sub>g</sub>",un:"cm",v:C/(D.f*1e9)/cs*100},{lab:"<i>v</i><sub>p</sub>",un:"× 10⁸ m/s",v:3/cs},{lab:"<i>v</i><sub>g</sub>",un:"× 10⁸ m/s",v:3*cs}]; },
+ pasos:(D,R)=>{ const fc=C/(2*D.a*1e-3)/1e9, cs=Math.sqrt(1-Math.pow(fc/D.f,2)), l0=C/(D.f*1e9)*100; return [`<i>f</i><sub>c</sub> = <i>c</i>/(2<i>a</i>) = ${s3(fc)} GHz; cos θ = √(1 − (${s3(fc)}/${D.f})²) = ${s3(cs)}.`,`λ<sub>0</sub> = <i>c</i>/<i>f</i> = ${s3(l0)} cm; λ<sub>g</sub> = λ<sub>0</sub>/cos θ = ${s3(R[0].v)} cm, mayor que λ<sub>0</sub>.`,`<i>v</i><sub>p</sub> = <i>c</i>/cos θ = ${s3(R[1].v)} × 10<sup>8</sup> m/s, mayor que <i>c</i>.`,`<i>v</i><sub>g</sub> = <i>c</i> cos θ = ${s3(R[2].v)} × 10<sup>8</sup> m/s, menor que <i>c</i>. Comprobación: <i>v</i><sub>p</sub><i>v</i><sub>g</sub> = ${s3(R[1].v*R[2].v)} × 10<sup>16</sup> = <i>c</i>².`]; }},
+{t:5, tit:"Banda de un solo modo y tiempo de recorrido", gen:r=>{ const a=uni(r,10,80,1), b=+(a*uni(r,0.3,0.7,2)).toFixed(1), fc=C/(2*a*1e-3)/1e9, sg=Math.min(2*fc,C/(2*b*1e-3)/1e9); return {a,b,f:+(fc+(sg-fc)*uni(r,0.3,0.8,2)).toPrecision(3),Lg:uni(r,0.5,6,1)}; },
+ enun:D=>`Una guía rectangular tiene <span class="m">a</span> = <b>${f2(D.a,1)} mm</b> y <span class="m">b</span> = <b>${f2(D.b,1)} mm</b>. Calculen la frecuencia de corte del modo fundamental, la del modo siguiente y el tiempo que tarda un pulso de <b>${D.f} GHz</b> en recorrer <b>${f2(D.Lg,1)} m</b> de guía.`,
+ res:D=>{ const fc=C/(2*D.a*1e-3)/1e9, f20=2*fc, f01=C/(2*D.b*1e-3)/1e9, cs=Math.sqrt(1-Math.pow(fc/D.f,2)); return [{lab:"<i>f</i><sub>c</sub> del modo TE<sub>10</sub>",un:"GHz",v:fc},{lab:"<i>f</i><sub>c</sub> del modo siguiente",un:"GHz",v:Math.min(f20,f01)},{lab:"Tiempo de recorrido",un:"ns",v:D.Lg/(C*cs)*1e9}]; },
+ pasos:(D,R)=>{ const fc=R[0].v, f20=2*fc, f01=C/(2*D.b*1e-3)/1e9, cs=Math.sqrt(1-Math.pow(fc/D.f,2)); return [`<i>f</i><sub>c,10</sub> = <i>c</i>/(2<i>a</i>) = ${s3(fc)} GHz.`,`Candidatos al modo siguiente: TE<sub>20</sub>, con <i>c</i>/<i>a</i> = ${s3(f20)} GHz, y TE<sub>01</sub>, con <i>c</i>/(2<i>b</i>) = ${s3(f01)} GHz. El menor es el ${f20<=f01?"TE<sub>20</sub>":"TE<sub>01</sub>"}: ${s3(R[1].v)} GHz.`,`La guía transmite un solo modo de ${s3(fc)} a ${s3(R[1].v)} GHz; la señal de ${D.f} GHz está dentro de esa banda.`,`cos θ = √(1 − (${s3(fc)}/${D.f})²) = ${s3(cs)}; <i>v</i><sub>g</sub> = <i>c</i> cos θ = ${s3(3*cs)} × 10<sup>8</sup> m/s.`,`<i>t</i> = <i>L</i>/<i>v</i><sub>g</sub> = ${f2(D.Lg,1)}/${s3(C*cs)} = ${s3(R[2].v)} ns (en el vacío: ${s3(D.Lg/C*1e9)} ns). Con <i>v</i><sub>p</sub> saldría un tiempo menor que en el vacío, lo cual es imposible para una señal.`]; }},
+{t:5, tit:"Frecuencias de corte de varios modos", gen:r=>{ const a=uni(r,10,80,1); return {a,b:+(a*uni(r,0.35,0.65,2)).toFixed(1)}; },
+ enun:D=>`Una guía rectangular tiene <span class="m">a</span> = <b>${f2(D.a,1)} mm</b> y <span class="m">b</span> = <b>${f2(D.b,1)} mm</b>. Calculen las frecuencias de corte de los modos TE<sub>20</sub>, TE<sub>01</sub> y TE<sub>11</sub>.`,
+ res:D=>{ const a=D.a*1e-3,b=D.b*1e-3,fc=(m,n)=>C/2*Math.hypot(m/a,n/b)/1e9; return [{lab:"<i>f</i><sub>c</sub> de TE<sub>20</sub>",un:"GHz",v:fc(2,0)},{lab:"<i>f</i><sub>c</sub> de TE<sub>01</sub>",un:"GHz",v:fc(0,1)},{lab:"<i>f</i><sub>c</sub> de TE<sub>11</sub>",un:"GHz",v:fc(1,1)}]; },
+ pasos:(D,R)=>[`<i>f</i><sub>c,mn</sub> = (<i>c</i>/2)√[(<i>m</i>/<i>a</i>)² + (<i>n</i>/<i>b</i>)²], con <i>a</i> = ${s3(D.a*1e-3)} m y <i>b</i> = ${s3(D.b*1e-3)} m.`,`TE<sub>20</sub>: <i>c</i>/<i>a</i> = ${s3(R[0].v)} GHz (el doble del corte del TE<sub>10</sub>, ${s3(R[0].v/2)} GHz).`,`TE<sub>01</sub>: <i>c</i>/(2<i>b</i>) = ${s3(R[1].v)} GHz.`,`TE<sub>11</sub>: √(${s3(R[0].v/2)}² + ${s3(R[1].v)}²) = ${s3(R[2].v)} GHz. El modo TM<sub>11</sub> tiene el mismo corte; no existen TM<sub>10</sub> ni TM<sub>01</sub>.`]}
+];
+// ---------------------------------------------------------------- carta de Smith de la solución
+function dibujaCarta(cv,F){
+  const g=cv.getContext("2d"), W=cv.width, cx=W/2, cy=W/2+4, R=W/2-46, X=u=>cx+u*R, Y=v=>cy-v*R;
+  g.clearRect(0,0,cv.width,cv.height); g.save(); g.beginPath(); g.arc(cx,cy,R,0,TP); g.clip(); g.lineWidth=0.8; g.strokeStyle="#B9BEC9";
+  for(const r of [0.2,0.5,1,2,5]){ g.beginPath(); g.arc(X(r/(1+r)),cy,R/(1+r),0,TP); g.stroke(); }
+  for(const x of [0.2,0.5,1,2,5]) for(const s of [1,-1]){ g.beginPath(); g.arc(X(1),Y(s/x),R/x,0,TP); g.stroke(); }
+  g.beginPath(); g.moveTo(X(-1),cy); g.lineTo(X(1),cy); g.stroke(); g.restore();
+  g.strokeStyle="#1b1e27"; g.lineWidth=1.3; g.beginPath(); g.arc(cx,cy,R,0,TP); g.stroke();
+  g.fillStyle="#8A3A0C"; g.font="11px system-ui,sans-serif"; g.textAlign="left"; g.textBaseline="top";
+  for(const r of [0.2,0.5,1,2,5]) g.fillText(String(r),X((r-1)/(r+1))+2,cy+2);
+  g.fillStyle="#6A3D9A"; g.textAlign="center"; g.textBaseline="middle";
+  for(const x of [0.2,0.5,1,2,5]) for(const s of [1,-1]){ const a=s*2*Math.atan(1/x); g.fillText((s>0?"+j":"−j")+x,X(0.9*Math.cos(a)),Y(0.9*Math.sin(a))); }
+  g.fillStyle="#333"; g.strokeStyle="#5A5F6B"; g.lineWidth=0.8;
+  for(let k=0;k<50;k++){ const a=Math.PI-TP*2*k/100, L=k%5===0?7:4; g.beginPath(); g.moveTo(X(Math.cos(a)),Y(Math.sin(a))); g.lineTo(cx+(R+L)*Math.cos(a),cy-(R+L)*Math.sin(a)); g.stroke();
+    if(k%5===0) g.fillText(k===0?"0":(k/100).toFixed(2),cx+(R+22)*Math.cos(a),cy-(R+22)*Math.sin(a)); }
+  const G=gam(F.z), m=Math.hypot(G[0],G[1]), w=wtg(G), ang=u=>Math.PI-TP*2*u;
+  g.strokeStyle="#1F5FBF"; g.lineWidth=1.5; g.setLineDash([6,4]); g.beginPath(); g.arc(cx,cy,m*R,0,TP); g.stroke(); g.setLineDash([]);
+  const radio=(u,col)=>{ g.strokeStyle=col; g.lineWidth=1.1; g.setLineDash([4,3]); g.beginPath(); g.moveTo(cx,cy); g.lineTo(cx+(R+8)*Math.cos(ang(u)),cy-(R+8)*Math.sin(ang(u))); g.stroke(); g.setLineDash([]); };
+  const punto=(Gp,col,txt,dy,lado)=>{ g.fillStyle=col; g.beginPath(); g.arc(X(Gp[0]),Y(Gp[1]),5,0,TP); g.fill(); g.strokeStyle="#fff"; g.lineWidth=1.5; g.stroke();
+    g.font="600 12.5px system-ui,sans-serif"; const tw=g.measureText(txt).width+8, tx=Math.min(Math.max(X(Gp[0])+(lado||0)*(tw/2+9),tw/2+2),W-tw/2-2), ty=Y(Gp[1])+(lado?0:dy);
+    g.fillStyle="rgba(255,255,255,0.92)"; g.fillRect(tx-tw/2,ty-9,tw,18); g.fillStyle=col; g.textAlign="center"; g.textBaseline="middle"; g.fillText(txt,tx,ty); };
+  radio(w,"#C1571B");
+  if(F.d>0){ const w2=w+F.d, zi=zin(F.z,F.d), Gi=gam(zi); radio(w2%0.5,"#2E7D32");
+    g.strokeStyle="#2E7D32"; g.lineWidth=3.2; g.beginPath(); for(let k=0;k<=80;k++){ const a=ang(w+F.d*k/80), px=cx+m*R*Math.cos(a), py=cy-m*R*Math.sin(a); k?g.lineTo(px,py):g.moveTo(px,py); } g.stroke();
+    punto(Gi,"#2E7D32","entrada: "+cj(zi[0],zi[1],2),0,Gi[0]>=G[0]?1:-1); }
+  if(F.ext){ punto([m,0],"#B3261E","V máx",17); punto([-m,0],"#B3261E","V mín",17); }
+  punto(G,"#C1571B","carga: "+cj(F.z[0],F.z[1],2),G[1]>=0?-17:17,F.d>0?((gam(zin(F.z,F.d))[0]>=G[0])?-1:1):0);
+}
+// ---------------------------------------------------------------- motor
+let EST={}, semillas=[], filtro=0, INT={};
+try{ EST=JSON.parse(localStorage.getItem("autoeval_em_u4")||"{}"); }catch(e){ EST={}; }
+const guarda=()=>{ try{ localStorage.setItem("autoeval_em_u4",JSON.stringify(EST)); }catch(e){} };
+for(let i=0;i<P.length;i++) semillas.push(Math.floor(Math.random()*1e9));
+const datos=i=>P[i].gen(rng(semillas[i]));
+const num=s=>{ s=String(s).trim().replace(",",".").replace("−","-"); return s===""?NaN:Number(s); };
+const correcto=(v,x,c)=>Math.abs(x-v)<=Math.max(c.abs||0,c.abs?0:TOL*Math.abs(v),1e-9);
+function html(i){
+  const p=P[i], D=datos(i), R=p.res(D);
+  return `<div class="t">Tipo ${p.t} · ${NOMBRES[p.t]}</div><h3>${i+1}. ${p.tit}</h3><div class="enun">${p.enun(D)}</div>
+  <div class="campos">${R.map((c,j)=>`<div class="campo" id="p${i}c${j}"><label for="p${i}i${j}">${c.lab}</label><div class="in"><input id="p${i}i${j}" inputmode="decimal" autocomplete="off"><span class="un">${c.un}</span><span class="mk" id="p${i}m${j}" aria-live="polite"></span></div></div>`).join("")}</div>
+  <div class="acc"><button class="pri" data-a="comp" data-i="${i}">Comprobar</button><button data-a="sol" data-i="${i}" aria-expanded="false">Ver solución</button><button data-a="nuevo" data-i="${i}">Datos nuevos</button></div>
+  <div class="pmsg" id="p${i}msg" role="status" aria-live="polite"></div>
+  <div class="sol" id="p${i}sol"><b>Solución.</b><ol>${p.pasos(D,R).map(t=>"<li>"+t+"</li>").join("")}</ol>${p.fig?`<canvas id="p${i}cv" width="460" height="470" role="img" aria-label="Construcción en la carta de Smith"></canvas><div class="pie">Carta de Smith: carga (naranja), círculo de S constante (azul)${p.fig(D).d>0?", giro hacia el generador y resultado (verde)":""}${p.fig(D).ext?", extremos de voltaje (rojo)":""}. Escala exterior: longitudes de onda hacia el generador.</div>`:""}
+  <div style="margin-top:6px"><b>Resultados:</b> ${R.map(c=>c.lab+" = "+s3(c.v)+(c.un?" "+c.un:"")).join(" · ")}</div></div>`;
+}
+function repinta(i){ const e=$("prob"+i); e.innerHTML=html(i); if(P[i].fig) dibujaCarta($("p"+i+"cv"),P[i].fig(datos(i))); }
+function pinta(){ $("lista").innerHTML=P.map((p,i)=>`<section class="prob" id="prob${i}" data-t="${p.t}"></section>`).join(""); for(let i=0;i<P.length;i++) repinta(i); aplicaFiltro(); marcador(); }
+function aplicaFiltro(){ document.querySelectorAll(".prob").forEach(e=>{ e.style.display=(filtro===0||+e.dataset.t===filtro)?"":"none"; }); }
+function marcador(){ const n=Object.keys(EST).length, a=Object.values(EST).filter(v=>v==="a").length;
+  $("marcador").textContent="Problemas resueltos en este navegador: "+n+" de "+P.length+(n?" ("+a+" a la primera)":"")+". Tolerancia de comprobación: 2 %."; }
+function comprueba(i){
+  const R=P[i].res(datos(i)); let bien=0, vacios=0;
+  R.forEach((c,j)=>{ const x=num($("p"+i+"i"+j).value), box=$("p"+i+"c"+j), mk=$("p"+i+"m"+j); box.classList.remove("ok","mal"); mk.className="mk";
+    if(isNaN(x)){ vacios++; mk.textContent=""; return; } const ok=correcto(c.v,x,c); box.classList.add(ok?"ok":"mal"); mk.classList.add(ok?"ok":"mal"); mk.textContent=ok?"✓":"✗"; if(ok) bien++; });
+  const k="p"+i; let m;
+  if(vacios===R.length) m="Escriban al menos un resultado.";
+  else { INT[k]=(INT[k]||0)+1;
+    if(bien===R.length){ m="Todo correcto."; if(!EST[k]){ EST[k]=INT[k]===1?"a":"b"; guarda(); marcador(); } }
+    else m=bien+" de "+R.length+" correctos. Revisen las unidades y el paso donde se separan"+(INT[k]>=2?"; ya pueden abrir la solución.":"."); }
+  $("p"+i+"msg").textContent=m;
+}
+document.addEventListener("click",ev=>{ const b=ev.target.closest("button"); if(!b) return;
+  if(b.dataset.f!==undefined){ filtro=+b.dataset.f; document.querySelectorAll("[data-f]").forEach(x=>x.classList.toggle("on",x===b)); aplicaFiltro(); return; }
+  if(b.id==="todo-nuevo"){ for(let i=0;i<P.length;i++) semillas[i]=Math.floor(Math.random()*1e9); INT={}; pinta(); return; }
+  const i=+b.dataset.i; if(b.dataset.a==="comp") comprueba(i);
+  if(b.dataset.a==="sol"){ const s=$("p"+i+"sol"); s.classList.toggle("on"); const on=s.classList.contains("on"); b.textContent=on?"Ocultar solución":"Ver solución"; b.setAttribute("aria-expanded",on); }
+  if(b.dataset.a==="nuevo"){ semillas[i]=Math.floor(Math.random()*1e9); delete INT["p"+i]; repinta(i); }
+});
+document.addEventListener("keydown",ev=>{ if(ev.key==="Enter"&&ev.target.matches(".campo input")){ comprueba(+ev.target.id.slice(1).split("i")[0]); } });
+window.__ae={P,datos,semillas,rng,correcto,repinta};
+pinta();
+</script>
+<!-- contador:inicio -->
+<style>
+  .visitas{max-width:940px;margin:0 auto;padding:0 18px 26px;font-size:11.5px;
+    color:var(--muted,#7A8699);display:none;font-family:inherit}
+  .visitas span{display:inline-block;background:var(--card,#fff);
+    border:1px solid var(--line,#D3DEEE);border-radius:20px;padding:3px 11px}
+  .visitas b{color:var(--navy,var(--ink,#1F3864));font-weight:700}
+  .visitas a{color:var(--muted,#7A8699);text-decoration:none;margin-left:6px}
+  .visitas a:hover{text-decoration:underline}
+</style>
+<div class="visitas" id="visitas"><span>👁 Esta página: <b id="vis-pag">–</b> visitas · Todo el sitio: <b id="vis-tot">–</b>
+<a href="https://elodiestrupiechonski.goatcounter.com" target="_blank" rel="noopener" title="Estadísticas públicas del sitio (GoatCounter, sin cookies)">estadísticas ↗</a></span></div>
+<script>
+(function(){
+  if(location.protocol!=='http:' && location.protocol!=='https:') return;   // copia local: sin contador ni peticiones
+  var sc=document.createElement('script'); sc.async=true;
+  sc.setAttribute('data-goatcounter','https://elodiestrupiechonski.goatcounter.com/count');
+  sc.src='https://gc.zgo.at/count.js'; document.head.appendChild(sc);
+  var base='https://elodiestrupiechonski.goatcounter.com/counter/';
+  function pide(path){
+    return fetch(base+encodeURIComponent(path).replace(/%2F/g,'/')+'.json',{cache:'no-cache'})
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+  }
+  var p=location.pathname;
+  if(/\/index\.html$/.test(p)) p=p.replace(/index\.html$/,'');
+  Promise.all([pide(p), pide('TOTAL')]).then(function(res){
+    var a=res[0], b=res[1];
+    if(!a && !b) return;
+    document.getElementById('vis-pag').textContent = a ? a.count : '–';
+    document.getElementById('vis-tot').textContent = b ? b.count : '–';
+    document.getElementById('visitas').style.display='block';
+  });
+})();
+</script>
+<!-- contador:fin -->
+</body>
+</html>
+<!-- navegacion:inicio -->
+<style>
+  :root{--nv-w:272px}
+  body{margin-top:0!important}
+  @media (min-width:1100px){ body{margin-left:var(--nv-w)!important} }
+  .nvside{position:fixed;top:0;left:0;bottom:0;width:var(--nv-w);z-index:9999;display:flex;flex-direction:column;
+    background:var(--card,#fff);border-right:1px solid var(--line,#e2dcc9);
+    font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:14px;color:var(--ink,#1a1a1a);
+    box-shadow:1px 0 8px rgba(0,0,0,.05);transition:transform .2s ease}
+  .nvside a{text-decoration:none;color:inherit}
+  .nv-cab{padding:14px 16px 10px;border-bottom:1px solid var(--line,#e2dcc9)}
+  .nv-marca{display:block;font-family:"Century Gothic","Questrial",Arial,sans-serif;font-weight:700;font-size:15px;
+    line-height:1.25;color:var(--navy,var(--ink,#1F3864))}
+  .nv-marca small{display:block;font-weight:400;font-size:12px;color:var(--muted,#5a5a5a);margin-top:2px}
+  .nv-pasos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .nv-paso{display:flex;flex-direction:column;gap:1px;padding:6px 8px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font-size:11px;color:var(--muted,#5a5a5a);min-width:0}
+  .nv-paso b{font-size:12.5px;color:var(--ink,#1a1a1a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nv-paso.sig{text-align:right}
+  .nv-paso:hover{background:var(--bg,#f4f1ea)}
+  .nv-paso[aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-busca{margin-top:8px;width:100%;box-sizing:border-box;padding:7px 9px;border:1px solid var(--line,#e2dcc9);border-radius:8px;
+    font:inherit;background:var(--bg,#f8f6f0);color:inherit}
+  .nv-lista{flex:1;overflow-y:auto;padding:6px 8px 10px}
+  .nv-grp{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#8a8fa0);padding:12px 8px 4px}
+  .nv-lista a{display:block;padding:6px 8px 6px 10px;border-radius:6px;border-left:3px solid transparent;line-height:1.3}
+  .nv-lista a small{display:block;font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-lista a:hover{background:var(--bg,#f4f1ea)}
+  .nv-lista a.nv-aqui{background:var(--bg,#f4f1ea);border-left-color:var(--accent,#C1571B);font-weight:700}
+  .nv-pie{padding:8px 14px;border-top:1px solid var(--line,#e2dcc9);font-size:11px;color:var(--muted,#8a8fa0)}
+  .nv-boton{display:none;position:fixed;top:10px;left:10px;z-index:10000;gap:6px}
+  .nv-boton a,.nv-boton button{display:flex;align-items:center;justify-content:center;height:38px;min-width:38px;padding:0 10px;
+    border:1px solid var(--line,#e2dcc9);border-radius:9px;background:var(--card,#fff);color:var(--ink,#1a1a1a);
+    font:600 14px Arial,sans-serif;text-decoration:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .nv-boton [aria-disabled="true"]{opacity:.3;pointer-events:none}
+  .nv-velo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:10001}
+  .nv-cierra{display:none;position:absolute;top:10px;right:10px;width:32px;height:32px;border:1px solid var(--line,#e2dcc9);border-radius:8px;background:var(--card,#fff);color:inherit;font-size:16px;cursor:pointer}
+  .nv-cab{position:relative}
+  @media (max-width:1099px){
+    body{margin-top:56px!important}
+    .nvside{transform:translateX(-102%);width:min(320px,88vw)}
+    .nvside.abierto{transform:none;z-index:10002}
+    .nv-cierra{display:block}
+    .nv-boton{display:flex}
+    .nvside.abierto ~ .nv-velo{display:block}
+  }
+  @media print{.nvside,.nv-boton,.nv-velo{display:none} body{margin:0!important}}
+</style>
+<nav class="nvside" id="nvside" aria-label="Exploradores del curso">
+  <div class="nv-cab">
+    <button class="nv-cierra" id="nv-cierra" aria-label="Cerrar el temario">✕</button>
+    <a class="nv-marca" href="index.html">Exploradores de Teoría Electromagnética<small>ENES Juriquilla, UNAM · inicio</small></a>
+    <div class="nv-pasos">
+      <a class="nv-paso" id="nv-ant" href="#" aria-label="Explorador anterior">‹ anterior<b id="nv-ant-t">…</b></a>
+      <a class="nv-paso sig" id="nv-sig" href="#" aria-label="Explorador siguiente">siguiente ›<b id="nv-sig-t">…</b></a>
+    </div>
+    <input class="nv-busca" id="nv-busca" type="search" placeholder="Buscar (tecla /)" aria-label="Buscar explorador">
+  </div>
+  <div class="nv-lista" id="nv-lista">
+<div class="nv-grp">Unidad 1 · Conceptos fundamentales y ecuaciones de Maxwell</div>
+<a href="CampoGauss_explorador.html" data-nv="CampoGauss_explorador.html">Ley de Gauss<small>1.1 · P1</small></a>
+<a href="Capacitor_explorador.html" data-nv="Capacitor_explorador.html">Capacitor con dieléctrico<small>1.2 · P1</small></a>
+<a href="Solenoide_explorador.html" data-nv="Solenoide_explorador.html">Solenoide finito<small>1.4 · P3</small></a>
+<a href="Induccion_explorador.html" data-nv="Induccion_explorador.html">Inducción de Faraday<small>1.6 · P3</small></a>
+<div class="nv-grp">Unidad 2 · Ondas planas electromagnéticas</div>
+<a href="RC_interactivo.html" data-nv="RC_interactivo.html">Circuito RC y fasores<small>fasores · P4</small></a>
+<a href="MicroondasC_explorador.html" data-nv="MicroondasC_explorador.html">c con microondas<small>2.3 · P5</small></a>
+<a href="EfectoPiel_explorador.html" data-nv="EfectoPiel_explorador.html">Efecto piel<small>2.6 · P6</small></a>
+<a href="Polarizacion_explorador.html" data-nv="Polarizacion_explorador.html">Polarización<small>2.8 · P7</small></a>
+<a href="Doppler_explorador.html" data-nv="Doppler_explorador.html">Efecto Doppler<small>2.9</small></a>
+<div class="nv-grp">Unidad 3 · Reflexión y refracción de ondas planas</div>
+<a href="Reflexion_interactivo.html" data-nv="Reflexion_interactivo.html">Incidencia normal<small>3.2 · P8</small></a>
+<a href="TDR_explorador.html" data-nv="TDR_explorador.html">TDR en cable coaxial<small>3.2 · P8</small></a>
+<a href="CapaTresMedios_interactivo.html" data-nv="CapaTresMedios_interactivo.html">Capa dieléctrica (3 medios)<small>3.3</small></a>
+<a href="CapaDielectrica_explorador.html" data-nv="CapaDielectrica_explorador.html">Impedancia efectiva η(d)<small>3.3</small></a>
+<a href="Snell_explorador.html" data-nv="Snell_explorador.html">Ley de Snell<small>3.5 · P10</small></a>
+<a href="Fresnel_explorador.html" data-nv="Fresnel_explorador.html">Coeficientes de Fresnel<small>3.6–3.8 · P11</small></a>
+<div class="nv-grp">Unidad 4 · Líneas de transmisión y guías de onda</div>
+<a href="LineaTransmision_interactivo.html" data-nv="LineaTransmision_interactivo.html">Línea de transmisión · Γ y VSWR<small>4.3–4.4</small></a>
+<a href="ImpedanciaEntrada_explorador.html" data-nv="ImpedanciaEntrada_explorador.html">Líneas cortas como reactancias<small>4.5–4.6 · P14</small></a>
+<a href="Smith_explorador.html" data-nv="Smith_explorador.html">Carta de Smith<small>4.7 · P15</small></a>
+<a href="Acoplamiento_explorador.html" data-nv="Acoplamiento_explorador.html">Acoplamiento λ/4 y stub<small>4.8–4.9 · P15</small></a>
+<a href="OndaQueRebota_explorador.html" data-nv="OndaQueRebota_explorador.html">Guía de onda: onda que rebota<small>4.10</small></a>
+<a href="GuiaOnda_explorador.html" data-nv="GuiaOnda_explorador.html">Guía de onda rectangular<small>4.10–4.12 · P16</small></a>
+<a href="FEM_explorador.html" data-nv="FEM_explorador.html">Elemento finito en una guía<small>4.10–4.11 · P16</small></a>
+<a href="Autoevaluacion_U4.html" data-nv="Autoevaluacion_U4.html">Autoevaluación · examen final<small>repaso de la U4</small></a>
+<div class="nv-grp">Transversales</div>
+<a href="Espectro_explorador.html" data-nv="Espectro_explorador.html">Espectro electromagnético<small>todo el curso</small></a>
+<a href="AnatomiaGrafica_explorador.html" data-nv="AnatomiaGrafica_explorador.html">Anatomía de una gráfica<small>cómputo · P6</small></a>
+  </div>
+  <div class="nv-pie">Teclas: ← anterior · → siguiente · / buscar · Esc cerrar</div>
+</nav>
+<div class="nv-boton"><button id="nv-abre" aria-controls="nvside" aria-expanded="false">☰ Temario</button>
+  <a id="nv-ant2" href="#" aria-label="Anterior">‹</a><a id="nv-sig2" href="#" aria-label="Siguiente">›</a></div>
+<div class="nv-velo" id="nv-velo"></div>
+<script>
+(function(){
+  var lista=document.getElementById('nv-lista'), side=document.getElementById('nvside');
+  var l=lista.querySelectorAll('a[data-nv]'), orden=[], dat={};
+  for(var i=0;i<l.length;i++){var f=l[i].getAttribute('data-nv');orden.push(f);
+    dat[f]={el:l[i],t:l[i].childNodes[0].textContent.trim()};}
+  var aqui=(location.pathname.split('/').pop()||'index.html'), k=orden.indexOf(aqui);
+  function paso(idA,idT,j){var a=document.getElementById(idA);
+    if(j<0||j>=orden.length){a.setAttribute('aria-disabled','true');if(idT)document.getElementById(idT).textContent='';return;}
+    a.href=orden[j];a.title=dat[orden[j]].t+(j<k?' (tecla ←)':' (tecla →)');if(idT)document.getElementById(idT).textContent=dat[orden[j]].t;}
+  if(k>=0){dat[aqui].el.className='nv-aqui';dat[aqui].el.setAttribute('aria-current','page');
+    paso('nv-ant','nv-ant-t',k-1);paso('nv-sig','nv-sig-t',k+1);paso('nv-ant2',null,k-1);paso('nv-sig2',null,k+1);
+    setTimeout(function(){var r=dat[aqui].el;lista.scrollTop=r.offsetTop-lista.clientHeight/3;},0);}
+  else{paso('nv-ant','nv-ant-t',-1);paso('nv-sig','nv-sig-t',0);paso('nv-ant2',null,-1);paso('nv-sig2',null,0);}
+  var bus=document.getElementById('nv-busca');
+  bus.addEventListener('input',function(){var q=bus.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    var grp=null,vis=0;
+    Array.prototype.forEach.call(lista.children,function(c){
+      if(c.classList.contains('nv-grp')){if(grp)grp.style.display=vis?'':'none';grp=c;vis=0;return;}
+      var t=c.textContent.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+      var ok=!q||t.indexOf(q)>=0;c.style.display=ok?'':'none';if(ok)vis++;});
+    if(grp)grp.style.display=vis?'':'none';});
+  bus.addEventListener('keydown',function(e){if(e.key==='Enter'){var v=lista.querySelector('a[data-nv]:not([style*="none"])');if(v)location.href=v.href;}});
+  var abre=document.getElementById('nv-abre'), velo=document.getElementById('nv-velo');
+  function cambia(on){side.classList.toggle('abierto',on);abre.setAttribute('aria-expanded',on?'true':'false');}
+  abre.addEventListener('click',function(){cambia(!side.classList.contains('abierto'));});
+  velo.addEventListener('click',function(){cambia(false);});
+  document.getElementById('nv-cierra').addEventListener('click',function(){cambia(false);});
+  document.addEventListener('keydown',function(e){
+    var t=(e.target.tagName||'').toUpperCase();
+    if(e.key==='Escape'){cambia(false);if(t==='INPUT')e.target.blur();return;}
+    if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.altKey||e.ctrlKey||e.metaKey) return;
+    if(e.key==='/'){e.preventDefault();if(innerWidth<1100)cambia(true);bus.focus();return;}
+    if(k<0) return;
+    if(e.key==='ArrowLeft'&&k>0) location.href=orden[k-1];
+    if(e.key==='ArrowRight'&&k<orden.length-1) location.href=orden[k+1];
+  });
+})();
+</script>
+<!-- navegacion:fin -->

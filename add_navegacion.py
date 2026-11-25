@@ -50,6 +50,7 @@ NAV = [
    ("OndaQueRebota_explorador.html",  "Guía de onda: onda que rebota","4.10"),
    ("GuiaOnda_explorador.html",       "Guía de onda rectangular",    "4.10–4.12 · P16"),
    ("FEM_explorador.html",            "Elemento finito en una guía", "4.10–4.11 · P16"),
+   ("Autoevaluacion_U4.html",         "Autoevaluación · examen final","repaso de la U4"),
  ]),
  ("Transversales", [
    ("Espectro_explorador.html",       "Espectro electromagnético",   "todo el curso"),

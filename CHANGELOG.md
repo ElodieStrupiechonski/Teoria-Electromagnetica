@@ -4,6 +4,7 @@ La numeración sigue las etiquetas (*tags*) de GitHub, que son las versiones arc
 
 ## Rama principal después de la v1.4 (20 nov)
 
+- Página nueva `Autoevaluacion_U4.html` (repaso de la Unidad 4, 25 nov): 17 problemas con datos nuevos cada vez en los cinco tipos del examen final, comprobación con 2 % de tolerancia (0.2 dB en decibeles; lectura gráfica en los de carta de Smith), solución paso a paso con los números del problema y construcción en la carta de Smith. El avance se guarda solo en el navegador.
 - Explorador nuevo `FEM_explorador.html` (4.10–4.11 · P16, 25 nov): método del elemento finito resuelto en el navegador con triángulos lineales. Malla ajustable de la guía rectangular o de doble cresta, matrices de rigidez y de masa del triángulo seleccionado, frecuencias de corte de los cuatro primeros modos TE frente a la fórmula exacta con el error estimado (π²/6)(h/λ_t)², estudio de convergencia, mapas del campo eléctrico transversal y de H_z, caso de una dimensión con sus matrices ensambladas y tres ejercicios. Veinticuatro exploradores.
 - Explorador nuevo `OndaQueRebota_explorador.html` (4.10): modelo de la onda que rebota entre dos paredes conductoras. Campo animado y sus dos ondas planas componentes, rayos con el ángulo θ, reglas de λ₀ y λ_g, régimen bajo el corte con 1/α, carrera entre la fase, una señal en el vacío y la energía, curva de v_p y v_g contra f/f_c, sección «¿Puede la velocidad de fase ser mayor que c?» con un pulso de banda angosta y la cresta marcada, y tres ejercicios con pista al tercer intento. Veintitrés exploradores.
 
